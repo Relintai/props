@@ -40,9 +40,7 @@ SOFTWARE.
 #include "prop_tool/prop_tool_prop.h"
 #include "prop_tool/prop_tool_scene.h"
 
-#ifdef TOOLS_ENABLED
-#include "prop_tool/prop_tool_editor_plugin.h"
-#endif
+#include "prop_instance.h"
 
 void register_props_types() {
 	ClassDB::register_class<PropData>();
@@ -53,6 +51,7 @@ void register_props_types() {
 	ClassDB::register_class<PropDataProp>();
 	ClassDB::register_class<PropDataEntity>();
 
+	ClassDB::register_class<GroundClutter>();
 	ClassDB::register_class<GroundClutterFoliage>();
 
 	ClassDB::register_class<PropTool>();
@@ -62,9 +61,7 @@ void register_props_types() {
 	ClassDB::register_class<PropToolLight>();
 	ClassDB::register_class<PropToolScene>();
 
-#ifdef TOOLS_ENABLED
-	EditorPlugins::add_by_type<PropToolEditorPlugin>();
-#endif
+	ClassDB::register_class<PropInstance>();
 }
 
 void unregister_props_types() {
