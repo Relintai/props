@@ -20,33 +20,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PROP_INSTANCE_H
-#define PROP_INSTANCE_H
+#ifndef PROP_VOXELMAN_LIGHT_H
+#define PROP_VOXELMAN_LIGHT_H
 
 #include "scene/3d/spatial.h"
 
 #include "core/math/vector3.h"
 
-class PropInstance : public Spatial {
-	GDCLASS(PropInstance, Spatial);
+class PropVoxelmanLight : public Spatial {
+	GDCLASS(PropVoxelmanLight, Spatial);
 	OBJ_CATEGORY("Props");
 
 public:
-	bool get_snap_to_mesh() const;
-	void set_snap_to_mesh(const bool value);
+	//make it turn into a normal light if voxelman isn't present?
 
-	Vector3 get_snap_axis() const;
-	void set_snap_axis(const Vector3 &value);
-
-	PropInstance();
-	~PropInstance();
+	PropVoxelmanLight();
+	~PropVoxelmanLight();
 
 protected:
 	static void _bind_methods();
 
 private:
-	bool _snap_to_mesh;
-	Vector3 _snap_axis;
 };
 
 #endif

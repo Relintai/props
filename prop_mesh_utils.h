@@ -20,33 +20,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PROP_INSTANCE_H
-#define PROP_INSTANCE_H
+#ifndef PROP_MESH_UTILS_H
+#define PROP_MESH_UTILS_H
 
-#include "scene/3d/spatial.h"
+#include "core/reference.h"
 
 #include "core/math/vector3.h"
 
-class PropInstance : public Spatial {
-	GDCLASS(PropInstance, Spatial);
-	OBJ_CATEGORY("Props");
+class PropMeshUtils : public Reference {
+	GDCLASS(PropMeshUtils, Reference);
 
 public:
-	bool get_snap_to_mesh() const;
-	void set_snap_to_mesh(const bool value);
-
-	Vector3 get_snap_axis() const;
-	void set_snap_axis(const Vector3 &value);
-
-	PropInstance();
-	~PropInstance();
+	PropMeshUtils();
+	~PropMeshUtils();
 
 protected:
 	static void _bind_methods();
-
-private:
-	bool _snap_to_mesh;
-	Vector3 _snap_axis;
 };
 
 #endif

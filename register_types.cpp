@@ -40,7 +40,12 @@ SOFTWARE.
 #include "prop_tool/prop_tool_prop.h"
 #include "prop_tool/prop_tool_scene.h"
 
+#include "prop_mesh_utils.h"
+
+#include "prop_ess_entity.h"
 #include "prop_instance.h"
+#include "prop_mesh_data_instance.h"
+#include "prop_voxelman_light.h"
 
 void register_props_types() {
 	ClassDB::register_class<PropData>();
@@ -61,7 +66,13 @@ void register_props_types() {
 	ClassDB::register_class<PropToolLight>();
 	ClassDB::register_class<PropToolScene>();
 
+	ClassDB::register_class<PropMeshUtils>();
+
 	ClassDB::register_class<PropInstance>();
+
+	ClassDB::register_class<PropESSEntity>();
+	ClassDB::register_class<PropMeshDataInstance>();
+	ClassDB::register_class<PropVoxelmanLight>();
 }
 
 void unregister_props_types() {

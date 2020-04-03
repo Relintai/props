@@ -29,7 +29,12 @@ sources = [
     "prop_tool/prop_tool_light.cpp",
     "prop_tool/prop_tool_mesh.cpp",
 
+    "prop_mesh_utils.cpp",
+
     "prop_instance.cpp",
+    "prop_ess_entity.cpp",
+    "prop_mesh_data_instance.cpp",
+    "prop_voxelman_light.cpp",
 ]
 
 if env['tools']:
