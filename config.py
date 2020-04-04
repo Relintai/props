@@ -14,20 +14,11 @@ def get_doc_classes():
         "GroundClutterFoliage",
         "GroundClutter",
 
-        "PropDataEntity",
-        "PropDataEntry",
-        "PropDataLight",
-        "PropDataMesh",
-        "PropDataProp",
-        "PropDataScene",
-        "PropData",
-
-        "PropTool",
-        "PropToolEntity",
-        "PropToolLight",
-        "PropToolMesh",
-        "PropToolProp",
-        "PropToolScene",
+        "PropESSEntity",
+        "PropInstance",
+        "PropMeshDataInstance",
+        "PropMeshUtils",
+        "PropVoxelmanLights",
     ]
 
 def get_doc_path():

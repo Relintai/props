@@ -11,23 +11,8 @@ sources = [
 
     "register_types.cpp",
 
-    "props/prop_data.cpp",
-    "props/prop_data_entry.cpp",
-    "props/prop_data_scene.cpp",
-    "props/prop_data_mesh.cpp",
-    "props/prop_data_light.cpp",
-    "props/prop_data_prop.cpp",
-    "props/prop_data_entity.cpp",
-
     "clutter/ground_clutter.cpp",
     "clutter/ground_clutter_foliage.cpp",
-
-    "prop_tool/prop_tool.cpp",
-    "prop_tool/prop_tool_entity.cpp",
-    "prop_tool/prop_tool_prop.cpp",
-    "prop_tool/prop_tool_scene.cpp",
-    "prop_tool/prop_tool_light.cpp",
-    "prop_tool/prop_tool_mesh.cpp",
 
     "prop_mesh_utils.cpp",
 
@@ -36,9 +21,6 @@ sources = [
     "prop_mesh_data_instance.cpp",
     "prop_voxelman_light.cpp",
 ]
-
-if env['tools']:
-    sources.append("prop_tool/prop_tool_editor_plugin.cpp")
 
 if ARGUMENTS.get('custom_modules_shared', 'no') == 'yes':
     # Shared lib compilation

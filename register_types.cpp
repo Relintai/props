@@ -22,23 +22,8 @@ SOFTWARE.
 
 #include "register_types.h"
 
-#include "props/prop_data.h"
-#include "props/prop_data_entity.h"
-#include "props/prop_data_entry.h"
-#include "props/prop_data_light.h"
-#include "props/prop_data_mesh.h"
-#include "props/prop_data_prop.h"
-#include "props/prop_data_scene.h"
-
 #include "clutter/ground_clutter.h"
 #include "clutter/ground_clutter_foliage.h"
-
-#include "prop_tool/prop_tool.h"
-#include "prop_tool/prop_tool_entity.h"
-#include "prop_tool/prop_tool_light.h"
-#include "prop_tool/prop_tool_mesh.h"
-#include "prop_tool/prop_tool_prop.h"
-#include "prop_tool/prop_tool_scene.h"
 
 #include "prop_mesh_utils.h"
 
@@ -48,23 +33,8 @@ SOFTWARE.
 #include "prop_voxelman_light.h"
 
 void register_props_types() {
-	ClassDB::register_class<PropData>();
-	ClassDB::register_class<PropDataEntry>();
-	ClassDB::register_class<PropDataScene>();
-	ClassDB::register_class<PropDataMesh>();
-	ClassDB::register_class<PropDataLight>();
-	ClassDB::register_class<PropDataProp>();
-	ClassDB::register_class<PropDataEntity>();
-
 	ClassDB::register_class<GroundClutter>();
 	ClassDB::register_class<GroundClutterFoliage>();
-
-	ClassDB::register_class<PropTool>();
-	ClassDB::register_class<PropToolEntity>();
-	ClassDB::register_class<PropToolProp>();
-	ClassDB::register_class<PropToolMesh>();
-	ClassDB::register_class<PropToolLight>();
-	ClassDB::register_class<PropToolScene>();
 
 	ClassDB::register_class<PropMeshUtils>();
 
