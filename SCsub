@@ -7,6 +7,12 @@ module_env = env.Clone()
 if os.path.isdir('../mesh_data_resource'):
     module_env.Append(CPPDEFINES=['MESH_DATA_RESOURCE_PRESENT'])
 
+if os.path.isdir('../texture_packer'):
+    module_env.Append(CPPDEFINES=['TEXTURE_PACKER_PRESENT'])
+
+if os.path.isdir('../voxelman'):
+    module_env.Append(CPPDEFINES=['VOXELMAN_PRESENT'])
+
 sources = [
 
     "register_types.cpp",
