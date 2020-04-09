@@ -23,7 +23,15 @@ SOFTWARE.
 #ifndef PROP_VOXELMAN_LIGHT_H
 #define PROP_VOXELMAN_LIGHT_H
 
+#include "core/version.h"
+
+#if VERSION_MAJOR < 4
 #include "scene/3d/spatial.h"
+#else
+#include "scene/3d/node_3d.h"
+
+#define Spatial Node3D
+#endif
 
 #include "core/math/vector3.h"
 
