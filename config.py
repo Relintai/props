@@ -18,7 +18,7 @@ def get_doc_classes():
         "PropInstance",
         "PropMeshDataInstance",
         "PropMeshUtils",
-        "PropVoxelmanLights",
+        "PropVoxelmanLight",
     ]
 
 def get_doc_path():
