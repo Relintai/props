@@ -10,9 +10,6 @@ if os.path.isdir('../mesh_data_resource'):
 if os.path.isdir('../texture_packer'):
     module_env.Append(CPPDEFINES=['TEXTURE_PACKER_PRESENT'])
 
-if os.path.isdir('../voxelman'):
-    module_env.Append(CPPDEFINES=['VOXELMAN_PRESENT'])
-
 sources = [
 
     "register_types.cpp",
@@ -26,6 +23,7 @@ sources = [
     "prop_ess_entity.cpp",
     "prop_mesh_data_instance.cpp",
     "prop_voxelman_light.cpp",
+    "prop_instance_job.cpp",
 ]
 
 if ARGUMENTS.get('custom_modules_shared', 'no') == 'yes':

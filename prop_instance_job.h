@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Péter Magyar
+Copyright (c) 2020 Péter Magyar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,34 +20,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "register_types.h"
+#ifndef PROP_INSTANCE_JOB_H
+#define PROP_INSTANCE_JOB_H
 
-#include "clutter/ground_clutter.h"
-#include "clutter/ground_clutter_foliage.h"
+#include "core/math/vector3.h"
+#include "core/vector.h"
 
-#include "prop_mesh_utils.h"
+#include "../thread_pool/thread_pool_job.h"
 
-#include "prop_ess_entity.h"
-#include "prop_instance.h"
-#include "prop_mesh_data_instance.h"
-#include "prop_voxelman_light.h"
+#include "../mesh_data_resource/mesh_data_resource.h"
+#include "scene/resources/texture.h"
 
-#include "prop_instance_job.h"
+class PropMeshDataInstance;
 
-void register_props_types() {
-	ClassDB::register_class<GroundClutter>();
-	ClassDB::register_class<GroundClutterFoliage>();
+class PropInstanceJob : public ThreadPoolJob {
+	GDCLASS(PropInstanceJob, ThreadPoolJob);
 
-	ClassDB::register_class<PropMeshUtils>();
+protected:
+	struct PropMeshInstanceEntry {
+		Transform transform;
+		Ref<MeshDataResource> mesh;
+		Ref<Texture> texture;
+	};
 
-	ClassDB::register_class<PropInstance>();
+public:
+	Transform get_base_transform() const;
+	void set_base_transform(const Transform &value);
 
-	ClassDB::register_class<PropESSEntity>();
-	ClassDB::register_class<PropMeshDataInstance>();
-	ClassDB::register_class<PropVoxelmanLight>();
+	void add_mesh_instance(const Transform &transform, const Ref<MeshDataResource> &mesh, const Ref<Texture> &texture);
+	int get_mesh_instance_count();
 
-	ClassDB::register_class<PropInstanceJob>();
-}
+	void clear();
 
-void unregister_props_types() {
-}
+	void _execute();
+
+	PropInstanceJob();
+	~PropInstanceJob();
+
+protected:
+	static void _bind_methods();
+
+private:
+	Transform _base_transform;
+	Vector<PropMeshInstanceEntry> _mesh_instances;
+};
+
+#endif

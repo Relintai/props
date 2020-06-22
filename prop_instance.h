@@ -35,16 +35,30 @@ SOFTWARE.
 
 #include "core/math/vector3.h"
 
+#include "prop_instance_job.h"
+
+class PropMeshDataInstance;
+
 class PropInstance : public Spatial {
 	GDCLASS(PropInstance, Spatial);
 	OBJ_CATEGORY("Props");
 
 public:
+	bool get_auto_bake() const;
+	void set_auto_bake(const bool value);
+
 	bool get_snap_to_mesh() const;
 	void set_snap_to_mesh(const bool value);
 
 	Vector3 get_snap_axis() const;
 	void set_snap_axis(const Vector3 &value);
+
+	void register_prop_mesh_data_instance(PropMeshDataInstance *instance);
+	void unregister_prop_mesh_data_instance(PropMeshDataInstance *instance);
+
+	void bake();
+	void queue_bake();
+	void bake_finished();
 
 	PropInstance();
 	~PropInstance();
@@ -53,8 +67,13 @@ protected:
 	static void _bind_methods();
 
 private:
+	bool _auto_bake;
+	bool _bake_queued;
+	bool _baking;
 	bool _snap_to_mesh;
 	Vector3 _snap_axis;
+	Vector<PropMeshDataInstance *> _mesh_data_instances;
+	Ref<PropInstanceJob> _job;
 };
 
 #endif
