@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Péter Magyar
+Copyright (c) 2020 Péter Magyar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,28 +20,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "prop_utils.h"
+#ifndef PROP_EDITOR_PLUGIN_H
+#define PROP_EDITOR_PLUGIN_H
 
-#include "../props/prop_data.h"
+#include "editor/editor_node.h"
+#include "editor/editor_plugin.h"
 
-PropUtils *PropUtils::_instance;
+#include "core/version.h"
 
-PropUtils *PropUtils::get_singleton() {
-	return _instance;
-}
+class PropEditorPlugin : public EditorPlugin {
 
-Ref<PropData> PropUtils::convert_tree(Node *root) {
-	return Ref<PropData>();
-}
+	GDCLASS(PropEditorPlugin, EditorPlugin);
+	EditorNode *editor;
 
-PropUtils::PropUtils() {
-	_instance = this;
-}
+protected:
+	static void _bind_methods();
 
-PropUtils::~PropUtils() {
-	_instance = NULL;
-}
+public:
+	virtual String get_name() const { return "PropEditorPlugin"; }
+	bool has_main_screen() const { return false; }
+	virtual void edit(Object *p_object) {}
+	virtual bool handles(Object *p_object) const { return false; }
+	virtual void make_visible(bool p_visible) {}
 
-void PropUtils::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("convert_tree", "root"), &PropUtils::convert_tree);
-}
+	void convert_scene_to_prop_data(Variant param);
+
+	PropEditorPlugin(EditorNode *p_node);
+	~PropEditorPlugin();
+};
+
+#endif

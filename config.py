@@ -24,6 +24,8 @@ def get_doc_classes():
         "PropESSEntity",
         "PropInstance",
         "PropMeshUtils",
+
+        "PropUtils",
     ]
 
 def get_doc_path():

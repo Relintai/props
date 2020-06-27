@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Péter Magyar
+Copyright (c) 2020 Péter Magyar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,28 +20,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "prop_utils.h"
+#include "prop_editor_plugin.h"
 
-#include "../props/prop_data.h"
-
-PropUtils *PropUtils::_instance;
-
-PropUtils *PropUtils::get_singleton() {
-	return _instance;
+void PropEditorPlugin::convert_scene_to_prop_data(Variant param) {
 }
 
-Ref<PropData> PropUtils::convert_tree(Node *root) {
-	return Ref<PropData>();
+PropEditorPlugin::PropEditorPlugin(EditorNode *p_node) {
+
+	editor = p_node;
+
+	editor->add_tool_menu_item("Convert current scene to PropData", this, "convert_scene_to_prop_data");
 }
 
-PropUtils::PropUtils() {
-	_instance = this;
+PropEditorPlugin::~PropEditorPlugin() {
 }
 
-PropUtils::~PropUtils() {
-	_instance = NULL;
-}
-
-void PropUtils::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("convert_tree", "root"), &PropUtils::convert_tree);
+void PropEditorPlugin::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("convert_scene_to_prop_data"), &PropEditorPlugin::convert_scene_to_prop_data);
 }

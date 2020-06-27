@@ -41,6 +41,8 @@ SOFTWARE.
 #include "core/engine.h"
 #include "singleton/prop_utils.h"
 
+#include "./editor/prop_editor_plugin.h"
+
 static PropUtils *prop_utils = NULL;
 
 void register_props_types() {
@@ -64,6 +66,10 @@ void register_props_types() {
 	prop_utils = memnew(PropUtils);
 	ClassDB::register_class<PropUtils>();
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PropUtils", PropUtils::get_singleton()));
+
+#ifdef TOOLS_ENABLED
+	EditorPlugins::add_by_type<PropEditorPlugin>();
+#endif
 }
 
 void unregister_props_types() {

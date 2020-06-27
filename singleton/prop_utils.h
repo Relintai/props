@@ -25,11 +25,17 @@ SOFTWARE.
 
 #include "core/object.h"
 
+#include "core/reference.h"
+
+class PropData;
+
 class PropUtils : public Object {
 	GDCLASS(PropUtils, Object);
 
 public:
 	static PropUtils *get_singleton();
+
+	Ref<PropData> convert_tree(Node *root);
 
 	PropUtils();
 	~PropUtils();
