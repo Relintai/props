@@ -22,6 +22,8 @@ SOFTWARE.
 
 #include "prop_data.h"
 
+#include "prop_data_entry.h"
+#include "prop_data_light.h"
 #include "prop_data_prop.h"
 
 #include "../../voxelman/world/voxel_chunk.h"
