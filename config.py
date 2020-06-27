@@ -10,6 +10,13 @@ def configure(env):
 
 def get_doc_classes():
     return [
+        "PropDataEntity",
+        "PropDataEntry",
+        "PropDataLight",
+        "PropDataMesh",
+        "PropDataProp",
+        "PropDataScene",
+        "PropData",
 
         "GroundClutterFoliage",
         "GroundClutter",
