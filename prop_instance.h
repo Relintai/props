@@ -37,7 +37,7 @@ SOFTWARE.
 
 #include "prop_instance_job.h"
 
-class PropMeshDataInstance;
+class MeshDataInstance;
 
 class PropInstance : public Spatial {
 	GDCLASS(PropInstance, Spatial);
@@ -53,8 +53,8 @@ public:
 	Vector3 get_snap_axis() const;
 	void set_snap_axis(const Vector3 &value);
 
-	void register_prop_mesh_data_instance(PropMeshDataInstance *instance);
-	void unregister_prop_mesh_data_instance(PropMeshDataInstance *instance);
+	void register_prop_mesh_data_instance(MeshDataInstance *instance);
+	void unregister_prop_mesh_data_instance(MeshDataInstance *instance);
 
 	void bake();
 	void queue_bake();
@@ -72,7 +72,7 @@ private:
 	bool _baking;
 	bool _snap_to_mesh;
 	Vector3 _snap_axis;
-	Vector<PropMeshDataInstance *> _mesh_data_instances;
+	Vector<MeshDataInstance *> _mesh_data_instances;
 	Ref<PropInstanceJob> _job;
 };
 

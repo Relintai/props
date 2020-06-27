@@ -23,7 +23,6 @@ def get_doc_classes():
 
         "PropESSEntity",
         "PropInstance",
-        "PropMeshDataInstance",
         "PropMeshUtils",
     ]
 

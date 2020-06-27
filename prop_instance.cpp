@@ -1,6 +1,6 @@
 #include "prop_instance.h"
 
-#include "prop_mesh_data_instance.h"
+#include "../mesh_data_resource/nodes/mesh_data_instance.h"
 
 #include "../thread_pool/thread_pool.h"
 
@@ -25,7 +25,7 @@ void PropInstance::set_snap_axis(const Vector3 &value) {
 	_snap_axis = value;
 }
 
-void PropInstance::register_prop_mesh_data_instance(PropMeshDataInstance *instance) {
+void PropInstance::register_prop_mesh_data_instance(MeshDataInstance *instance) {
 	ERR_FAIL_COND(!ObjectDB::instance_validate(instance));
 
 	_mesh_data_instances.push_back(instance);
@@ -34,7 +34,7 @@ void PropInstance::register_prop_mesh_data_instance(PropMeshDataInstance *instan
 		queue_bake();
 }
 
-void PropInstance::unregister_prop_mesh_data_instance(PropMeshDataInstance *instance) {
+void PropInstance::unregister_prop_mesh_data_instance(MeshDataInstance *instance) {
 	ERR_FAIL_COND(!ObjectDB::instance_validate(instance));
 
 	_mesh_data_instances.erase(instance);
@@ -50,7 +50,7 @@ void PropInstance::bake() {
 	_job->clear();
 
 	for (int i = 0; i < _mesh_data_instances.size(); ++i) {
-		PropMeshDataInstance *md = _mesh_data_instances.get(i);
+		MeshDataInstance *md = _mesh_data_instances.get(i);
 
 		ERR_CONTINUE(!ObjectDB::instance_validate(md));
 
