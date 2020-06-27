@@ -38,7 +38,6 @@ SOFTWARE.
 #include "prop_ess_entity.h"
 #include "prop_instance.h"
 #include "prop_mesh_data_instance.h"
-#include "prop_voxelman_light.h"
 
 #include "prop_instance_job.h"
 
@@ -60,7 +59,6 @@ void register_props_types() {
 
 	ClassDB::register_class<PropESSEntity>();
 	ClassDB::register_class<PropMeshDataInstance>();
-	ClassDB::register_class<PropVoxelmanLight>();
 
 	ClassDB::register_class<PropInstanceJob>();
 }
