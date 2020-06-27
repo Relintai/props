@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2020 Péter Magyar
+Copyright (c) 2019-2020 Péter Magyar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PROP_MESH_UTILS_H
-#define PROP_MESH_UTILS_H
+#include "prop_utils.h"
 
-#include "core/reference.h"
+PropUtils *PropUtils::_instance;
 
-#include "core/math/vector3.h"
+PropUtils *PropUtils::get_singleton() {
+	return _instance;
+}
 
-class PropMeshUtils : public Reference {
-	GDCLASS(PropMeshUtils, Reference);
+PropUtils::PropUtils() {
+	_instance = this;
+}
 
-public:
-	PropMeshUtils();
-	~PropMeshUtils();
+PropUtils::~PropUtils() {
+	_instance = NULL;
+}
 
-protected:
-	static void _bind_methods();
-};
-
-#endif
+void PropUtils::_bind_methods() {
+}

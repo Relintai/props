@@ -26,11 +26,11 @@ sources = [
     "clutter/ground_clutter.cpp",
     "clutter/ground_clutter_foliage.cpp",
 
-    "prop_mesh_utils.cpp",
-
     "prop_instance.cpp",
     "prop_ess_entity.cpp",
     "prop_instance_job.cpp",
+
+    "singleton/prop_utils.cpp",
 ]
 
 if ARGUMENTS.get('custom_modules_shared', 'no') == 'yes':

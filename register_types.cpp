@@ -33,12 +33,15 @@ SOFTWARE.
 #include "clutter/ground_clutter.h"
 #include "clutter/ground_clutter_foliage.h"
 
-#include "prop_mesh_utils.h"
-
 #include "prop_ess_entity.h"
 #include "prop_instance.h"
 
 #include "prop_instance_job.h"
+
+#include "core/engine.h"
+#include "singleton/prop_utils.h"
+
+static PropUtils *prop_utils = NULL;
 
 void register_props_types() {
 	ClassDB::register_class<PropData>();
@@ -52,14 +55,19 @@ void register_props_types() {
 	ClassDB::register_class<GroundClutter>();
 	ClassDB::register_class<GroundClutterFoliage>();
 
-	ClassDB::register_class<PropMeshUtils>();
-
 	ClassDB::register_class<PropInstance>();
 
 	ClassDB::register_class<PropESSEntity>();
 
 	ClassDB::register_class<PropInstanceJob>();
+
+	prop_utils = memnew(PropUtils);
+	ClassDB::register_class<PropUtils>();
+	Engine::get_singleton()->add_singleton(Engine::Singleton("PropUtils", PropUtils::get_singleton()));
 }
 
 void unregister_props_types() {
+	if (prop_utils) {
+		memdelete(prop_utils);
+	}
 }
