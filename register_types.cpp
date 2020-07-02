@@ -43,6 +43,8 @@ SOFTWARE.
 
 #include "./editor/prop_editor_plugin.h"
 
+#include "processor/prop_data_processor.h"
+
 static PropUtils *prop_utils = NULL;
 
 void register_props_types() {
@@ -53,6 +55,8 @@ void register_props_types() {
 	ClassDB::register_class<PropDataLight>();
 	ClassDB::register_class<PropDataProp>();
 	ClassDB::register_class<PropDataEntity>();
+
+	ClassDB::register_class<PropDataProcessor>();
 
 	ClassDB::register_class<GroundClutter>();
 	ClassDB::register_class<GroundClutterFoliage>();

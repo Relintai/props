@@ -22,6 +22,7 @@ sources = [
     "props/prop_data_prop.cpp",
     "props/prop_data_entity.cpp",
 
+    "processor/prop_data_processor.cpp",
 
     "clutter/ground_clutter.cpp",
     "clutter/ground_clutter_foliage.cpp",

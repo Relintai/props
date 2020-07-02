@@ -20,47 +20,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PROP_UTILS_H
-#define PROP_UTILS_H
+#ifndef PROP_DATA_PROCESSOR_H
+#define PROP_DATA_PROCESSOR_H
 
-#include "core/object.h"
-
-#include "core/vector.h"
-
+#include "core/math/transform.h"
+#include "core/math/vector3.h"
 #include "core/reference.h"
 
-class PropDataProcessor;
-class PropData;
+#include "../props/prop_data.h"
 
-class PropUtils : public Object {
-	GDCLASS(PropUtils, Object);
+class Spatial;
+
+class PropDataProcessor : public Reference {
+	GDCLASS(PropDataProcessor, Reference);
 
 public:
-	static PropUtils *get_singleton();
+	bool handles(Node *node);
+	void process(Ref<PropData> prop_data, Node *node, const Transform &transform);
 
-	Ref<PropData> convert_tree(Node *root);
+	virtual bool _handles(Node *node);
+	virtual void _process(Ref<PropData> prop_data, Node *node, const Transform &transform);
 
-	static int add_processor(const Ref<PropDataProcessor> &processor);
-	static Ref<PropDataProcessor> get_processor(const int index);
-	static void swap_processors(const int index1, const int index2);
-	static void remove_processor(const int index);
-	static int get_processor_count();
-
-	PropUtils();
-	~PropUtils();
+	PropDataProcessor();
+	~PropDataProcessor();
 
 protected:
 	static void _bind_methods();
-
-private:
-	int _add_processor_bind(const Ref<PropDataProcessor> &processor);
-	Ref<PropDataProcessor> _get_processor_bind(const int index);
-	void _swap_processors_bind(const int index1, const int index2);
-	void _remove_processor_bind(const int index);
-	int _get_processor_count_bind();
-
-	static Vector<Ref<PropDataProcessor> > _processors;
-	static PropUtils *_instance;
 };
 
 #endif

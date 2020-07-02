@@ -18,6 +18,8 @@ def get_doc_classes():
         "PropDataScene",
         "PropData",
 
+        "PropDataProcessor",
+
         "GroundClutterFoliage",
         "GroundClutter",
 
