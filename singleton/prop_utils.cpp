@@ -33,10 +33,50 @@ PropUtils *PropUtils::get_singleton() {
 }
 
 Ref<PropData> PropUtils::convert_tree(Node *root) {
-	return Ref<PropData>();
+	ERR_FAIL_COND_V(!ObjectDB::instance_validate(root), Ref<PropData>());
+
+	Ref<PropData> data;
+	data.instance();
+	Transform t;
+
+	_convert_tree(data, root, t);
+
+	return data;
+}
+
+void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transform &transform) {
+	ERR_FAIL_COND(!ObjectDB::instance_validate(node));
+
+	for (int i = 0; i < PropUtils::_processors.size(); ++i) {
+		Ref<PropDataProcessor> proc = PropUtils::_processors.get(i);
+
+		ERR_CONTINUE(!proc.is_valid());
+
+		if (proc->handles(node)) {
+			proc->process(prop_data, node, transform);
+			break;
+		}
+	}
+
+	Spatial *sp = Object::cast_to<Spatial>(node);
+
+	if (!sp) {
+		//reset transform
+		Transform t;
+
+		for (int i = 0; i < node->get_child_count(); ++i) {
+			_convert_tree(prop_data, node->get_child(i), t);
+		}
+	} else {
+		for (int i = 0; i < node->get_child_count(); ++i) {
+			_convert_tree(prop_data, node->get_child(i), transform * sp->get_transform());
+		}
+	}
 }
 
 int PropUtils::add_processor(const Ref<PropDataProcessor> &processor) {
+	ERR_FAIL_COND_V(!processor.is_valid(), 0);
+
 	PropUtils::_processors.push_back(processor);
 
 	return PropUtils::_processors.size() - 1;

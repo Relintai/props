@@ -43,7 +43,9 @@ public:
 	virtual bool handles(Object *p_object) const { return false; }
 	virtual void make_visible(bool p_visible) {}
 
-	void convert_scene_to_prop_data(Variant param);
+	void convert_active_scene_to_prop_data(Variant param);
+	void convert_selected_scene_to_prop_data(Variant param);
+	void convert_scene(Node *root, const String &path);
 
 	PropEditorPlugin(EditorNode *p_node);
 	~PropEditorPlugin();

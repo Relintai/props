@@ -39,6 +39,7 @@ public:
 	static PropUtils *get_singleton();
 
 	Ref<PropData> convert_tree(Node *root);
+	void _convert_tree(Ref<PropData> prop_data, Node *node, const Transform &transform);
 
 	static int add_processor(const Ref<PropDataProcessor> &processor);
 	static Ref<PropDataProcessor> get_processor(const int index);
