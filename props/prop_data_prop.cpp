@@ -43,6 +43,14 @@ void PropDataProp::set_snap_axis(Vector3 value) {
 	_snap_axis = value;
 }
 
+#if TEXTURE_PACKER_PRESENT
+void PropDataProp::_add_textures_into(Ref<TexturePacker> texture_packer) {
+	if (get_prop().is_valid()) {
+		get_prop()->add_textures_into(texture_packer);
+	}
+}
+#endif
+
 PropDataProp::PropDataProp() {
 	_snap_to_mesh = false;
 	_snap_axis = Vector3(0, 1, 0);
@@ -64,4 +72,8 @@ void PropDataProp::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_snap_axis"), &PropDataProp::get_snap_axis);
 	ClassDB::bind_method(D_METHOD("set_snap_axis", "value"), &PropDataProp::set_snap_axis);
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "snap_axis"), "set_snap_axis", "get_snap_axis");
+
+#if TEXTURE_PACKER_PRESENT
+	ClassDB::bind_method(D_METHOD("_add_textures_into", "texture_packer"), &PropDataProp::_add_textures_into);
+#endif
 }

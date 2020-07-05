@@ -29,6 +29,13 @@ void PropDataEntry::set_transform(const Transform &value) {
 	_transform = value;
 }
 
+#if TEXTURE_PACKER_PRESENT
+void PropDataEntry::add_textures_into(Ref<TexturePacker> texture_packer) {
+	if (has_method("_add_textures_into"))
+		call("_add_textures_into", texture_packer);
+}
+#endif
+
 PropDataEntry::PropDataEntry() {
 }
 PropDataEntry::~PropDataEntry() {
@@ -38,4 +45,10 @@ void PropDataEntry::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_transform"), &PropDataEntry::get_transform);
 	ClassDB::bind_method(D_METHOD("set_transform", "value"), &PropDataEntry::set_transform);
 	ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM, "transform"), "set_transform", "get_transform");
+
+#if TEXTURE_PACKER_PRESENT
+	BIND_VMETHOD(MethodInfo("_add_textures_into", PropertyInfo(Variant::OBJECT, "texture_packer", PROPERTY_HINT_RESOURCE_TYPE, "TexturePacker")));
+
+	ClassDB::bind_method(D_METHOD("add_textures_into", "texture_packer"), &PropDataEntry::add_textures_into);
+#endif
 }

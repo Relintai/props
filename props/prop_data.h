@@ -36,7 +36,9 @@ SOFTWARE.
 
 #include "../../voxelman/meshers/voxel_mesher.h"
 
+#if TEXTURE_PACKER_PRESENT
 #include "../../texture_packer/texture_packer.h"
+#endif
 
 class Spatial;
 class VoxelChunk;
@@ -64,13 +66,9 @@ public:
 	Vector<Variant> get_props();
 	void set_props(const Vector<Variant> &props);
 
+#if TEXTURE_PACKER_PRESENT
 	void add_textures_into(Ref<TexturePacker> texture_packer);
-	void add_prop_lights_into(Ref<VoxelChunk> chunk, Transform parent_transform, bool allow_snap);
-	void add_meshes_into(Ref<VoxelMesher> mesher, Ref<TexturePacker> texture_packer, Transform parent_transform, Spatial *snap_spatial = NULL);
-	void add_meshes_into_bind(Ref<VoxelMesher> mesher, Ref<TexturePacker> texture_packer, Transform parent_transform, Node *snap_spatial = NULL);
-
-	Transform get_next_snapped_prop_transform(Spatial *s, Transform parent_transform, bool snap_to_mesh, Vector3 snap_axis);
-	Transform get_next_snapped_prop_transform_bind(Node *spatial, Transform parent_transform, bool snap_to_mesh, Vector3 snap_axis);
+#endif
 
 	PropData();
 	~PropData();

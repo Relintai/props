@@ -26,12 +26,20 @@ SOFTWARE.
 #include "core/math/transform.h"
 #include "core/resource.h"
 
+#if TEXTURE_PACKER_PRESENT
+#include "../../texture_packer/texture_packer.h"
+#endif
+
 class PropDataEntry : public Resource {
 	GDCLASS(PropDataEntry, Resource);
 
 public:
 	Transform get_transform() const;
 	void set_transform(const Transform &value);
+
+#if TEXTURE_PACKER_PRESENT
+	void add_textures_into(Ref<TexturePacker> texture_packer);
+#endif
 
 	PropDataEntry();
 	~PropDataEntry();
