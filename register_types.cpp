@@ -26,7 +26,6 @@ SOFTWARE.
 #include "props/prop_data_entity.h"
 #include "props/prop_data_entry.h"
 #include "props/prop_data_light.h"
-#include "props/prop_data_mesh.h"
 #include "props/prop_data_prop.h"
 #include "props/prop_data_scene.h"
 
@@ -51,7 +50,6 @@ void register_props_types() {
 	ClassDB::register_class<PropData>();
 	ClassDB::register_class<PropDataEntry>();
 	ClassDB::register_class<PropDataScene>();
-	ClassDB::register_class<PropDataMesh>();
 	ClassDB::register_class<PropDataLight>();
 	ClassDB::register_class<PropDataProp>();
 	ClassDB::register_class<PropDataEntity>();

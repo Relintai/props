@@ -93,13 +93,13 @@ void PropData::add_textures_into(Ref<TexturePacker> texture_packer) {
 
 	for (int i = 0; i < _props.size(); ++i) {
 		Ref<PropDataEntry> entry = _props.get(i);
-
+		/*
 		Ref<PropDataMesh> pmesh = entry;
 
 		if (pmesh.is_valid() && pmesh->get_texture().is_valid()) {
 			texture_packer->add_texture(pmesh->get_texture());
 		}
-
+*/
 		Ref<PropDataProp> pdataprop = entry;
 
 		if (pdataprop.is_valid() && pdataprop->get_prop().is_valid()) {
@@ -148,6 +148,7 @@ void PropData::add_prop_lights_into(Ref<VoxelChunk> chunk, Transform parent_tran
 }
 
 void PropData::add_meshes_into(Ref<VoxelMesher> mesher, Ref<TexturePacker> texture_packer, Transform parent_transform, Spatial *snap_spatial) {
+	/*
 	ERR_FAIL_COND(!mesher.is_valid());
 	ERR_FAIL_COND(!texture_packer.is_valid());
 	ERR_FAIL_COND(texture_packer->get_generated_texture_count() == 0);
@@ -192,6 +193,7 @@ void PropData::add_meshes_into(Ref<VoxelMesher> mesher, Ref<TexturePacker> textu
 				pdataprop->get_prop()->add_meshes_into(mesher, texture_packer, parent_transform * pmesh->get_transform(), snap_spatial);
 		}
 	}
+	*/
 }
 void PropData::add_meshes_into_bind(Ref<VoxelMesher> mesher, Ref<TexturePacker> texture_packer, Transform parent_transform, Node *snap_spatial) {
 	Spatial *s = Object::cast_to<Spatial>(snap_spatial);

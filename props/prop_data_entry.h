@@ -31,7 +31,7 @@ class PropDataEntry : public Resource {
 
 public:
 	Transform get_transform() const;
-	void set_transform(const Transform value);
+	void set_transform(const Transform &value);
 
 	PropDataEntry();
 	~PropDataEntry();

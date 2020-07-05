@@ -25,7 +25,7 @@ SOFTWARE.
 Transform PropDataEntry::get_transform() const {
 	return _transform;
 }
-void PropDataEntry::set_transform(const Transform value) {
+void PropDataEntry::set_transform(const Transform &value) {
 	_transform = value;
 }
 

@@ -13,7 +13,6 @@ def get_doc_classes():
         "PropDataEntity",
         "PropDataEntry",
         "PropDataLight",
-        "PropDataMesh",
         "PropDataProp",
         "PropDataScene",
         "PropData",

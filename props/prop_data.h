@@ -33,7 +33,6 @@ SOFTWARE.
 #include "servers/physics_server.h"
 
 #include "prop_data_entry.h"
-#include "prop_data_mesh.h"
 
 #include "../../voxelman/meshers/voxel_mesher.h"
 
