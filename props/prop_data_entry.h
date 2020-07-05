@@ -49,7 +49,7 @@ public:
 
 	virtual bool _processor_handles(Node *node);
 	virtual void _processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform);
-	virtual Node *_processor_get_node_for(const Ref<PropData> &prop_data);
+	virtual Node *_processor_get_node_for(const Transform &transform);
 
 	PropDataEntry();
 	~PropDataEntry();

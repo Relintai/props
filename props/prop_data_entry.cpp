@@ -54,7 +54,7 @@ bool PropDataEntry::_processor_handles(Node *node) {
 }
 void PropDataEntry::_processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform) {
 }
-Node *PropDataEntry::_processor_get_node_for(const Ref<PropData> &prop_data) {
+Node *PropDataEntry::_processor_get_node_for(const Transform &transform) {
 	return NULL;
 }
 
@@ -81,7 +81,7 @@ void PropDataEntry::_bind_methods() {
 			PropertyInfo(Variant::TRANSFORM, "transform")));
 
 	BIND_VMETHOD(MethodInfo(PropertyInfo(Variant::OBJECT, "node", PROPERTY_HINT_RESOURCE_TYPE, "Node"), "_processor_get_node_for",
-			PropertyInfo(Variant::OBJECT, "prop_data", PROPERTY_HINT_RESOURCE_TYPE, "PropData")));
+			PropertyInfo(Variant::TRANSFORM, "transform")));
 
 	ClassDB::bind_method(D_METHOD("processor_handles", "node"), &PropDataEntry::processor_handles);
 	ClassDB::bind_method(D_METHOD("processor_process", "prop_data", "node", "transform"), &PropDataEntry::processor_process);
@@ -89,5 +89,5 @@ void PropDataEntry::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("_processor_handles", "node"), &PropDataEntry::_processor_handles);
 	ClassDB::bind_method(D_METHOD("_processor_process", "prop_data", "node", "transform"), &PropDataEntry::_processor_process);
-	ClassDB::bind_method(D_METHOD("_processor_get_node_for", "prop_data"), &PropDataEntry::_processor_get_node_for);
+	ClassDB::bind_method(D_METHOD("_processor_get_node_for", "transform"), &PropDataEntry::_processor_get_node_for);
 }
