@@ -37,13 +37,17 @@ SOFTWARE.
 
 #include "prop_instance_job.h"
 
+#include "props/prop_data.h"
+
 class MeshDataInstance;
 
 class PropInstance : public Spatial {
 	GDCLASS(PropInstance, Spatial);
-	OBJ_CATEGORY("Props");
 
 public:
+	Ref<PropData> get_prop_data();
+	void set_prop_data(const Ref<PropData> &data);
+
 	bool get_auto_bake() const;
 	void set_auto_bake(const bool value);
 
@@ -60,6 +64,8 @@ public:
 	void queue_bake();
 	void bake_finished();
 
+	void build();
+
 	PropInstance();
 	~PropInstance();
 
@@ -67,6 +73,7 @@ protected:
 	static void _bind_methods();
 
 private:
+	Ref<PropData> _prop_data;
 	bool _auto_bake;
 	bool _bake_queued;
 	bool _baking;

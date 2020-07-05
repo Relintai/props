@@ -24,8 +24,10 @@ SOFTWARE.
 
 #include "../props/prop_data.h"
 #include "../singleton/prop_utils.h"
+#include "core/os/input.h"
+#include "core/os/keyboard.h"
 
-void PropEditorPlugin::convert_active_scene_to_prop_data(Variant param) {
+void PropEditorPlugin::convert_active_scene_to_prop_data() {
 	SceneTree *st = SceneTree::get_singleton();
 
 	if (st) {
@@ -39,7 +41,7 @@ void PropEditorPlugin::convert_active_scene_to_prop_data(Variant param) {
 		}
 	}
 }
-void PropEditorPlugin::convert_selected_scene_to_prop_data(Variant param) {
+void PropEditorPlugin::convert_selected_scene_to_prop_data() {
 }
 
 void PropEditorPlugin::convert_scene(Node *root, const String &path) {
@@ -60,12 +62,37 @@ void PropEditorPlugin::convert_scene(Node *root, const String &path) {
 	s.save(path, data);
 }
 
+void PropEditorPlugin::_quick_convert_button_pressed() {
+	convert_active_scene_to_prop_data();
+}
+
+void PropEditorPlugin::_convert_active_scene_to_prop_data(Variant param) {
+	convert_active_scene_to_prop_data();
+}
+void PropEditorPlugin::_convert_selected_scene_to_prop_data(Variant param) {
+	convert_selected_scene_to_prop_data();
+}
+
 PropEditorPlugin::PropEditorPlugin(EditorNode *p_node) {
 
 	editor = p_node;
 
 	editor->add_tool_menu_item("Convert active scene to PropData", this, "convert_active_scene_to_prop_data");
 	editor->add_tool_menu_item("Convert selected scene(s) to PropData", this, "convert_selected_scene_to_prop_data");
+
+	HBoxContainer *container = memnew(HBoxContainer);
+
+	container->add_child(memnew(VSeparator));
+
+	Button *b = memnew(Button);
+	container->add_child(b);
+	b->set_flat(true);
+
+	b->connect("pressed", this, "_quick_convert_button_pressed");
+	b->set_text("To Prop");
+	b->set_shortcut(ED_SHORTCUT("spatial_editor/quick_prop_convert", "Quick convert scene to PropData.", KEY_MASK_ALT + KEY_U));
+
+	add_control_to_container(EditorPlugin::CONTAINER_SPATIAL_EDITOR_MENU, container);
 }
 
 PropEditorPlugin::~PropEditorPlugin() {
@@ -74,4 +101,6 @@ PropEditorPlugin::~PropEditorPlugin() {
 void PropEditorPlugin::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("convert_active_scene_to_prop_data"), &PropEditorPlugin::convert_active_scene_to_prop_data);
 	ClassDB::bind_method(D_METHOD("convert_selected_scene_to_prop_data"), &PropEditorPlugin::convert_selected_scene_to_prop_data);
+
+	ClassDB::bind_method(D_METHOD("_quick_convert_button_pressed"), &PropEditorPlugin::_quick_convert_button_pressed);
 }

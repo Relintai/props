@@ -37,9 +37,11 @@ class PropDataProcessor : public Reference {
 public:
 	bool handles(Node *node);
 	void process(Ref<PropData> prop_data, Node *node, const Transform &transform);
+	Node *get_node_for(const Ref<PropData> &prop_data);
 
 	virtual bool _handles(Node *node);
 	virtual void _process(Ref<PropData> prop_data, Node *node, const Transform &transform);
+	virtual Node *_get_node_for(const Ref<PropData> &prop_data);
 
 	PropDataProcessor();
 	~PropDataProcessor();

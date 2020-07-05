@@ -4,6 +4,18 @@
 
 #include "../thread_pool/thread_pool.h"
 
+Ref<PropData> PropInstance::get_prop_data() {
+	return _prop_data;
+}
+void PropInstance::set_prop_data(const Ref<PropData> &data) {
+	if (_prop_data == data)
+		return;
+
+	_prop_data = data;
+
+	build();
+}
+
 bool PropInstance::get_auto_bake() const {
 	return _auto_bake;
 }
@@ -95,6 +107,26 @@ void PropInstance::queue_bake() {
 	}
 }
 
+void PropInstance::build() {
+	if (!is_inside_tree()) {
+		return;
+	}
+
+	for (int i = 0; i < get_child_count(); ++i) {
+		get_child(i)->queue_delete();
+	}
+
+	if (!_prop_data.is_valid())
+		return;
+
+	for (int i = 0; i < _prop_data->get_prop_count(); ++i) {
+		Ref<PropDataEntry> e = _prop_data->get_prop(i);
+
+		if (!e.is_valid())
+			continue;
+	}
+}
+
 PropInstance::PropInstance() {
 	_baking = false;
 	_bake_queued = false;
@@ -106,6 +138,7 @@ PropInstance::PropInstance() {
 PropInstance::~PropInstance() {
 	_mesh_data_instances.clear();
 	_job.unref();
+	_prop_data.unref();
 }
 
 void PropInstance::_bind_methods() {
