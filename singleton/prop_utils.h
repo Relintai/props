@@ -29,8 +29,8 @@ SOFTWARE.
 
 #include "core/reference.h"
 
-class PropDataProcessor;
 class PropData;
+class PropDataEntry;
 
 class PropUtils : public Object {
 	GDCLASS(PropUtils, Object);
@@ -41,8 +41,8 @@ public:
 	Ref<PropData> convert_tree(Node *root);
 	void _convert_tree(Ref<PropData> prop_data, Node *node, const Transform &transform);
 
-	static int add_processor(const Ref<PropDataProcessor> &processor);
-	static Ref<PropDataProcessor> get_processor(const int index);
+	static int add_processor(const Ref<PropDataEntry> &processor);
+	static Ref<PropDataEntry> get_processor(const int index);
 	static void swap_processors(const int index1, const int index2);
 	static void remove_processor(const int index);
 	static int get_processor_count();
@@ -54,13 +54,13 @@ protected:
 	static void _bind_methods();
 
 private:
-	int _add_processor_bind(const Ref<PropDataProcessor> &processor);
-	Ref<PropDataProcessor> _get_processor_bind(const int index);
+	int _add_processor_bind(const Ref<PropDataEntry> &processor);
+	Ref<PropDataEntry> _get_processor_bind(const int index);
 	void _swap_processors_bind(const int index1, const int index2);
 	void _remove_processor_bind(const int index);
 	int _get_processor_count_bind();
 
-	static Vector<Ref<PropDataProcessor> > _processors;
+	static Vector<Ref<PropDataEntry> > _processors;
 	static PropUtils *_instance;
 };
 

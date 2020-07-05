@@ -22,11 +22,11 @@ SOFTWARE.
 
 #include "prop_utils.h"
 
-#include "../processor/prop_data_processor.h"
 #include "../props/prop_data.h"
+#include "../props/prop_data_entry.h"
 
 PropUtils *PropUtils::_instance;
-Vector<Ref<PropDataProcessor> > PropUtils::_processors;
+Vector<Ref<PropDataEntry> > PropUtils::_processors;
 
 PropUtils *PropUtils::get_singleton() {
 	return _instance;
@@ -48,12 +48,12 @@ void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transfo
 	ERR_FAIL_COND(!ObjectDB::instance_validate(node));
 
 	for (int i = 0; i < PropUtils::_processors.size(); ++i) {
-		Ref<PropDataProcessor> proc = PropUtils::_processors.get(i);
+		Ref<PropDataEntry> proc = PropUtils::_processors.get(i);
 
 		ERR_CONTINUE(!proc.is_valid());
 
-		if (proc->handles(node)) {
-			proc->process(prop_data, node, transform);
+		if (proc->processor_handles(node)) {
+			proc->processor_process(prop_data, node, transform);
 			break;
 		}
 	}
@@ -74,15 +74,15 @@ void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transfo
 	}
 }
 
-int PropUtils::add_processor(const Ref<PropDataProcessor> &processor) {
+int PropUtils::add_processor(const Ref<PropDataEntry> &processor) {
 	ERR_FAIL_COND_V(!processor.is_valid(), 0);
 
 	PropUtils::_processors.push_back(processor);
 
 	return PropUtils::_processors.size() - 1;
 }
-Ref<PropDataProcessor> PropUtils::get_processor(const int index) {
-	ERR_FAIL_INDEX_V(index, PropUtils::_processors.size(), Ref<PropDataProcessor>());
+Ref<PropDataEntry> PropUtils::get_processor(const int index) {
+	ERR_FAIL_INDEX_V(index, PropUtils::_processors.size(), Ref<PropDataEntry>());
 
 	return PropUtils::_processors[index];
 }
@@ -90,7 +90,7 @@ void PropUtils::swap_processors(const int index1, const int index2) {
 	ERR_FAIL_INDEX(index1, PropUtils::_processors.size());
 	ERR_FAIL_INDEX(index2, PropUtils::_processors.size());
 
-	Ref<PropDataProcessor> a = PropUtils::_processors.get(index1);
+	Ref<PropDataEntry> a = PropUtils::_processors.get(index1);
 	PropUtils::_processors.set(index1, PropUtils::_processors.get(index2));
 	PropUtils::_processors.set(index2, a);
 }
@@ -123,10 +123,10 @@ void PropUtils::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_processor_count"), &PropUtils::_get_processor_count_bind);
 }
 
-int PropUtils::_add_processor_bind(const Ref<PropDataProcessor> &processor) {
+int PropUtils::_add_processor_bind(const Ref<PropDataEntry> &processor) {
 	return PropUtils::add_processor(processor);
 }
-Ref<PropDataProcessor> PropUtils::_get_processor_bind(const int index) {
+Ref<PropDataEntry> PropUtils::_get_processor_bind(const int index) {
 	return PropUtils::get_processor(index);
 }
 void PropUtils::_swap_processors_bind(const int index1, const int index2) {

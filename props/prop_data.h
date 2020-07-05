@@ -40,9 +40,6 @@ SOFTWARE.
 #include "../../texture_packer/texture_packer.h"
 #endif
 
-class Spatial;
-class VoxelChunk;
-
 class PropData : public Resource {
 	GDCLASS(PropData, Resource);
 

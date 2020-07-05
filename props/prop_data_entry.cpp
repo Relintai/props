@@ -22,6 +22,9 @@ SOFTWARE.
 
 #include "prop_data_entry.h"
 
+#include "prop_data.h"
+#include "scene/3d/spatial.h"
+
 Transform PropDataEntry::get_transform() const {
 	return _transform;
 }
@@ -35,6 +38,25 @@ void PropDataEntry::add_textures_into(Ref<TexturePacker> texture_packer) {
 		call("_add_textures_into", texture_packer);
 }
 #endif
+
+bool PropDataEntry::processor_handles(Node *node) {
+	return call("_processor_handles", node);
+}
+void PropDataEntry::processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform) {
+	call("_processor_process", prop_data, node, transform);
+}
+Node *PropDataEntry::processor_get_node_for(const Ref<PropData> &prop_data) {
+	return call("_processor_get_node_for", prop_data);
+}
+
+bool PropDataEntry::_processor_handles(Node *node) {
+	return false;
+}
+void PropDataEntry::_processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform) {
+}
+Node *PropDataEntry::_processor_get_node_for(const Ref<PropData> &prop_data) {
+	return NULL;
+}
 
 PropDataEntry::PropDataEntry() {
 }
@@ -51,4 +73,21 @@ void PropDataEntry::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("add_textures_into", "texture_packer"), &PropDataEntry::add_textures_into);
 #endif
+
+	BIND_VMETHOD(MethodInfo(PropertyInfo(Variant::BOOL, "handles"), "_processor_handles"));
+	BIND_VMETHOD(MethodInfo("_processor_process",
+			PropertyInfo(Variant::OBJECT, "prop_data", PROPERTY_HINT_RESOURCE_TYPE, "PropData"),
+			PropertyInfo(Variant::OBJECT, "node", PROPERTY_HINT_RESOURCE_TYPE, "Node"),
+			PropertyInfo(Variant::TRANSFORM, "transform")));
+
+	BIND_VMETHOD(MethodInfo(PropertyInfo(Variant::OBJECT, "node", PROPERTY_HINT_RESOURCE_TYPE, "Node"), "_processor_get_node_for",
+			PropertyInfo(Variant::OBJECT, "prop_data", PROPERTY_HINT_RESOURCE_TYPE, "PropData")));
+
+	ClassDB::bind_method(D_METHOD("processor_handles", "node"), &PropDataEntry::processor_handles);
+	ClassDB::bind_method(D_METHOD("processor_process", "prop_data", "node", "transform"), &PropDataEntry::processor_process);
+	ClassDB::bind_method(D_METHOD("processor_get_node_for", "prop_data"), &PropDataEntry::processor_get_node_for);
+
+	ClassDB::bind_method(D_METHOD("_processor_handles", "node"), &PropDataEntry::_processor_handles);
+	ClassDB::bind_method(D_METHOD("_processor_process", "prop_data", "node", "transform"), &PropDataEntry::_processor_process);
+	ClassDB::bind_method(D_METHOD("_processor_get_node_for", "prop_data"), &PropDataEntry::_processor_get_node_for);
 }

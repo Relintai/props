@@ -30,6 +30,8 @@ SOFTWARE.
 #include "../../texture_packer/texture_packer.h"
 #endif
 
+class PropData;
+
 class PropDataEntry : public Resource {
 	GDCLASS(PropDataEntry, Resource);
 
@@ -40,6 +42,14 @@ public:
 #if TEXTURE_PACKER_PRESENT
 	void add_textures_into(Ref<TexturePacker> texture_packer);
 #endif
+
+	bool processor_handles(Node *node);
+	void processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform);
+	Node *processor_get_node_for(const Ref<PropData> &prop_data);
+
+	virtual bool _processor_handles(Node *node);
+	virtual void _processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform);
+	virtual Node *_processor_get_node_for(const Ref<PropData> &prop_data);
 
 	PropDataEntry();
 	~PropDataEntry();

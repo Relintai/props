@@ -26,8 +26,6 @@ SOFTWARE.
 #include "prop_data_light.h"
 #include "prop_data_prop.h"
 
-#include "../../voxelman/world/voxel_chunk.h"
-
 int PropData::get_id() const {
 	return _id;
 }
