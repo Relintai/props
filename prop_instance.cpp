@@ -4,6 +4,8 @@
 
 #include "../thread_pool/thread_pool.h"
 
+#include "core/engine.h"
+
 Ref<PropData> PropInstance::get_prop_data() {
 	return _prop_data;
 }
@@ -113,7 +115,12 @@ void PropInstance::build() {
 	}
 
 	for (int i = 0; i < get_child_count(); ++i) {
-		get_child(i)->queue_delete();
+		Node *n = get_child(i);
+
+		//this way we won't delete the user's nodes
+		if (n->get_owner() == NULL) {
+			n->queue_delete();
+		}
 	}
 
 	if (!_prop_data.is_valid())
@@ -124,6 +131,15 @@ void PropInstance::build() {
 
 		if (!e.is_valid())
 			continue;
+
+		Node *n = e->processor_get_node_for(get_transform());
+
+		if (n) {
+			add_child(n);
+
+			//if (Engine::get_singleton()->is_editor_hint())
+			//	n->set_owner(get_tree()->get_edited_scene_root());
+		}
 	}
 }
 
@@ -141,7 +157,19 @@ PropInstance::~PropInstance() {
 	_prop_data.unref();
 }
 
+void PropInstance::_notification(int p_what) {
+	switch (p_what) {
+		case NOTIFICATION_ENTER_TREE: {
+			build();
+		}
+	}
+}
+
 void PropInstance::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("get_prop_data"), &PropInstance::get_prop_data);
+	ClassDB::bind_method(D_METHOD("set_prop_data", "value"), &PropInstance::set_prop_data);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "prop_data", PROPERTY_HINT_RESOURCE_TYPE, "PropData"), "set_prop_data", "get_prop_data");
+
 	ClassDB::bind_method(D_METHOD("get_auto_bake"), &PropInstance::get_auto_bake);
 	ClassDB::bind_method(D_METHOD("set_auto_bake", "value"), &PropInstance::set_auto_bake);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "auto_bake"), "set_auto_bake", "get_auto_bake");

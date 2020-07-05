@@ -45,8 +45,8 @@ bool PropDataEntry::processor_handles(Node *node) {
 void PropDataEntry::processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform) {
 	call("_processor_process", prop_data, node, transform);
 }
-Node *PropDataEntry::processor_get_node_for(const Ref<PropData> &prop_data) {
-	return call("_processor_get_node_for", prop_data);
+Node *PropDataEntry::processor_get_node_for(const Transform &transform) {
+	return call("_processor_get_node_for", transform);
 }
 
 bool PropDataEntry::_processor_handles(Node *node) {
