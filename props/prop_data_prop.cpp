@@ -22,6 +22,9 @@ SOFTWARE.
 
 #include "prop_data_prop.h"
 
+#include "../prop_instance.h"
+#include "prop_data.h"
+
 Ref<PropData> PropDataProp::get_prop() const {
 	return _prop;
 }
@@ -50,6 +53,33 @@ void PropDataProp::_add_textures_into(Ref<TexturePacker> texture_packer) {
 	}
 }
 #endif
+
+bool PropDataProp::_processor_handles(Node *node) {
+	PropInstance *i = Object::cast_to<PropInstance>(node);
+
+	return i;
+}
+
+void PropDataProp::_processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform) {
+	PropInstance *i = Object::cast_to<PropInstance>(node);
+
+	ERR_FAIL_COND(!i);
+
+	Ref<PropDataProp> l;
+	l.instance();
+	l->set_prop(i->get_prop_data());
+	l->set_transform(transform * i->get_transform());
+	prop_data->add_prop(l);
+}
+
+Node *PropDataProp::_processor_get_node_for(const Transform &transform) {
+	PropInstance *i = memnew(PropInstance);
+
+	i->set_prop_data(get_prop());
+	i->set_transform(get_transform());
+
+	return i;
+}
 
 PropDataProp::PropDataProp() {
 	_snap_to_mesh = false;

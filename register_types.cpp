@@ -68,6 +68,9 @@ void register_props_types() {
 	Ref<PropDataLight> light_processor = Ref<PropDataLight>(memnew(PropDataLight));
 	PropUtils::add_processor(light_processor);
 
+	Ref<PropDataProp> prop_processor = Ref<PropDataProp>(memnew(PropDataProp));
+	PropUtils::add_processor(prop_processor);
+
 #ifdef TOOLS_ENABLED
 	EditorPlugins::add_by_type<PropEditorPlugin>();
 #endif
