@@ -15,10 +15,10 @@ sources = [
     "register_types.cpp",
 
     "props/prop_data.cpp",
+    "props/prop_data_entry.cpp",
     "props/prop_data_scene.cpp",
     "props/prop_data_light.cpp",
     "props/prop_data_prop.cpp",
-    "props/prop_data_entity.cpp",
 
     "clutter/ground_clutter.cpp",
     "clutter/ground_clutter_foliage.cpp",
