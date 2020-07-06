@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include "../props/prop_data.h"
 #include "../props/prop_data_entry.h"
+#include "core/engine.h"
 
 PropUtils *PropUtils::_instance;
 Vector<Ref<PropDataEntry> > PropUtils::_processors;
@@ -70,11 +71,30 @@ void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transfo
 		Transform t;
 
 		for (int i = 0; i < node->get_child_count(); ++i) {
-			_convert_tree(prop_data, node->get_child(i), t);
+			Node *child = node->get_child(i);
+
+			if (Engine::get_singleton()->is_editor_hint()) {
+				//Skip it if it's hidden from the tree
+				if (child->get_owner() != NULL) {
+					_convert_tree(prop_data, node->get_child(i), t);
+				}
+			} else {
+				_convert_tree(prop_data, node->get_child(i), t);
+			}
 		}
 	} else {
 		for (int i = 0; i < node->get_child_count(); ++i) {
-			_convert_tree(prop_data, node->get_child(i), transform * sp->get_transform());
+
+			Node *child = node->get_child(i);
+
+			if (Engine::get_singleton()->is_editor_hint()) {
+				//Skip it if it's hidden from the tree
+				if (child->get_owner() != NULL) {
+					_convert_tree(prop_data, node->get_child(i), transform * sp->get_transform());
+				}
+			} else {
+				_convert_tree(prop_data, node->get_child(i), transform * sp->get_transform());
+			}
 		}
 	}
 }
