@@ -54,6 +54,11 @@ void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transfo
 
 		if (proc->processor_handles(node)) {
 			proc->processor_process(prop_data, node, transform);
+
+			if (!proc->processor_evaluate_children()) {
+				return;
+			}
+
 			break;
 		}
 	}
