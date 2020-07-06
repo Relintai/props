@@ -28,6 +28,8 @@ sources = [
     "prop_ess_entity.cpp",
     "prop_instance_job.cpp",
 
+    "prop_scene_instance.cpp",
+
     "singleton/prop_utils.cpp",
 
     "editor/prop_editor_plugin.cpp",

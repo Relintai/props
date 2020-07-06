@@ -37,6 +37,8 @@ SOFTWARE.
 
 #include "prop_instance_job.h"
 
+#include "prop_scene_instance.h"
+
 #include "core/engine.h"
 #include "singleton/prop_utils.h"
 
@@ -61,6 +63,8 @@ void register_props_types() {
 
 	ClassDB::register_class<PropInstanceJob>();
 
+	ClassDB::register_class<PropSceneInstance>();
+
 	prop_utils = memnew(PropUtils);
 	ClassDB::register_class<PropUtils>();
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PropUtils", PropUtils::get_singleton()));
@@ -70,6 +74,9 @@ void register_props_types() {
 
 	Ref<PropDataProp> prop_processor = Ref<PropDataProp>(memnew(PropDataProp));
 	PropUtils::add_processor(prop_processor);
+
+	Ref<PropDataScene> scene_processor = Ref<PropDataScene>(memnew(PropDataScene));
+	PropUtils::add_processor(scene_processor);
 
 #ifdef TOOLS_ENABLED
 	EditorPlugins::add_by_type<PropEditorPlugin>();

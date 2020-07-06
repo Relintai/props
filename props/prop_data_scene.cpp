@@ -22,10 +22,13 @@ SOFTWARE.
 
 #include "prop_data_scene.h"
 
-Ref<PackedScene> PropDataScene::get_scene() const {
+#include "../prop_scene_instance.h"
+#include "prop_data.h"
+
+Ref<PackedScene> PropDataScene::get_scene() {
 	return _scene;
 }
-void PropDataScene::set_scene(const Ref<PackedScene> value) {
+void PropDataScene::set_scene(const Ref<PackedScene> &value) {
 	_scene = value;
 }
 
@@ -41,6 +44,33 @@ Vector3 PropDataScene::get_snap_axis() {
 }
 void PropDataScene::set_snap_axis(Vector3 value) {
 	_snap_axis = value;
+}
+
+bool PropDataScene::_processor_handles(Node *node) {
+	PropSceneInstance *i = Object::cast_to<PropSceneInstance>(node);
+
+	return i;
+}
+
+void PropDataScene::_processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform) {
+	PropSceneInstance *i = Object::cast_to<PropSceneInstance>(node);
+
+	ERR_FAIL_COND(!i);
+
+	Ref<PropDataScene> l;
+	l.instance();
+	l->set_scene(i->get_scene());
+	l->set_transform(transform * i->get_transform());
+	prop_data->add_prop(l);
+}
+
+Node *PropDataScene::_processor_get_node_for(const Transform &transform) {
+	PropSceneInstance *i = memnew(PropSceneInstance);
+
+	i->set_scene(get_scene());
+	i->set_transform(get_transform());
+
+	return i;
 }
 
 PropDataScene::PropDataScene() {

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Péter Magyar
+Copyright (c) 2020 Péter Magyar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,41 +20,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PROP_DATA_SCENE_H
-#define PROP_DATA_SCENE_H
+#ifndef PROP_SCENE_INSTANCE_H
+#define PROP_SCENE_INSTANCE_H
+
+#include "core/version.h"
+
+#if VERSION_MAJOR < 4
+#include "scene/3d/spatial.h"
+#else
+#include "scene/3d/node_3d.h"
+
+#define Spatial Node3D
+#endif
 
 #include "core/math/vector3.h"
-#include "prop_data_entry.h"
 
+#include "props/prop_data.h"
 #include "scene/resources/packed_scene.h"
 
-class PropDataScene : public PropDataEntry {
-	GDCLASS(PropDataScene, PropDataEntry);
+class PropSceneInstance : public Spatial {
+	GDCLASS(PropSceneInstance, Spatial);
 
 public:
 	Ref<PackedScene> get_scene();
-	void set_scene(const Ref<PackedScene> &value);
+	void set_scene(const Ref<PackedScene> &data);
 
-	bool get_snap_to_mesh();
-	void set_snap_to_mesh(bool value);
+	bool get_snap_to_mesh() const;
+	void set_snap_to_mesh(const bool value);
 
-	Vector3 get_snap_axis();
-	void set_snap_axis(Vector3 value);
+	Vector3 get_snap_axis() const;
+	void set_snap_axis(const Vector3 &value);
 
-	bool _processor_handles(Node *node);
-	void _processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform);
-	Node *_processor_get_node_for(const Transform &transform);
+	void build();
 
-	PropDataScene();
-	~PropDataScene();
+	PropSceneInstance();
+	~PropSceneInstance();
 
 protected:
+	void _notification(int p_what);
 	static void _bind_methods();
 
 private:
+	Ref<PackedScene> _scene;
 	bool _snap_to_mesh;
 	Vector3 _snap_axis;
-	Ref<PackedScene> _scene;
 };
 
 #endif

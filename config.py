@@ -26,6 +26,8 @@ def get_doc_classes():
         "PropInstance",
         "PropMeshUtils",
 
+        "PropSceneInstance",
+
         "PropUtils",
     ]
 
