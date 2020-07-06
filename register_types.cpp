@@ -65,6 +65,9 @@ void register_props_types() {
 	ClassDB::register_class<PropUtils>();
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PropUtils", PropUtils::get_singleton()));
 
+	Ref<PropDataLight> light_processor = Ref<PropDataLight>(memnew(PropDataLight));
+	PropUtils::add_processor(light_processor);
+
 #ifdef TOOLS_ENABLED
 	EditorPlugins::add_by_type<PropEditorPlugin>();
 #endif

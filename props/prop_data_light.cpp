@@ -22,6 +22,9 @@ SOFTWARE.
 
 #include "prop_data_light.h"
 
+#include "prop_data.h"
+#include "scene/3d/light.h"
+
 Color PropDataLight::get_light_color() const {
 	return _light_color;
 }
@@ -36,8 +39,37 @@ void PropDataLight::set_light_size(const int value) {
 	_light_size = value;
 }
 
+bool PropDataLight::_processor_handles(Node *node) {
+	OmniLight *i = Object::cast_to<OmniLight>(node);
+
+	return i;
+}
+
+void PropDataLight::_processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform) {
+	OmniLight *i = Object::cast_to<OmniLight>(node);
+
+	ERR_FAIL_COND(!i);
+
+	Ref<PropDataLight> l;
+	l.instance();
+	l->set_light_color(i->get_color());
+	l->set_light_size(i->get_param(Light::PARAM_RANGE));
+	l->set_transform(transform * i->get_transform());
+	prop_data->add_prop(l);
+}
+
+Node *PropDataLight::_processor_get_node_for(const Transform &transform) {
+	OmniLight *i = memnew(OmniLight);
+
+	i->set_color(get_light_color());
+	i->set_param(Light::PARAM_RANGE, get_light_size());
+	i->set_transform(get_transform());
+
+	return i;
+}
+
 PropDataLight::PropDataLight() {
-	_light_size = 5;
+	_light_size = 0;
 }
 PropDataLight::~PropDataLight() {
 }

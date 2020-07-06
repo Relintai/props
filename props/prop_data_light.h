@@ -37,6 +37,10 @@ public:
 	int get_light_size() const;
 	void set_light_size(const int value);
 
+	bool _processor_handles(Node *node);
+	void _processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform);
+	Node *_processor_get_node_for(const Transform &transform);
+
 	PropDataLight();
 	~PropDataLight();
 
