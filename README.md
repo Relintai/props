@@ -9,7 +9,7 @@ check whether it works from time to time.
 
 # Pre-built binaries
 
-You can grab a pre-built editor binary from the releases tab in the [Broken Seals](https://github.com/Relintai/broken_seals/releases) 
+You can grab a pre-built editor binary from the [Broken Seals](https://github.com/Relintai/broken_seals/releases) 
 repo, should you want to. It contains all my modules.
 
 # Optional Dependencies
