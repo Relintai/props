@@ -53,7 +53,7 @@ PropInstances are not yet finished.
 
 They will be able to merge meshes, texture etc from a Prop, and also generate lods for it.
 
-Essenrtially they will be a more advanced MeshInstance.
+Essentially they will be a more advanced MeshInstance.
 
 Voxelman implements all of this, just haven't finished porting it yet.
 
@@ -88,7 +88,7 @@ cd ./godot/modules/
 3. Clone this repository
 
 ```
-git clone https://github.com/Relintai/texture_packer texture_packer
+git clone https://github.com/Relintai/props props
 ```
 
 4. Build Godot. [Tutorial](https://docs.godotengine.org/en/latest/development/compiling/index.html)
