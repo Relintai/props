@@ -23,7 +23,14 @@ SOFTWARE.
 #include "prop_data_light.h"
 
 #include "prop_data.h"
+
+#if VERSION_MAJOR < 4
 #include "scene/3d/light.h"
+#else
+#include "scene/3d/light_3d.h"
+#define OmniLight OmniLight3D
+#define Light Light3D
+#endif
 
 Color PropDataLight::get_light_color() const {
 	return _light_color;

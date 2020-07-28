@@ -26,15 +26,19 @@ SOFTWARE.
 #include "../props/prop_data_entry.h"
 #include "core/engine.h"
 
+#include "core/version.h"
+
 PropUtils *PropUtils::_instance;
-Vector<Ref<PropDataEntry> > PropUtils::_processors;
+Vector<Ref<PropDataEntry>> PropUtils::_processors;
 
 PropUtils *PropUtils::get_singleton() {
 	return _instance;
 }
 
 Ref<PropData> PropUtils::convert_tree(Node *root) {
+#if VERSION_MAJOR < 4
 	ERR_FAIL_COND_V(!ObjectDB::instance_validate(root), Ref<PropData>());
+#endif
 
 	Ref<PropData> data;
 	data.instance();
@@ -46,7 +50,9 @@ Ref<PropData> PropUtils::convert_tree(Node *root) {
 }
 
 void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transform &transform) {
+#if VERSION_MAJOR < 4
 	ERR_FAIL_COND(!ObjectDB::instance_validate(node));
+#endif
 
 	for (int i = 0; i < PropUtils::_processors.size(); ++i) {
 		Ref<PropDataEntry> proc = PropUtils::_processors.get(i);
@@ -84,7 +90,6 @@ void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transfo
 		}
 	} else {
 		for (int i = 0; i < node->get_child_count(); ++i) {
-
 			Node *child = node->get_child(i);
 
 			if (Engine::get_singleton()->is_editor_hint()) {

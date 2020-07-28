@@ -23,7 +23,15 @@ SOFTWARE.
 #include "prop_data_entry.h"
 
 #include "prop_data.h"
+
+#include "core/version.h"
+
+#if VERSION_MAJOR < 4
 #include "scene/3d/spatial.h"
+#else
+#include "scene/3d/node_3d.h"
+#define Spatial Node3D
+#endif
 
 Transform PropDataEntry::get_transform() const {
 	return _transform;

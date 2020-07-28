@@ -40,7 +40,7 @@ void PropInstance::set_snap_axis(const Vector3 &value) {
 }
 
 void PropInstance::register_prop_mesh_data_instance(MeshDataInstance *instance) {
-	ERR_FAIL_COND(!ObjectDB::instance_validate(instance));
+	//ERR_FAIL_COND(!ObjectDB::instance_validate(instance));
 
 	_mesh_data_instances.push_back(instance);
 
@@ -49,7 +49,7 @@ void PropInstance::register_prop_mesh_data_instance(MeshDataInstance *instance) 
 }
 
 void PropInstance::unregister_prop_mesh_data_instance(MeshDataInstance *instance) {
-	ERR_FAIL_COND(!ObjectDB::instance_validate(instance));
+	//ERR_FAIL_COND(!ObjectDB::instance_validate(instance));
 
 	_mesh_data_instances.erase(instance);
 
@@ -66,7 +66,7 @@ void PropInstance::bake() {
 	for (int i = 0; i < _mesh_data_instances.size(); ++i) {
 		MeshDataInstance *md = _mesh_data_instances.get(i);
 
-		ERR_CONTINUE(!ObjectDB::instance_validate(md));
+		//ERR_CONTINUE(!ObjectDB::instance_validate(md));
 
 		Ref<MeshDataResource> mdr = md->get_mesh();
 
@@ -149,7 +149,7 @@ PropInstance::PropInstance() {
 	_snap_to_mesh = false;
 	_snap_axis = Vector3(0, -1, 0);
 	_job.instance();
-	_job->connect("completed", this, "bake_finished", Vector<Variant>(), Object::CONNECT_DEFERRED);
+	//_job->connect("completed", this, "bake_finished", Vector<Variant>(), Object::CONNECT_DEFERRED);
 }
 PropInstance::~PropInstance() {
 	_mesh_data_instances.clear();

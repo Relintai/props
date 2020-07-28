@@ -30,7 +30,7 @@ SOFTWARE.
 #include "core/reference.h"
 #include "core/vector.h"
 
-#include "servers/physics_server.h"
+#include "core/version.h"
 
 #include "prop_data_entry.h"
 
@@ -78,7 +78,7 @@ private:
 	bool _snap_to_mesh;
 	Vector3 _snap_axis;
 
-	Vector<Ref<PropDataEntry> > _props;
+	Vector<Ref<PropDataEntry>> _props;
 };
 
 #endif

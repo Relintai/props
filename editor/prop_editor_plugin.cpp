@@ -24,8 +24,22 @@ SOFTWARE.
 
 #include "../props/prop_data.h"
 #include "../singleton/prop_utils.h"
-#include "core/os/input.h"
 #include "core/os/keyboard.h"
+
+#include "core/version.h"
+
+#if VERSION_MAJOR < 4
+#include "core/os/input.h"
+
+#define CONNECT(sig, obj, target_method_class, method) connect(sig, obj, #method)
+#define DISCONNECT(sig, obj, target_method_class, method) disconnect(sig, obj, #method)
+
+#else
+#include "core/input/input.h"
+
+#define CONNECT(sig, obj, target_method_class, method) connect(sig, callable_mp(obj, &target_method_class::method))
+#define DISCONNECT(sig, obj, target_method_class, method) disconnect(sig, callable_mp(obj, &target_method_class::method))
+#endif
 
 void PropEditorPlugin::convert_active_scene_to_prop_data() {
 	SceneTree *st = SceneTree::get_singleton();
@@ -74,7 +88,6 @@ void PropEditorPlugin::_convert_selected_scene_to_prop_data(Variant param) {
 }
 
 PropEditorPlugin::PropEditorPlugin(EditorNode *p_node) {
-
 	editor = p_node;
 
 	editor->add_tool_menu_item("Convert active scene to PropData", this, "convert_active_scene_to_prop_data");
@@ -88,7 +101,7 @@ PropEditorPlugin::PropEditorPlugin(EditorNode *p_node) {
 	container->add_child(b);
 	b->set_flat(true);
 
-	b->connect("pressed", this, "_quick_convert_button_pressed");
+	b->CONNECT("pressed", this, PropEditorPlugin, _quick_convert_button_pressed);
 	b->set_text("To Prop");
 	b->set_shortcut(ED_SHORTCUT("spatial_editor/quick_prop_convert", "Quick convert scene to PropData.", KEY_MASK_ALT + KEY_U));
 
