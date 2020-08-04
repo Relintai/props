@@ -2,7 +2,7 @@
 
 #include "../mesh_data_resource/nodes/mesh_data_instance.h"
 
-#include "../thread_pool/thread_pool.h"
+//#include "../thread_pool/thread_pool.h"
 
 #include "core/engine.h"
 
@@ -61,7 +61,7 @@ void PropInstance::bake() {
 	_baking = true;
 	_bake_queued = false;
 
-	_job->clear();
+	//_job->clear();
 
 	for (int i = 0; i < _mesh_data_instances.size(); ++i) {
 		MeshDataInstance *md = _mesh_data_instances.get(i);
@@ -83,12 +83,12 @@ void PropInstance::bake() {
 			sp = Object::cast_to<Spatial>(sp->get_parent());
 		}
 
-		_job->add_mesh_instance(t, mdr, md->get_texture());
+		//_job->add_mesh_instance(t, mdr, md->get_texture());
 	}
 
-	if (_job->get_mesh_instance_count() > 0) {
-		ThreadPool::get_singleton()->add_job(_job);
-	}
+	//if (_job->get_mesh_instance_count() > 0) {
+	//	ThreadPool::get_singleton()->add_job(_job);
+	//}
 }
 
 void PropInstance::bake_finished() {
@@ -148,12 +148,12 @@ PropInstance::PropInstance() {
 	_bake_queued = false;
 	_snap_to_mesh = false;
 	_snap_axis = Vector3(0, -1, 0);
-	_job.instance();
+	//_job.instance();
 	//_job->connect("completed", this, "bake_finished", Vector<Variant>(), Object::CONNECT_DEFERRED);
 }
 PropInstance::~PropInstance() {
 	_mesh_data_instances.clear();
-	_job.unref();
+	//_job.unref();
 	_prop_data.unref();
 }
 

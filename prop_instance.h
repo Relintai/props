@@ -35,7 +35,7 @@ SOFTWARE.
 
 #include "core/math/vector3.h"
 
-#include "prop_instance_job.h"
+//#include "prop_instance_job.h"
 
 #include "props/prop_data.h"
 
@@ -81,7 +81,7 @@ private:
 	bool _snap_to_mesh;
 	Vector3 _snap_axis;
 	Vector<MeshDataInstance *> _mesh_data_instances;
-	Ref<PropInstanceJob> _job;
+	//Ref<PropInstanceJob> _job;
 };
 
 #endif
