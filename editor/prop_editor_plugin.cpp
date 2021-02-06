@@ -90,8 +90,11 @@ void PropEditorPlugin::_convert_selected_scene_to_prop_data(Variant param) {
 PropEditorPlugin::PropEditorPlugin(EditorNode *p_node) {
 	editor = p_node;
 
+#if VERSION_MAJOR < 4
 	editor->add_tool_menu_item("Convert active scene to PropData", this, "convert_active_scene_to_prop_data");
 	editor->add_tool_menu_item("Convert selected scene(s) to PropData", this, "convert_selected_scene_to_prop_data");
+#else
+#endif
 
 	HBoxContainer *container = memnew(HBoxContainer);
 

@@ -24,9 +24,14 @@ SOFTWARE.
 
 #include "../props/prop_data.h"
 #include "../props/prop_data_entry.h"
-#include "core/engine.h"
 
 #include "core/version.h"
+
+#if VERSION_MAJOR > 3
+#include "core/config/engine.h"
+#else
+#include "core/engine.h"
+#endif
 
 PropUtils *PropUtils::_instance;
 Vector<Ref<PropDataEntry>> PropUtils::_processors;

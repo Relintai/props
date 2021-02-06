@@ -23,8 +23,15 @@ SOFTWARE.
 #ifndef PROP_INSTANCE_JOB_H
 #define PROP_INSTANCE_JOB_H
 
-#include "core/math/vector3.h"
+#include "core/version.h"
+
+#if VERSION_MAJOR > 3
+#include "core/templates/vector.h"
+#else
 #include "core/vector.h"
+#endif
+
+#include "core/math/vector3.h"
 
 #include "../thread_pool/thread_pool_job.h"
 

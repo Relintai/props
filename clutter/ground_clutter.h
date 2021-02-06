@@ -23,7 +23,13 @@ SOFTWARE.
 #ifndef GROUND_CLUTTER_H
 #define GROUND_CLUTTER_H
 
+#include "core/version.h"
+
+#if VERSION_MAJOR > 3
+#include "core/io/resource.h"
+#else
 #include "core/resource.h"
+#endif
 
 #ifdef TEXTURE_PACKER_PRESENT
 #include "../../texture_packer/texture_packer.h"

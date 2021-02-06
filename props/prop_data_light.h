@@ -23,9 +23,15 @@ SOFTWARE.
 #ifndef PROP_DATA_LIGHT_H
 #define PROP_DATA_LIGHT_H
 
-#include "prop_data_entry.h"
+#include "core/version.h"
 
+#if VERSION_MAJOR > 3
+#include "core/math/color.h"
+#else
 #include "core/color.h"
+#endif
+
+#include "prop_data_entry.h"
 
 class PropDataLight : public PropDataEntry {
 	GDCLASS(PropDataLight, PropDataEntry);

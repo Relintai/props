@@ -23,8 +23,15 @@ SOFTWARE.
 #ifndef PROP_DATA_DATA_H
 #define PROP_DATA_DATA_H
 
-#include "core/math/transform.h"
+#include "core/version.h"
+
+#if VERSION_MAJOR > 3
+#include "core/io/resource.h"
+#else
 #include "core/resource.h"
+#endif
+
+#include "core/math/transform.h"
 
 #if TEXTURE_PACKER_PRESENT
 #include "../../texture_packer/texture_packer.h"

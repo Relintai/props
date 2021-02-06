@@ -1,6 +1,12 @@
 #include "prop_scene_instance.h"
 
+#include "core/version.h"
+
+#if VERSION_MAJOR > 3
+#include "core/config/engine.h"
+#else
 #include "core/engine.h"
+#endif
 
 Ref<PackedScene> PropSceneInstance::get_scene() {
 	return _scene;

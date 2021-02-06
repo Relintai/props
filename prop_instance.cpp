@@ -4,7 +4,13 @@
 
 //#include "../thread_pool/thread_pool.h"
 
+#include "core/version.h"
+
+#if VERSION_MAJOR > 3
+#include "core/config/engine.h"
+#else
 #include "core/engine.h"
+#endif
 
 Ref<PropData> PropInstance::get_prop_data() {
 	return _prop_data;

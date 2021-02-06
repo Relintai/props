@@ -22,6 +22,14 @@ SOFTWARE.
 
 #include "register_types.h"
 
+#include "core/version.h"
+
+#if VERSION_MAJOR > 3
+#include "core/config/engine.h"
+#else
+#include "core/engine.h"
+#endif
+
 #include "props/prop_data.h"
 #include "props/prop_data_entry.h"
 #include "props/prop_data_light.h"
@@ -38,7 +46,6 @@ SOFTWARE.
 
 #include "prop_scene_instance.h"
 
-#include "core/engine.h"
 #include "singleton/prop_utils.h"
 
 #include "./editor/prop_editor_plugin.h"

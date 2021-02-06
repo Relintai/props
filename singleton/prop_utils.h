@@ -23,11 +23,17 @@ SOFTWARE.
 #ifndef PROP_UTILS_H
 #define PROP_UTILS_H
 
+#include "core/version.h"
+
+#if VERSION_MAJOR > 3
+#include "core/object/object.h"
+#include "core/object/reference.h"
+#include "core/templates/vector.h"
+#else
 #include "core/object.h"
-
-#include "core/vector.h"
-
 #include "core/reference.h"
+#include "core/vector.h"
+#endif
 
 class PropData;
 class PropDataEntry;
@@ -60,7 +66,7 @@ private:
 	void _remove_processor_bind(const int index);
 	int _get_processor_count_bind();
 
-	static Vector<Ref<PropDataEntry> > _processors;
+	static Vector<Ref<PropDataEntry>> _processors;
 	static PropUtils *_instance;
 };
 

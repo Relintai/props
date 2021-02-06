@@ -23,9 +23,15 @@ SOFTWARE.
 #ifndef GROUND_CLUTTER_FOLIAGE_H
 #define GROUND_CLUTTER_FOLIAGE_H
 
-#include "ground_clutter.h"
+#include "core/version.h"
 
+#if VERSION_MAJOR > 3
+#include "core/templates/vector.h"
+#else
 #include "core/vector.h"
+#endif
+
+#include "ground_clutter.h"
 
 #include "scene/resources/texture.h"
 
