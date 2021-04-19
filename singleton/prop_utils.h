@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Péter Magyar
+Copyright (c) 2019-2021 Péter Magyar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,11 +29,15 @@ SOFTWARE.
 #include "core/object/object.h"
 #include "core/object/reference.h"
 #include "core/templates/vector.h"
+#include "scene/3d/node_3d.h"
 #else
 #include "core/object.h"
 #include "core/reference.h"
 #include "core/vector.h"
+#include "scene/3d/spatial.h"
 #endif
+
+#include "scene/main/node.h"
 
 class PropData;
 class PropDataEntry;

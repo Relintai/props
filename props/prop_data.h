@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Péter Magyar
+Copyright (c) 2019-2021 Péter Magyar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,6 @@ SOFTWARE.
 
 #include "prop_data_entry.h"
 
-#include "../../voxelman/meshers/voxel_mesher.h"
 
 #if TEXTURE_PACKER_PRESENT
 #include "../../texture_packer/texture_packer.h"
