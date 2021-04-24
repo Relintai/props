@@ -50,6 +50,8 @@ SOFTWARE.
 
 #include "./editor/prop_editor_plugin.h"
 
+#include "prop_mesher.h"
+
 static PropUtils *prop_utils = NULL;
 
 void register_props_types() {
@@ -61,6 +63,8 @@ void register_props_types() {
 
 	ClassDB::register_class<GroundClutter>();
 	ClassDB::register_class<GroundClutterFoliage>();
+
+	ClassDB::register_class<PropMesher>();
 
 	ClassDB::register_class<PropInstance>();
 
