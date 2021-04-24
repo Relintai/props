@@ -16,6 +16,10 @@ if os.path.isdir('../terraman'):
 if os.path.isdir('../mesh_utils'):
     module_env.Append(CPPDEFINES=['MESH_UTILS_PRESENT'])
 
+
+if os.path.isdir('../thread_pool'):
+    module_env.Append(CPPDEFINES=['THREAD_POOL_PRESENT'])
+
 sources = [
 
     "register_types.cpp",
@@ -31,7 +35,7 @@ sources = [
 
     "prop_instance.cpp",
     "prop_ess_entity.cpp",
-   # "prop_instance_job.cpp",
+    "prop_instance_job.cpp",
 
     "prop_scene_instance.cpp",
 

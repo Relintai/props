@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2020 Péter Magyar
+Copyright (c) 2019-2021 Péter Magyar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,46 +20,75 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PROP_INSTANCE_JOB_H
-#define PROP_INSTANCE_JOB_H
+#ifndef PROP_INSTANCE_JOB
+#define PROP_INSTANCE_JOB
+
+#include "scene/resources/texture.h"
+
+#if THREAD_POOL_PRESENT
+#include "../thread_pool/thread_pool_job.h"
+#else
 
 #include "core/version.h"
 
 #if VERSION_MAJOR > 3
-#include "core/templates/vector.h"
+#include "core/object/reference.h"
+#define Texture Texture2D
 #else
-#include "core/vector.h"
+#include "core/reference.h"
 #endif
 
-#include "core/math/vector3.h"
+#endif
 
-#include "../thread_pool/thread_pool_job.h"
+class PropData;
+class PropInstance;
 
-#include "../mesh_data_resource/mesh_data_resource.h"
-#include "scene/resources/texture.h"
-
-class PropMeshDataInstance;
-
+#if THREAD_POOL_PRESENT
 class PropInstanceJob : public ThreadPoolJob {
 	GDCLASS(PropInstanceJob, ThreadPoolJob);
+#else
+class PropInstanceJob : public Reference {
+	GDCLASS(PropInstanceJob, Reference);
+#endif
 
-protected:
-	struct PropMeshInstanceEntry {
-		Transform transform;
-		Ref<MeshDataResource> mesh;
-		Ref<Texture> texture;
+public:
+	static const String BINDING_STRING_ACTIVE_BUILD_PHASE_TYPE;
+
+	enum ActiveBuildPhaseType {
+		BUILD_PHASE_TYPE_NORMAL = 0,
+		BUILD_PHASE_TYPE_PROCESS,
+		BUILD_PHASE_TYPE_PHYSICS_PROCESS,
 	};
 
 public:
-	Transform get_base_transform() const;
-	void set_base_transform(const Transform &value);
+	ActiveBuildPhaseType get_build_phase_type();
+	void set_build_phase_type(PropInstanceJob::ActiveBuildPhaseType build_phase_type);
 
-	void add_mesh_instance(const Transform &transform, const Ref<MeshDataResource> &mesh, const Ref<Texture> &texture);
-	int get_mesh_instance_count();
+	void set_prop(const Ref<PropData> &prop);
+	void set_prop_instance(PropInstance *instance);
+	void set_prop_instance_bind(Node *instance);
 
-	void clear();
+	int get_phase();
+	void set_phase(const int phase);
+	void next_phase();
+
+	bool get_build_done();
+	void set_build_done(const bool val);
+
+	void finished();
+
+	void reset();
+	virtual void _reset();
 
 	void _execute();
+
+	void execute_phase();
+	virtual void _execute_phase();
+
+	void process(const float delta);
+	void physics_process(const float delta);
+
+	void prop_instance_exit_tree();
 
 	PropInstanceJob();
 	~PropInstanceJob();
@@ -67,9 +96,54 @@ public:
 protected:
 	static void _bind_methods();
 
+	ActiveBuildPhaseType _build_phase_type;
+	bool _build_done;
+	int _phase;
+	bool _in_tree;
+	Ref<PropData> _prop;
+	PropInstance *_instance;
+
+public:
+#if !THREAD_POOL_PRESENT
+	bool get_complete() const;
+	void set_complete(const bool value);
+
+	bool get_cancelled() const;
+	void set_cancelled(const bool value);
+
+	float get_max_allocated_time() const;
+	void set_max_allocated_time(const float value);
+
+	int get_start_time() const;
+	void set_start_time(const int value);
+
+	int get_current_run_stage() const;
+	void set_current_run_stage(const int value);
+
+	int get_stage() const;
+	void set_stage(const int value);
+
+	void reset_stages();
+
+	float get_current_execution_time();
+
+	bool should_do(const bool just_check = false);
+	bool should_return();
+
+	void execute();
+
 private:
-	Transform _base_transform;
-	Vector<PropMeshInstanceEntry> _mesh_instances;
+	bool _complete;
+	bool _cancelled;
+
+	float _max_allocated_time;
+	uint64_t _start_time;
+
+	int _current_run_stage;
+	int _stage;
+#endif
 };
+
+VARIANT_ENUM_CAST(PropInstanceJob::ActiveBuildPhaseType);
 
 #endif
