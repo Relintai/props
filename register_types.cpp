@@ -46,6 +46,8 @@ SOFTWARE.
 
 #include "prop_scene_instance.h"
 
+#include "prop_mesher_job_step.h"
+
 #include "singleton/prop_utils.h"
 
 #include "./editor/prop_editor_plugin.h"
@@ -65,6 +67,7 @@ void register_props_types() {
 	ClassDB::register_class<GroundClutterFoliage>();
 
 	ClassDB::register_class<PropMesher>();
+	ClassDB::register_class<PropMesherJobStep>();
 
 	ClassDB::register_class<PropInstance>();
 

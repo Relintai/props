@@ -13,7 +13,9 @@ if os.path.isdir('../texture_packer'):
 if os.path.isdir('../terraman'):
     module_env.Append(CPPDEFINES=['TERRAMAN_PRESENT'])
 
-#ifdef 
+if os.path.isdir('../mesh_utils'):
+    module_env.Append(CPPDEFINES=['MESH_UTILS_PRESENT'])
+
 sources = [
 
     "register_types.cpp",
@@ -38,6 +40,8 @@ sources = [
     "editor/prop_editor_plugin.cpp",
 
     "prop_mesher.cpp",
+
+    "prop_mesher_job_step.cpp",
 ]
 
 if ARGUMENTS.get('custom_modules_shared', 'no') == 'yes':
