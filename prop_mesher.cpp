@@ -534,6 +534,85 @@ void PropMesher::add_mesh_data_resource_transform_colored(Ref<MeshDataResource> 
 }
 #endif
 
+//Data Management functions
+void PropMesher::generate_ao() {
+	/*
+	ERR_FAIL_COND(!_chunk.is_valid());
+
+	int data_size_x = _chunk->get_data_size_x();
+	int data_size_z = _chunk->get_data_size_z();
+
+	ERR_FAIL_COND(data_size_x == 0 || data_size_z == 0);
+
+	int margin_start = _chunk->get_margin_start();
+	int margin_end = _chunk->get_margin_end();
+
+	int ssize_x = _chunk->get_size_x();
+	int ssize_z = _chunk->get_size_z();
+
+	int size_x = ssize_x + margin_end;
+	int size_z = ssize_z + margin_end;
+
+	for (int z = margin_start - 1; z < size_z - 1; ++z) {
+		for (int x = margin_start - 1; x < size_x - 1; ++x) {
+			int current = _chunk->get_voxel(x, z, TerraChunkDefault::DEFAULT_CHANNEL_ISOLEVEL);
+
+			int sum = _chunk->get_voxel(x + 1, z, TerraChunkDefault::DEFAULT_CHANNEL_ISOLEVEL);
+			sum += _chunk->get_voxel(x - 1, z, TerraChunkDefault::DEFAULT_CHANNEL_ISOLEVEL);
+			sum += _chunk->get_voxel(x, z + 1, TerraChunkDefault::DEFAULT_CHANNEL_ISOLEVEL);
+			sum += _chunk->get_voxel(x, z - 1, TerraChunkDefault::DEFAULT_CHANNEL_ISOLEVEL);
+
+			sum /= 6;
+
+			sum -= current;
+
+			if (sum < 0)
+				sum = 0;
+
+			_chunk->set_voxel(sum, x, z, TerraChunkDefault::DEFAULT_CHANNEL_AO);
+		}
+	}*/
+}
+
+void PropMesher::generate_random_ao(int seed, int octaves, int period, float persistence, float scale_factor) {
+	/*
+	ERR_FAIL_COND(!_chunk.is_valid());
+
+	int margin_start = _chunk->get_margin_start();
+	int margin_end = _chunk->get_margin_end();
+
+	int size_x = _chunk->get_size_x();
+	int size_z = _chunk->get_size_z();
+
+	int position_x = _chunk->get_position_x();
+	int position_z = _chunk->get_position_z();
+
+	Ref<OpenSimplexNoise> noise;
+	noise.instance();
+
+	noise->set_seed(seed);
+	noise->set_octaves(octaves);
+	noise->set_period(period);
+	noise->set_persistence(persistence);
+
+	for (int x = -margin_start; x < size_x + margin_end; ++x) {
+		for (int z = -margin_start; z < size_z + margin_end; ++z) {
+
+			float val = noise->get_noise_3d(x + (position_x * size_x), 0, z + (position_z * size_z));
+
+			val *= scale_factor;
+
+			if (val > 1)
+				val = 1;
+
+			if (val < 0)
+				val = -val;
+
+			_chunk->set_voxel(int(val * 255.0), x, z, TerraChunkDefault::DEFAULT_CHANNEL_RANDOM_AO);
+		}
+	}*/
+}
+
 void PropMesher::add_mesher(const Ref<PropMesher> &mesher) {
 	call("_add_mesher", mesher);
 }
@@ -944,6 +1023,9 @@ void PropMesher::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("add_mesh_data_resource_transform", "mesh", "transform", "uv_rect"), &PropMesher::add_mesh_data_resource_transform, DEFVAL(Rect2(0, 0, 1, 1)));
 	ClassDB::bind_method(D_METHOD("add_mesh_data_resource_transform_colored", "mesh", "transform", "colors", "uv_rect"), &PropMesher::add_mesh_data_resource_transform_colored, DEFVAL(Rect2(0, 0, 1, 1)));
 #endif
+
+	ClassDB::bind_method(D_METHOD("generate_ao"), &PropMesher::generate_ao);
+	ClassDB::bind_method(D_METHOD("generate_random_ao", "seed", "octaves", "period", "persistence", "scale_factor"), &PropMesher::generate_random_ao, DEFVAL(4), DEFVAL(30), DEFVAL(0.3), DEFVAL(0.6));
 
 	BIND_VMETHOD(MethodInfo("_add_mesher", PropertyInfo(Variant::OBJECT, "mesher", PROPERTY_HINT_RESOURCE_TYPE, "PropMesher")));
 	ClassDB::bind_method(D_METHOD("add_mesher", "mesher"), &PropMesher::add_mesher);

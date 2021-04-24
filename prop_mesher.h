@@ -152,6 +152,9 @@ public:
 	void add_mesh_data_resource_transform_colored(Ref<MeshDataResource> mesh, const Transform transform, const PoolColorArray &colors, const Rect2 uv_rect = Rect2(0, 0, 1, 1));
 #endif
 
+	void generate_ao();
+	void generate_random_ao(int seed, int octaves = 4, int period = 30, float persistence = 0.3, float scale_factor = 0.6);
+
 	void add_mesher(const Ref<PropMesher> &mesher);
 	void _add_mesher(const Ref<PropMesher> &mesher);
 
