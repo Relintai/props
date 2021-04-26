@@ -43,6 +43,7 @@ SOFTWARE.
 #include "prop_instance.h"
 
 #include "prop_instance_job.h"
+#include "prop_instance_prop_job.h"
 
 #include "prop_scene_instance.h"
 
@@ -74,6 +75,7 @@ void register_props_types() {
 	ClassDB::register_class<PropESSEntity>();
 
 	ClassDB::register_class<PropInstanceJob>();
+	ClassDB::register_class<PropInstancePropJob>();
 
 	ClassDB::register_class<PropSceneInstance>();
 

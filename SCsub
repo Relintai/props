@@ -36,6 +36,7 @@ sources = [
     "prop_instance.cpp",
     "prop_ess_entity.cpp",
     "prop_instance_job.cpp",
+    "prop_instance_prop_job.cpp",
 
     "prop_scene_instance.cpp",
 

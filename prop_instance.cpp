@@ -45,56 +45,16 @@ void PropInstance::set_snap_axis(const Vector3 &value) {
 	_snap_axis = value;
 }
 
-void PropInstance::register_prop_mesh_data_instance(MeshDataInstance *instance) {
-	//ERR_FAIL_COND(!ObjectDB::instance_validate(instance));
-
-	_mesh_data_instances.push_back(instance);
-
-	if (_auto_bake)
-		queue_bake();
-}
-
-void PropInstance::unregister_prop_mesh_data_instance(MeshDataInstance *instance) {
-	//ERR_FAIL_COND(!ObjectDB::instance_validate(instance));
-
-	_mesh_data_instances.erase(instance);
-
-	if (_auto_bake)
-		queue_bake();
-}
-
 void PropInstance::bake() {
-	_baking = true;
+		_baking = true;
 	_bake_queued = false;
 
-	//_job->clear();
-
-	for (int i = 0; i < _mesh_data_instances.size(); ++i) {
-		MeshDataInstance *md = _mesh_data_instances.get(i);
-
-		//ERR_CONTINUE(!ObjectDB::instance_validate(md));
-
-		Ref<MeshDataResource> mdr = md->get_mesh();
-
-		if (!mdr.is_valid())
-			continue;
-
-		Transform t = md->get_transform();
-
-		Spatial *sp = Object::cast_to<Spatial>(md->get_parent());
-
-		while (sp) {
-			t *= sp->get_transform();
-
-			sp = Object::cast_to<Spatial>(sp->get_parent());
-		}
-
-		//_job->add_mesh_instance(t, mdr, md->get_texture());
+	if (!_job.is_valid()) {
+		_job.instance();
 	}
 
-	//if (_job->get_mesh_instance_count() > 0) {
-	//	ThreadPool::get_singleton()->add_job(_job);
-	//}
+	_job->set_prop_instace(this);
+
 }
 
 void PropInstance::bake_finished() {
@@ -147,6 +107,7 @@ void PropInstance::build() {
 			//	n->set_owner(get_tree()->get_edited_scene_root());
 		}
 	}
+
 }
 
 PropInstance::PropInstance() {
@@ -158,7 +119,6 @@ PropInstance::PropInstance() {
 	//_job->connect("completed", this, "bake_finished", Vector<Variant>(), Object::CONNECT_DEFERRED);
 }
 PropInstance::~PropInstance() {
-	_mesh_data_instances.clear();
 	//_job.unref();
 	_prop_data.unref();
 }
@@ -166,7 +126,9 @@ PropInstance::~PropInstance() {
 void PropInstance::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_ENTER_TREE: {
-			build();
+			if (_prop_data.is_valid()) {
+				build();
+			}
 		}
 	}
 }

@@ -35,7 +35,7 @@ SOFTWARE.
 
 #include "core/math/vector3.h"
 
-//#include "prop_instance_job.h"
+#include "prop_instance_prop_job.h"
 
 #include "props/prop_data.h"
 
@@ -57,9 +57,6 @@ public:
 	Vector3 get_snap_axis() const;
 	void set_snap_axis(const Vector3 &value);
 
-	void register_prop_mesh_data_instance(MeshDataInstance *instance);
-	void unregister_prop_mesh_data_instance(MeshDataInstance *instance);
-
 	void bake();
 	void queue_bake();
 	void bake_finished();
@@ -80,8 +77,13 @@ private:
 	bool _baking;
 	bool _snap_to_mesh;
 	Vector3 _snap_axis;
-	Vector<MeshDataInstance *> _mesh_data_instances;
-	//Ref<PropInstanceJob> _job;
+
+	Ref<PropInstancePropJob> _job;
+
+	bool _merge_extures;
+	Vector<Ref<Material> > _original_materials;//if !_merge_extures, just use this ?
+
+	static HashMap<Ref<PropData>, Ref<Material> > _material_map;
 };
 
 #endif
