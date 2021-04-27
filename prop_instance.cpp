@@ -5,11 +5,11 @@
 #include "core/version.h"
 
 #if MESH_DATA_RESOURCE_PRESENT
-//define PROPS_PRESENT, so things compile. That module's scsub will define this too while compiling, 
+//define PROPS_PRESENT, so things compile. That module's scsub will define this too while compiling,
 //but not when included from here.
 #define PROPS_PRESENT 1
 #include "../mesh_data_resource/props/prop_data_mesh_data.h"
-#endif 
+#endif
 
 #include "./props/prop_data_entry.h"
 #include "./props/prop_data_light.h"
@@ -114,7 +114,7 @@ void PropInstance::_prop_preprocess(Transform transform, const Ref<PropData> &pr
 
 			Node *n = sc->instance();
 			add_child(n);
-			n->set_owner(this);
+			//n->set_owner(this);
 
 			Spatial *sp = Object::cast_to<Spatial>(n);
 
@@ -153,9 +153,14 @@ void PropInstance::_prop_preprocess(Transform transform, const Ref<PropData> &pr
 			if (!mdr.is_valid())
 				continue;
 
-			//add to job
-			//job could merge textures if needed
-			//chunk->mesh_data_resource_add(t, mdr, mesh_data->get_texture());
+			MeshDataInstance *mdi = memnew(MeshDataInstance);
+			add_child(mdi);
+			//mdi->set_owner(this);
+			mdi->set_transform(t);
+			//not yet sure how it would be best to do this
+			//Maybe giving this class a material, and setting it could work
+			//mdi->set_material();
+			mdi->set_mesh_data(mdr);
 
 			continue;
 		}
@@ -189,9 +194,9 @@ void PropInstance::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_prop_data", "value"), &PropInstance::set_prop_data);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "prop_data", PROPERTY_HINT_RESOURCE_TYPE, "PropData"), "set_prop_data", "get_prop_data");
 
-	BIND_VMETHOD(MethodInfo("_prop_preprocess", 
-					PropertyInfo(Variant::TRANSFORM, "tarnsform"), 
-					PropertyInfo(Variant::OBJECT, "prop_data", PROPERTY_HINT_RESOURCE_TYPE, "PropData")));
+	BIND_VMETHOD(MethodInfo("_prop_preprocess",
+			PropertyInfo(Variant::TRANSFORM, "tarnsform"),
+			PropertyInfo(Variant::OBJECT, "prop_data", PROPERTY_HINT_RESOURCE_TYPE, "PropData")));
 
 	ClassDB::bind_method(D_METHOD("prop_preprocess", "tarnsform", "prop"), &PropInstance::prop_preprocess);
 	ClassDB::bind_method(D_METHOD("_prop_preprocess", "tarnsform", "prop"), &PropInstance::_prop_preprocess);
