@@ -4,6 +4,14 @@
 
 #include "core/version.h"
 
+#if VERSION_MAJOR < 4
+#include "scene/3d/light.h"
+#else
+#include "scene/3d/light_3d.h"
+#define OmniLight OmniLight3D
+#define Light Light3D
+#endif
+
 #if MESH_DATA_RESOURCE_PRESENT
 //define PROPS_PRESENT, so things compile. That module's scsub will define this too while compiling,
 //but not when included from here.
@@ -80,6 +88,8 @@ void PropInstance::prop_preprocess(Transform transform, const Ref<PropData> &pro
 }
 
 void PropInstance::_prop_preprocess(Transform transform, const Ref<PropData> &prop) {
+	//don't set owners, to help working with the editor
+
 	ERR_FAIL_COND(!prop.is_valid());
 
 	int count = prop->get_prop_count();
@@ -114,7 +124,6 @@ void PropInstance::_prop_preprocess(Transform transform, const Ref<PropData> &pr
 
 			Node *n = sc->instance();
 			add_child(n);
-			//n->set_owner(this);
 
 			Spatial *sp = Object::cast_to<Spatial>(n);
 
@@ -125,24 +134,17 @@ void PropInstance::_prop_preprocess(Transform transform, const Ref<PropData> &pr
 			continue;
 		}
 
-		/*
-		//Will create a Terralight node, and prop
-		//PropDataLight could use standard godot light nodes
-		Ref<PropDataLight> light_data = entry;
+		Ref<PropDataLight> light_data = e;
 
 		if (light_data.is_valid()) {
-			Ref<VoxelLight> light;
-			light.instance();
-
-			light->set_world_position(wp.x / get_voxel_scale(), wp.y / get_voxel_scale(), wp.z / get_voxel_scale());
+			OmniLight *light = memnew(OmniLight);
+			add_child(light);
 			light->set_color(light_data->get_light_color());
-			light->set_size(light_data->get_light_size());
-
-			light_add(light);
+			light->set_param(Light::PARAM_RANGE, light_data->get_light_size());
+			light->set_transform(t);
 
 			continue;
 		}
-		*/
 
 #if MESH_DATA_RESOURCE_PRESENT
 		Ref<PropDataMeshData> mesh_data = e;
@@ -155,10 +157,7 @@ void PropInstance::_prop_preprocess(Transform transform, const Ref<PropData> &pr
 
 			MeshDataInstance *mdi = memnew(MeshDataInstance);
 			add_child(mdi);
-			//mdi->set_owner(this);
 			mdi->set_transform(t);
-			//not yet sure how it would be best to do this
-			//Maybe giving this class a material, and setting it could work
 			//mdi->set_material();
 			mdi->set_mesh_data(mdr);
 
