@@ -100,6 +100,8 @@ public:
 	void build_finished();
 	virtual void _build_finished();
 
+	void prop_preprocess(Transform tarnsform, const Ref<PropData> &prop);
+
 	PropInstance();
 	~PropInstance();
 

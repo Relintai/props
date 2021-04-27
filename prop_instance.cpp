@@ -33,6 +33,18 @@ typedef class RenderingServer VS;
 
 #endif
 
+#if MESH_DATA_RESOURCE_PRESENT
+//define PROPS_PRESENT, so things compile. That module's scsub will define this too while compiling, 
+//but not when included from here.
+#define PROPS_PRESENT 1
+#include "../mesh_data_resource/props/prop_data_mesh_data.h"
+#endif 
+
+#include "./props/prop_data_entry.h"
+#include "./props/prop_data_light.h"
+#include "./props/prop_data_prop.h"
+#include "./props/prop_data_scene.h"
+
 Ref<PropData> PropInstance::get_prop_data() {
 	return _prop_data;
 }
@@ -222,21 +234,7 @@ void PropInstance::build() {
 	if (!_prop_data.is_valid())
 		return;
 
-	for (int i = 0; i < _prop_data->get_prop_count(); ++i) {
-		Ref<PropDataEntry> e = _prop_data->get_prop(i);
-
-		if (!e.is_valid())
-			continue;
-
-		Node *n = e->processor_get_node_for(get_transform());
-
-		if (n) {
-			add_child(n);
-
-			//if (Engine::get_singleton()->is_editor_hint())
-			//	n->set_owner(get_tree()->get_edited_scene_root());
-		}
-	}
+	prop_preprocess(Transform(), _prop_data);
 }
 
 void PropInstance::queue_build() {
@@ -251,6 +249,90 @@ void PropInstance::build_finished() {
 }
 
 void PropInstance::_build_finished() {
+}
+
+void PropInstance::prop_preprocess(Transform transform, const Ref<PropData> &prop) {
+	ERR_FAIL_COND(!prop.is_valid());
+
+	int count = prop->get_prop_count();
+	for (int i = 0; i < count; ++i) {
+		Ref<PropDataEntry> e = prop->get_prop(i);
+
+		if (!e.is_valid())
+			continue;
+
+		Transform t = transform * e->get_transform();
+
+		Ref<PropDataProp> prop_entry_data = e;
+
+		if (prop_entry_data.is_valid()) {
+			Ref<PropData> p = prop_entry_data->get_prop();
+
+			if (!p.is_valid())
+				continue;
+
+			prop_preprocess(t, p);
+
+			continue;
+		}
+
+		Ref<PropDataScene> scene_data = e;
+
+		if (scene_data.is_valid()) {
+			Ref<PackedScene> sc = scene_data->get_scene();
+
+			if (!sc.is_valid())
+				continue;
+
+			Node *n = sc->instance();
+			add_child(n);
+			n->set_owner(this);
+
+			Spatial *sp = Object::cast_to<Spatial>(n);
+
+			if (sp) {
+				sp->set_transform(t);
+			}
+
+			continue;
+		}
+
+		/*
+		//Will create a Terralight node, and prop
+		//PropDataLight could use standard godot light nodes
+		Ref<PropDataLight> light_data = entry;
+
+		if (light_data.is_valid()) {
+			Ref<VoxelLight> light;
+			light.instance();
+
+			light->set_world_position(wp.x / get_voxel_scale(), wp.y / get_voxel_scale(), wp.z / get_voxel_scale());
+			light->set_color(light_data->get_light_color());
+			light->set_size(light_data->get_light_size());
+
+			light_add(light);
+
+			continue;
+		}
+		*/
+
+#if MESH_DATA_RESOURCE_PRESENT
+		Ref<PropDataMeshData> mesh_data = e;
+
+		if (mesh_data.is_valid()) {
+			Ref<MeshDataResource> mdr = mesh_data->get_mesh();
+
+			if (!mdr.is_valid())
+				continue;
+
+			//add to job
+			//job could merge textures if needed
+			//chunk->mesh_data_resource_add(t, mdr, mesh_data->get_texture());
+
+			continue;
+		}
+#endif
+	}
 }
 
 PropInstance::PropInstance() {
