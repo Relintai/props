@@ -96,7 +96,7 @@ public:
 	virtual void _build();
 	virtual void _build_finished();
 
-	void prop_preprocess(Transform tarnsform, const Ref<PropData> &prop);
+	void _prop_preprocess(Transform tarnsform, const Ref<PropData> &prop);
 
 	PropInstanceMerger();
 	~PropInstanceMerger();

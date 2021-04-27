@@ -76,6 +76,10 @@ void PropInstance::_build_finished() {
 }
 
 void PropInstance::prop_preprocess(Transform transform, const Ref<PropData> &prop) {
+	call("_prop_preprocess", transform, prop);
+}
+
+void PropInstance::_prop_preprocess(Transform transform, const Ref<PropData> &prop) {
 	ERR_FAIL_COND(!prop.is_valid());
 
 	int count = prop->get_prop_count();
@@ -184,6 +188,13 @@ void PropInstance::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_prop_data"), &PropInstance::get_prop_data);
 	ClassDB::bind_method(D_METHOD("set_prop_data", "value"), &PropInstance::set_prop_data);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "prop_data", PROPERTY_HINT_RESOURCE_TYPE, "PropData"), "set_prop_data", "get_prop_data");
+
+	BIND_VMETHOD(MethodInfo("_prop_preprocess", 
+					PropertyInfo(Variant::TRANSFORM, "tarnsform"), 
+					PropertyInfo(Variant::OBJECT, "prop_data", PROPERTY_HINT_RESOURCE_TYPE, "PropData")));
+
+	ClassDB::bind_method(D_METHOD("prop_preprocess", "tarnsform", "prop"), &PropInstance::prop_preprocess);
+	ClassDB::bind_method(D_METHOD("_prop_preprocess", "tarnsform", "prop"), &PropInstance::_prop_preprocess);
 
 	//---
 	BIND_VMETHOD(MethodInfo("_init_materials"));

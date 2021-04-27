@@ -225,7 +225,7 @@ void PropInstanceMerger::_build() {
 void PropInstanceMerger::_build_finished() {
 }
 
-void PropInstanceMerger::prop_preprocess(Transform transform, const Ref<PropData> &prop) {
+void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropData> &prop) {
 	ERR_FAIL_COND(!prop.is_valid());
 
 	int count = prop->get_prop_count();
