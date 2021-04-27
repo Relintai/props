@@ -98,6 +98,8 @@ public:
 	void build();
 	void queue_build();
 	void build_finished();
+	
+	virtual void _build();
 	virtual void _build_finished();
 
 	void prop_preprocess(Transform tarnsform, const Ref<PropData> &prop);

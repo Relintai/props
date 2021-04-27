@@ -209,6 +209,21 @@ void PropInstance::_init_materials() {
 }
 
 void PropInstance::build() {
+	call("_build");
+}
+
+void PropInstance::queue_build() {
+}
+
+void PropInstance::build_finished() {
+	_building = false;
+
+	if (_build_queued) {
+		call_deferred("build");
+	}
+}
+
+void PropInstance::_build() {
 	_building = true;
 	_build_queued = false;
 
@@ -235,17 +250,6 @@ void PropInstance::build() {
 		return;
 
 	prop_preprocess(Transform(), _prop_data);
-}
-
-void PropInstance::queue_build() {
-}
-
-void PropInstance::build_finished() {
-	_building = false;
-
-	if (_build_queued) {
-		call_deferred("build");
-	}
 }
 
 void PropInstance::_build_finished() {
@@ -442,7 +446,9 @@ void PropInstance::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("queue_build"), &PropInstance::queue_build);
 	ClassDB::bind_method(D_METHOD("build_finished"), &PropInstance::build_finished);
 
+	BIND_VMETHOD(MethodInfo("_build"));
 	BIND_VMETHOD(MethodInfo("_build_finished"));
 
+	ClassDB::bind_method(D_METHOD("_build"), &PropInstance::_build);
 	ClassDB::bind_method(D_METHOD("_build_finished"), &PropInstance::_build_finished);
 }
