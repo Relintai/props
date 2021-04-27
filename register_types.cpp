@@ -41,6 +41,7 @@ SOFTWARE.
 
 #include "prop_ess_entity.h"
 #include "prop_instance.h"
+#include "prop_instance_merger.h"
 
 #include "prop_instance_job.h"
 #include "prop_instance_prop_job.h"
@@ -71,6 +72,7 @@ void register_props_types() {
 	ClassDB::register_class<PropMesherJobStep>();
 
 	ClassDB::register_class<PropInstance>();
+	ClassDB::register_class<PropInstanceMerger>();
 
 	ClassDB::register_class<PropESSEntity>();
 

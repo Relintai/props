@@ -34,6 +34,7 @@ sources = [
     "clutter/ground_clutter_foliage.cpp",
 
     "prop_instance.cpp",
+    "prop_instance_merger.cpp",
     "prop_ess_entity.cpp",
     "prop_instance_job.cpp",
     "prop_instance_prop_job.cpp",
