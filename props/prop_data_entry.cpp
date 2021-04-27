@@ -61,6 +61,9 @@ Node *PropDataEntry::processor_get_node_for(const Transform &transform) {
 bool PropDataEntry::processor_evaluate_children() {
 	return call("_processor_evaluate_children");
 }
+bool PropDataEntry::merge_preferred() {
+	return call("_merge_preferred");
+}
 void PropDataEntry::add_to_mesher(Ref<PropMesher> mesher) {
 	call("_add_to_mesher", mesher);
 }
@@ -75,6 +78,9 @@ Node *PropDataEntry::_processor_get_node_for(const Transform &transform) {
 }
 bool PropDataEntry::_processor_evaluate_children() {
 	return true;
+}
+bool PropDataEntry::_merge_preferred() {
+	return false;
 }
 void PropDataEntry::_add_to_mesher(Ref<PropMesher> mesher) {
 }
@@ -106,18 +112,21 @@ void PropDataEntry::_bind_methods() {
 
 	BIND_VMETHOD(MethodInfo(PropertyInfo(Variant::BOOL, "evaluate"), "_processor_evaluate_children"));
 
+	BIND_VMETHOD(MethodInfo(PropertyInfo(Variant::BOOL, "is"), "_merge_preferred"));
 	BIND_VMETHOD(MethodInfo("_add_to_mesher", PropertyInfo(Variant::OBJECT, "mesher", PROPERTY_HINT_RESOURCE_TYPE, "PropMesher")));
 
 	ClassDB::bind_method(D_METHOD("processor_handles", "node"), &PropDataEntry::processor_handles);
 	ClassDB::bind_method(D_METHOD("processor_process", "prop_data", "node", "transform"), &PropDataEntry::processor_process);
 	ClassDB::bind_method(D_METHOD("processor_get_node_for", "prop_data"), &PropDataEntry::processor_get_node_for);
 	ClassDB::bind_method(D_METHOD("processor_evaluate_children"), &PropDataEntry::processor_evaluate_children);
+	ClassDB::bind_method(D_METHOD("merge_preferred"), &PropDataEntry::merge_preferred);
 	ClassDB::bind_method(D_METHOD("add_to_mesher", "mesher"), &PropDataEntry::add_to_mesher);
 
 	ClassDB::bind_method(D_METHOD("_processor_handles", "node"), &PropDataEntry::_processor_handles);
 	ClassDB::bind_method(D_METHOD("_processor_process", "prop_data", "node", "transform"), &PropDataEntry::_processor_process);
 	ClassDB::bind_method(D_METHOD("_processor_get_node_for", "transform"), &PropDataEntry::_processor_get_node_for);
 	ClassDB::bind_method(D_METHOD("_processor_evaluate_children"), &PropDataEntry::_processor_evaluate_children);
+	ClassDB::bind_method(D_METHOD("_merge_preferred"), &PropDataEntry::_merge_preferred);
 	ClassDB::bind_method(D_METHOD("_add_to_mesher", "mesher"), &PropDataEntry::_add_to_mesher);
 
 }

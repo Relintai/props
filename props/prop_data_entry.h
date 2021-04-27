@@ -55,12 +55,14 @@ public:
 	void processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform);
 	Node *processor_get_node_for(const Transform &transform);
 	bool processor_evaluate_children();
+	bool merge_preferred();
 	void add_to_mesher(Ref<PropMesher> mesher);
 
 	virtual bool _processor_handles(Node *node);
 	virtual void _processor_process(Ref<PropData> prop_data, Node *node, const Transform &transform);
 	virtual Node *_processor_get_node_for(const Transform &transform);
 	virtual bool _processor_evaluate_children();
+	virtual bool _merge_preferred();
 	virtual void _add_to_mesher(Ref<PropMesher> mesher);
 
 	PropDataEntry();
