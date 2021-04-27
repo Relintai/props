@@ -33,6 +33,8 @@ SOFTWARE.
 #define Spatial Node3D
 #endif
 
+#include "scene/resources/material.h"
+
 #include "core/math/vector3.h"
 
 #include "props/prop_data.h"
@@ -43,6 +45,9 @@ class PropInstance : public Spatial {
 public:
 	Ref<PropData> get_prop_data();
 	void set_prop_data(const Ref<PropData> &data);
+
+	Ref<Material> get_material();
+	void set_material(const Ref<Material> &material);
 
 	void init_materials();
 	virtual void _init_materials();
@@ -66,6 +71,7 @@ protected:
 
 protected:
 	Ref<PropData> _prop_data;
+	Ref<Material> _material;
 
 	bool _build_queued;
 	bool _building;

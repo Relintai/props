@@ -36,6 +36,13 @@ void PropInstance::set_prop_data(const Ref<PropData> &data) {
 	queue_build();
 }
 
+Ref<Material> PropInstance::get_material() {
+	return _material;
+}
+void PropInstance::set_material(const Ref<Material> &material) {
+	_material = material;
+}
+
 void PropInstance::init_materials() {
 	call("_init_materials");
 }
@@ -158,7 +165,32 @@ void PropInstance::_prop_preprocess(Transform transform, const Ref<PropData> &pr
 			MeshDataInstance *mdi = memnew(MeshDataInstance);
 			add_child(mdi);
 			mdi->set_transform(t);
-			//mdi->set_material();
+
+			if (_material.is_valid()) {
+				//duplicate the material, so that textures will work
+				Ref<Material> mat = _material->duplicate();
+
+				Ref<Texture> texture = mdi->get_texture();
+
+				if (texture.is_valid()) {
+					//texture is valid, try to set it into the material
+					Ref<SpatialMaterial> spmat = mat;
+
+					if (spmat.is_valid()) {
+						spmat->set_texture(SpatialMaterial::TEXTURE_ALBEDO, texture);
+					} else {
+
+						Ref<ShaderMaterial> shmat = mat;
+
+						if (shmat.is_valid()) {
+							shmat->set_shader_param("texture_albedo", texture);
+						}
+					}
+				}
+
+				mdi->set_material(mat);
+			}
+
 			mdi->set_mesh_data(mdr);
 
 			continue;
@@ -192,6 +224,10 @@ void PropInstance::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_prop_data"), &PropInstance::get_prop_data);
 	ClassDB::bind_method(D_METHOD("set_prop_data", "value"), &PropInstance::set_prop_data);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "prop_data", PROPERTY_HINT_RESOURCE_TYPE, "PropData"), "set_prop_data", "get_prop_data");
+
+	ClassDB::bind_method(D_METHOD("get_material"), &PropInstance::get_material);
+	ClassDB::bind_method(D_METHOD("set_material", "material"), &PropInstance::set_material);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_material", "get_material");
 
 	BIND_VMETHOD(MethodInfo("_prop_preprocess",
 			PropertyInfo(Variant::TRANSFORM, "tarnsform"),
