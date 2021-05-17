@@ -42,10 +42,13 @@ sources = [
     "prop_scene_instance.cpp",
 
     "singleton/prop_utils.cpp",
+    "singleton/prop_texture_cache.cpp",
 
     "editor/prop_editor_plugin.cpp",
 
     "prop_mesher.cpp",
+
+    "jobs/prop_texture_job.cpp",
 
     "prop_mesher_job_step.cpp",
 ]

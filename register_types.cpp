@@ -46,10 +46,13 @@ SOFTWARE.
 #include "prop_instance_job.h"
 #include "prop_instance_prop_job.h"
 
+#include "jobs/prop_texture_job.h"
+
 #include "prop_scene_instance.h"
 
 #include "prop_mesher_job_step.h"
 
+#include "singleton/prop_texture_cache.h"
 #include "singleton/prop_utils.h"
 
 #include "./editor/prop_editor_plugin.h"
@@ -57,6 +60,7 @@ SOFTWARE.
 #include "prop_mesher.h"
 
 static PropUtils *prop_utils = NULL;
+static PropTextureCache *prop_texture_cache = NULL;
 
 void register_props_types() {
 	ClassDB::register_class<PropData>();
@@ -79,11 +83,17 @@ void register_props_types() {
 	ClassDB::register_class<PropInstanceJob>();
 	ClassDB::register_class<PropInstancePropJob>();
 
+	ClassDB::register_class<PropTextureJob>();
+
 	ClassDB::register_class<PropSceneInstance>();
 
 	prop_utils = memnew(PropUtils);
 	ClassDB::register_class<PropUtils>();
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PropUtils", PropUtils::get_singleton()));
+
+	prop_texture_cache = memnew(PropTextureCache);
+	ClassDB::register_class<PropTextureCache>();
+	Engine::get_singleton()->add_singleton(Engine::Singleton("PropTextureCache", PropTextureCache::get_singleton()));
 
 	Ref<PropDataLight> light_processor = Ref<PropDataLight>(memnew(PropDataLight));
 	PropUtils::add_processor(light_processor);
@@ -102,5 +112,9 @@ void register_props_types() {
 void unregister_props_types() {
 	if (prop_utils) {
 		memdelete(prop_utils);
+	}
+
+	if (prop_texture_cache) {
+		memdelete(prop_texture_cache);
 	}
 }

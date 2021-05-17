@@ -33,12 +33,9 @@ SOFTWARE.
 
 #include "core/math/transform.h"
 
-#if TEXTURE_PACKER_PRESENT
-#include "../../texture_packer/texture_packer.h"
-#endif
-
 class PropData;
 class PropMesher;
+class TexturePacker;
 
 class PropDataEntry : public Resource {
 	GDCLASS(PropDataEntry, Resource);

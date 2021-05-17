@@ -33,6 +33,11 @@ SOFTWARE.
 #define Spatial Node3D
 #endif
 
+#if TEXTURE_PACKER_PRESENT
+#include "../../texture_packer/texture_packer.h"
+#endif
+
+
 #include "../prop_mesher.h"
 
 Transform PropDataEntry::get_transform() const {
