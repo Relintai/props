@@ -49,6 +49,10 @@ typedef class RenderingServer VS;
 #include "./singleton/prop_texture_cache.h"
 #endif
 
+#if THREAD_POOL_PRESENT
+#include "../thread_pool/thread_pool.h"
+#endif
+
 Ref<PropInstanceJob> PropInstanceMerger::get_job() {
 	return _job;
 }
@@ -243,6 +247,12 @@ void PropInstanceMerger::_build() {
 		return;
 
 	prop_preprocess(Transform(), _prop_data);
+
+#if THREAD_POOL_PRESENT
+	ThreadPool::get_singleton()->add_job(_job);
+#else
+	_job->execute();
+#endif
 }
 
 void PropInstanceMerger::_build_finished() {
