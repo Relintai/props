@@ -25,6 +25,10 @@ SOFTWARE.
 
 #include "prop_instance_job.h"
 
+#if TEXTURE_PACKER_PRESENT
+class TexturePacker;
+#endif
+
 class PropMesher;
 class PropInstance;
 
@@ -32,6 +36,11 @@ class PropInstancePropJob : public PropInstanceJob {
 	GDCLASS(PropInstancePropJob, PropInstanceJob);
 
 public:
+#if TEXTURE_PACKER_PRESENT
+	Ref<TexturePacker> get_texture_packer();
+	void set_texture_packer(const Ref<TexturePacker> &packer);
+#endif
+
 	PropInstance *get_prop_instace();
 	void set_prop_instace(PropInstance *prop);
 	void set_prop_instace_bind(Node *prop);
@@ -52,6 +61,9 @@ public:
 protected:
 	static void _bind_methods();
 
+#if TEXTURE_PACKER_PRESENT
+	Ref<TexturePacker> _texture_packer;
+#endif
 	Ref<PropMesher> _prop_mesher;
 	PropInstance *_prop_instace;
 

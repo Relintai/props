@@ -33,6 +33,19 @@ SOFTWARE.
 #include "../mesh_utils/fast_quadratic_mesh_simplifier.h"
 #endif
 
+#if TEXTURE_PACKER_PRESENT
+#include "../texture_packer/texture_packer.h"
+#endif
+
+#if TEXTURE_PACKER_PRESENT
+Ref<TexturePacker> PropInstancePropJob::get_texture_packer() {
+	return _texture_packer;
+}
+void PropInstancePropJob::set_texture_packer(const Ref<TexturePacker> &packer) {
+	_texture_packer = packer;
+}
+#endif
+
 PropInstance *PropInstancePropJob::get_prop_instace() {
 	return _prop_instace;
 }
@@ -389,6 +402,12 @@ PropInstancePropJob::~PropInstancePropJob() {
 }
 
 void PropInstancePropJob::_bind_methods() {
+#if TEXTURE_PACKER_PRESENT
+	ClassDB::bind_method(D_METHOD("get_texture_packer"), &PropInstancePropJob::get_texture_packer);
+	ClassDB::bind_method(D_METHOD("set_texture_packer", "packer"), &PropInstancePropJob::set_texture_packer);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "texture_packer", PROPERTY_HINT_RESOURCE_TYPE, "TexturePacker", 0), "set_texture_packer", "get_texture_packer");
+#endif
+
 	ClassDB::bind_method(D_METHOD("get_prop_mesher"), &PropInstancePropJob::get_prop_mesher);
 	ClassDB::bind_method(D_METHOD("set_prop_mesher", "mesher"), &PropInstancePropJob::set_prop_mesher);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "prop_mesher", PROPERTY_HINT_RESOURCE_TYPE, "PropMesher", 0), "set_prop_mesher", "get_prop_mesher");
