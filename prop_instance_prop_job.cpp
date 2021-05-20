@@ -37,6 +37,13 @@ SOFTWARE.
 #include "../texture_packer/texture_packer.h"
 #endif
 
+#if MESH_DATA_RESOURCE_PRESENT
+//define PROPS_PRESENT, so things compile. That module's scsub will define this too while compiling, 
+//but not when included from here.
+#define PROPS_PRESENT 1
+#include "../mesh_data_resource/props/prop_data_mesh_data.h"
+#endif 
+
 #if TEXTURE_PACKER_PRESENT
 Ref<TexturePacker> PropInstancePropJob::get_texture_packer() {
 	return _texture_packer;
@@ -62,6 +69,20 @@ Ref<PropMesher> PropInstancePropJob::get_prop_mesher() const {
 void PropInstancePropJob::set_prop_mesher(const Ref<PropMesher> &mesher) {
 	_prop_mesher = mesher;
 }
+
+#if MESH_DATA_RESOURCE_PRESENT
+void PropInstancePropJob::add_mesh(const Ref<PropDataMeshData> &mesh_data, const Transform &base_transform) {
+	PMDREntry e;
+	e.mesh_data = mesh_data;
+	e.base_transform = base_transform;
+
+	_prop_mesh_datas.push_back(e);
+}
+
+void PropInstancePropJob::clear_meshes() {
+	_prop_mesh_datas.clear();
+}
+#endif
 
 void PropInstancePropJob::phase_physics_process() {
 	/*

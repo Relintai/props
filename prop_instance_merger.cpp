@@ -299,9 +299,7 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 			if (!mdr.is_valid())
 				continue;
 
-			//add to job
-			//job could merge textures if needed
-			//chunk->mesh_data_resource_add(t, mdr, mesh_data->get_texture());
+			_job->add_mesh(mesh_data, transform);
 
 			continue;
 		}

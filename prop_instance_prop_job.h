@@ -32,6 +32,10 @@ class TexturePacker;
 class PropMesher;
 class PropInstance;
 
+#if MESH_DATA_RESOURCE_PRESENT
+class PropDataMeshData;
+#endif
+
 class PropInstancePropJob : public PropInstanceJob {
 	GDCLASS(PropInstancePropJob, PropInstanceJob);
 
@@ -48,6 +52,11 @@ public:
 	Ref<PropMesher> get_prop_mesher() const;
 	void set_prop_mesher(const Ref<PropMesher> &mesher);
 
+#if MESH_DATA_RESOURCE_PRESENT
+	void add_mesh(const Ref<PropDataMeshData> &mesh_data, const Transform &base_transform);
+	void clear_meshes();
+#endif
+
 	void phase_physics_process();
 	void phase_prop();
 
@@ -61,11 +70,23 @@ public:
 protected:
 	static void _bind_methods();
 
+protected:
+#if MESH_DATA_RESOURCE_PRESENT
+	struct PMDREntry {
+		Ref<PropDataMeshData> mesh_data;
+		Transform base_transform;
+	};
+#endif
+
 #if TEXTURE_PACKER_PRESENT
 	Ref<TexturePacker> _texture_packer;
 #endif
 	Ref<PropMesher> _prop_mesher;
 	PropInstance *_prop_instace;
+
+#if MESH_DATA_RESOURCE_PRESENT
+	Vector<PMDREntry> _prop_mesh_datas;
+#endif
 
 	Array temp_mesh_arr;
 };
