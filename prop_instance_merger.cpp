@@ -45,6 +45,10 @@ typedef class RenderingServer VS;
 #include "./props/prop_data_prop.h"
 #include "./props/prop_data_scene.h"
 
+#if TEXTURE_PACKER_PRESENT
+#include "./singleton/prop_texture_cache.h"
+#endif
+
 Ref<PropInstanceJob> PropInstanceMerger::get_job() {
 	return _job;
 }
@@ -197,15 +201,34 @@ void PropInstanceMerger::_build() {
 	_building = true;
 	_build_queued = false;
 
-	if (!_job.is_valid()) {
-		_job = Ref<PropInstanceJob>(memnew(PropInstancePropJob()));
-	}
-
-	_job->set_prop_instace(this);
-
-	if (!is_inside_tree()) {
+	if (!_prop_data.is_valid()) {
+		_building = false;
 		return;
 	}
+
+	if (!_job.is_valid()) {
+		_job = Ref<PropInstanceJob>(memnew(PropInstancePropJob()));
+		_job->set_prop_instace(this);
+	}
+
+	if (!is_inside_tree()) {
+		_building = false;
+		_build_queued = true;
+		return;
+	}
+
+#if TEXTURE_PACKER_PRESENT
+	Ref<TexturePacker> packer = PropTextureCache::get_singleton()->get_or_create_texture_threaded(_prop_data);
+
+	if (packer->get_generated_texture_count() == 0) {
+		_building = false;
+		_build_queued = true;
+		return;
+	}
+
+	_job->set_texture_packer(packer);
+#endif
+
 
 	for (int i = 0; i < get_child_count(); ++i) {
 		Node *n = get_child(i);
