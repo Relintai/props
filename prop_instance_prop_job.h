@@ -31,6 +31,7 @@ class TexturePacker;
 
 class PropMesher;
 class PropInstance;
+class PropInstanceMerger;
 
 #if MESH_DATA_RESOURCE_PRESENT
 class PropDataMeshData;
@@ -45,8 +46,8 @@ public:
 	void set_texture_packer(const Ref<TexturePacker> &packer);
 #endif
 
-	PropInstance *get_prop_instace();
-	void set_prop_instace(PropInstance *prop);
+	PropInstanceMerger *get_prop_instace();
+	void set_prop_instace(PropInstanceMerger *prop);
 	void set_prop_instace_bind(Node *prop);
 
 	Ref<PropMesher> get_prop_mesher() const;
@@ -82,7 +83,7 @@ protected:
 	Ref<TexturePacker> _texture_packer;
 #endif
 	Ref<PropMesher> _prop_mesher;
-	PropInstance *_prop_instace;
+	PropInstanceMerger *_prop_instace;
 
 #if MESH_DATA_RESOURCE_PRESENT
 	Vector<PMDREntry> _prop_mesh_datas;

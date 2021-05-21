@@ -66,21 +66,36 @@ public:
 
 	//Meshes
 	RID mesh_get(const int index);
-	void mesh_add(const RID value);
+	RID mesh_instance_get(const int index);
+	void mesh_add(const RID mesh_instance, const RID mesh);
 	int mesh_get_num() const;
-	void meshs_clear();
+	void meshes_clear();
+	void meshes_create(const int num);
 
 	Vector<Variant> meshes_get();
 	void meshes_set(const Vector<Variant> &meshes);
 
 	//Colliders
-	RID collider_get(const int index);
-	void collider_add(const RID value);
+	Transform collider_local_transform_get(const int index);
+	RID collider_body_get(const int index);
+	Ref<Shape> collider_shape_get(const int index);
+	RID collider_shape_rid_get(const int index);
+	int collider_add(const Transform &local_transform, const Ref<Shape> &shape, const RID &shape_rid, const RID &body);
 	int collider_get_num() const;
 	void colliders_clear();
 
 	Vector<Variant> colliders_get();
 	void colliders_set(const Vector<Variant> &colliders);
+
+	//Debug
+	void debug_mesh_allocate();
+	void debug_mesh_free();
+	bool debug_mesh_has();
+	void debug_mesh_clear();
+	void debug_mesh_array_clear();
+	void debug_mesh_add_vertices_to(const PoolVector3Array &arr);
+	void debug_mesh_send();
+	void draw_debug_mdr_colliders();
 
 	float get_first_lod_distance_squared();
 	void set_first_lod_distance_squared(const float dist);
@@ -105,6 +120,19 @@ protected:
 	void _notification(int p_what);
 	static void _bind_methods();
 
+protected:
+	struct ColliderBody {
+		Transform transform;
+		RID body;
+		Ref<Shape> shape;
+		RID shape_rid;
+	};
+
+	struct MeshEntry {
+		RID mesh;
+		RID mesh_instance;
+	};
+
 private:
 	Ref<PropData> _prop_data;
 
@@ -118,11 +146,16 @@ private:
 #endif
 
 	Vector<Ref<Material> > _materials;
-	Vector<RID> _meshes;
-	Vector<RID> _colliders;
+	Vector<MeshEntry> _meshes;
+	Vector<ColliderBody> _colliders;
 
 	float _first_lod_distance_squared;
 	float _lod_reduction_distance_squared;
+
+	//debug
+	RID _debug_mesh_rid;
+	RID _debug_mesh_instance;
+	PoolVector3Array _debug_mesh_array;
 };
 
 #endif
