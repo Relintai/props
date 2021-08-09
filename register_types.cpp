@@ -46,8 +46,8 @@ SOFTWARE.
 #include "prop_instance_job.h"
 #include "prop_instance_prop_job.h"
 
-#include "jobs/prop_texture_job.h"
 #include "jobs/prop_mesher_job_step.h"
+#include "jobs/prop_texture_job.h"
 
 #include "prop_scene_instance.h"
 
@@ -57,6 +57,12 @@ SOFTWARE.
 #include "./editor/prop_editor_plugin.h"
 
 #include "prop_mesher.h"
+
+#include "material_cache/prop_material_cache.h"
+
+#ifdef TEXTURE_PACKER_PRESENT
+#include "material_cache/prop_material_cache_pcm.h"
+#endif
 
 static PropUtils *prop_utils = NULL;
 static PropTextureCache *prop_texture_cache = NULL;
@@ -85,6 +91,12 @@ void register_props_types() {
 	ClassDB::register_class<PropTextureJob>();
 
 	ClassDB::register_class<PropSceneInstance>();
+
+	ClassDB::register_class<PropMaterialCache>();
+
+#ifdef TEXTURE_PACKER_PRESENT
+	ClassDB::register_class<PropMaterialCachePCM>();
+#endif
 
 	prop_utils = memnew(PropUtils);
 	ClassDB::register_class<PropUtils>();

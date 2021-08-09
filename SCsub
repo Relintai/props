@@ -7,7 +7,10 @@ module_env = env.Clone()
 if os.path.isdir('../mesh_data_resource'):
     module_env.Append(CPPDEFINES=['MESH_DATA_RESOURCE_PRESENT'])
 
+has_texture_packer = False
+
 if os.path.isdir('../texture_packer'):
+    has_texture_packer = True
     module_env.Append(CPPDEFINES=['TEXTURE_PACKER_PRESENT'])
 
 if os.path.isdir('../terraman'):
@@ -51,7 +54,12 @@ sources = [
     "jobs/prop_texture_job.cpp",
 
     "jobs/prop_mesher_job_step.cpp",
+
+    "material_cache/prop_material_cache.cpp"
 ]
+
+if has_texture_packer:
+    sources.append("material_cache/prop_material_cache_pcm.cpp")
 
 if ARGUMENTS.get('custom_modules_shared', 'no') == 'yes':
     # Shared lib compilation
