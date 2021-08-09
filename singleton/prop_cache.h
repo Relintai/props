@@ -41,22 +41,10 @@ SOFTWARE.
 
 #include "../props/prop_data.h"
 
-#if TEXTURE_PACKER_PRESENT
-class TexturePacker;
-#endif
-
 class PropMaterialCache;
 
 class PropCache : public Object {
 	GDCLASS(PropCache, Object);
-
-#if TEXTURE_PACKER_PRESENT
-public:
-	struct PropCacheEntry {
-		int refcount;
-		Ref<TexturePacker> merger;
-		Ref<PropData> prop;
-	};
 
 public:
 	static PropCache *get_singleton();
@@ -70,24 +58,8 @@ public:
 	Ref<PropMaterialCache> material_cache_custom_key_get(const uint64_t key);
 	void material_cache_custom_key_unref(const uint64_t key);
 
-	bool has_texture(const Ref<PropData> &prop);
-	void set_texture(const Ref<PropData> &prop, const Ref<TexturePacker> &merger);
-
-	Ref<TexturePacker> get_texture(const Ref<PropData> &prop);
-
-	void ref_texture(const Ref<PropData> &prop);
-	void unref_texture(const Ref<PropData> &prop);
-
-	Ref<TexturePacker> create_texture(const Ref<PropData> &prop);
-	Ref<TexturePacker> get_or_create_texture_immediate(const Ref<PropData> &prop);
-	Ref<TexturePacker> get_or_create_texture_threaded(const Ref<PropData> &prop);
-
 private:
-	Vector<PropCacheEntry> _entries;
-
 	static PropCache *_instance;
-
-#endif
 
 public:
 	PropCache();

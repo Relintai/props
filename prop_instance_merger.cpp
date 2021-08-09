@@ -410,15 +410,22 @@ void PropInstanceMerger::_build() {
 		return;
 	}
 
-#if TEXTURE_PACKER_PRESENT
-	Ref<TexturePacker> packer = PropCache::get_singleton()->get_or_create_texture_threaded(_prop_data);
+//!
+//job->cache
+//this->cache
+//job->cache = cache
+//job ->  if !has cache query -> buildings can use this to only have one material per building
 
+//move this to job
+#if TEXTURE_PACKER_PRESENT
+	Ref<TexturePacker> packer; // = PropCache::get_singleton()->get_or_create_texture_threaded(_prop_data);
+	/*
 	if (packer->get_generated_texture_count() == 0) {
 		_building = false;
 		_build_queued = true;
 		return;
 	}
-
+*/
 	_job->set_texture_packer(packer);
 #endif
 
