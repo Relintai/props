@@ -39,6 +39,8 @@ SOFTWARE.
 #include "core/vector.h"
 #endif
 
+#include "scene/resources/material.h"
+
 #include "core/os/mutex.h"
 
 #include "../props/prop_data.h"
@@ -74,6 +76,16 @@ public:
 	PoolStringArray material_paths_get() const;
 	void material_paths_set(const PoolStringArray &array);
 
+	void material_add(const Ref<Material> &value);
+	void material_set(const int index, const Ref<Material> &value);
+	void material_remove(const int index);
+	int material_get_num() const;
+	void materials_clear();
+	void materials_load();
+
+	Vector<Variant> materials_get();
+	void materials_set(const Vector<Variant> &materials);
+
 	Ref<PropMaterialCache> material_cache_get(const Ref<PropData> &prop);
 	void material_cache_unref(const Ref<PropData> &prop);
 
@@ -107,6 +119,7 @@ protected:
 #endif
 
 	PoolStringArray _material_paths;
+	Vector<Ref<Material>> _materials;
 };
 
 #endif

@@ -45,6 +45,26 @@ SOFTWARE.
 
 #include "core/hashfuncs.h"
 
+#if VERSION_MAJOR > 3
+
+#define VARIANT_ARRAY_GET(arr)             \
+	Vector<Variant> r;                     \
+	for (int i = 0; i < arr.size(); i++) { \
+		r.push_back(arr[i]);               \
+	}                                      \
+	return r;
+
+#else
+
+#define VARIANT_ARRAY_GET(arr)             \
+	Vector<Variant> r;                     \
+	for (int i = 0; i < arr.size(); i++) { \
+		r.push_back(arr[i].get_ref_ptr()); \
+	}                                      \
+	return r;
+
+#endif
+
 PropCache *PropCache::_instance;
 
 PropCache *PropCache::get_singleton() {
@@ -100,6 +120,48 @@ PoolStringArray PropCache::material_paths_get() const {
 }
 void PropCache::material_paths_set(const PoolStringArray &value) {
 	_material_paths = value;
+}
+
+void PropCache::material_add(const Ref<Material> &value) {
+	ERR_FAIL_COND(!value.is_valid());
+
+	_materials.push_back(value);
+}
+
+void PropCache::material_set(const int index, const Ref<Material> &value) {
+	ERR_FAIL_INDEX(index, _materials.size());
+
+	_materials.set(index, value);
+}
+
+void PropCache::material_remove(const int index) {
+	_materials.remove(index);
+}
+
+int PropCache::material_get_num() const {
+	return _materials.size();
+}
+
+void PropCache::materials_clear() {
+	_materials.clear();
+}
+
+void PropCache::materials_load() {
+
+}
+
+Vector<Variant> PropCache::materials_get() {
+	VARIANT_ARRAY_GET(_materials);
+}
+
+void PropCache::materials_set(const Vector<Variant> &materials) {
+	_materials.clear();
+
+	for (int i = 0; i < materials.size(); i++) {
+		Ref<Material> material = Ref<Material>(materials[i]);
+
+		_materials.push_back(material);
+	}
 }
 
 Ref<PropMaterialCache> PropCache::material_cache_get(const Ref<PropData> &prop) {
@@ -232,4 +294,15 @@ void PropCache::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("material_paths_get"), &PropCache::material_paths_get);
 	ClassDB::bind_method(D_METHOD("material_paths_set", "value"), &PropCache::material_paths_set);
 	ADD_PROPERTY(PropertyInfo(Variant::POOL_STRING_ARRAY, "material_paths"), "material_paths_set", "material_paths_get");
+
+	ClassDB::bind_method(D_METHOD("material_add", "value"), &PropCache::material_add);
+	ClassDB::bind_method(D_METHOD("material_set", "index", "value"), &PropCache::material_set);
+	ClassDB::bind_method(D_METHOD("material_remove", "index"), &PropCache::material_remove);
+	ClassDB::bind_method(D_METHOD("material_get_num"), &PropCache::material_get_num);
+	ClassDB::bind_method(D_METHOD("materials_clear"), &PropCache::materials_clear);
+	ClassDB::bind_method(D_METHOD("materials_load"), &PropCache::materials_load);
+
+	ClassDB::bind_method(D_METHOD("materials_get"), &PropCache::materials_get);
+	ClassDB::bind_method(D_METHOD("materials_set"), &PropCache::materials_set);
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "materials", PROPERTY_HINT_NONE, "17/17:Material", PROPERTY_USAGE_DEFAULT, "Material"), "materials_set", "materials_get");
 }
