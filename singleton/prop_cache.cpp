@@ -45,17 +45,92 @@ SOFTWARE.
 #include "../../texture_packer/texture_packer.h"
 #endif
 
+#include "../material_cache/prop_material_cache.h"
+
+#include "core/hashfuncs.h"
+
 PropCache *PropCache::_instance;
 
 PropCache *PropCache::get_singleton() {
 	return _instance;
 }
 
-String PropCache::get_default_prop_material_cache_class() {
+StringName PropCache::get_default_prop_material_cache_class() {
 	return _default_prop_material_cache_class;
 }
-void PropCache::set_default_prop_material_cache_class(const String &cls_name) {
+void PropCache::set_default_prop_material_cache_class(const StringName &cls_name) {
 	_default_prop_material_cache_class = cls_name;
+}
+
+Ref<PropMaterialCache> PropCache::material_cache_get(const Ref<PropData> &prop) {
+	ERR_FAIL_COND_V(!prop.is_valid(), Ref<PropMaterialCache>());
+
+	//get pointer's value as uint64
+	uint64_t k = make_uint64_t<const PropData *>(*prop);
+
+	_material_cache_mutex.lock();
+
+	if (_material_cache.has(k)) {
+		Ref<PropMaterialCache> m = _material_cache[k];
+
+		m->inc_ref_count();
+
+		_material_cache_mutex.unlock();
+
+		return m;
+	}
+
+	PropMaterialCache *p = Object::cast_to<PropMaterialCache>(ClassDB::instance(_default_prop_material_cache_class));
+
+	if (!p) {
+		ERR_PRINT("Can't instance the given PropMaterialCache! class_name: " + String(_default_prop_material_cache_class));
+	}
+
+	Ref<PropMaterialCache> m(p);
+
+	_material_cache[k] = m;
+
+	_material_cache_mutex.unlock();
+
+	return m;
+}
+void PropCache::material_cache_unref(const Ref<PropData> &prop) {
+	_material_cache_mutex.lock();
+
+	_material_cache_mutex.unlock();
+}
+
+Ref<PropMaterialCache> PropCache::material_cache_custom_key_get(const uint64_t key) {
+	_custom_keyed_material_cache_mutex.lock();
+
+	if (_custom_keyed_material_cache.has(key)) {
+		Ref<PropMaterialCache> m = _custom_keyed_material_cache[key];
+
+		m->inc_ref_count();
+
+		_custom_keyed_material_cache_mutex.unlock();
+
+		return m;
+	}
+
+	PropMaterialCache *p = Object::cast_to<PropMaterialCache>(ClassDB::instance(_default_prop_material_cache_class));
+
+	if (!p) {
+		ERR_PRINT("Can't instance the given PropMaterialCache! class_name: " + String(_default_prop_material_cache_class));
+	}
+
+	Ref<PropMaterialCache> m(p);
+
+	_custom_keyed_material_cache[key] = m;
+
+	_custom_keyed_material_cache_mutex.unlock();
+
+	return m;
+}
+void PropCache::material_cache_custom_key_unref(const uint64_t key) {
+	_custom_keyed_material_cache_mutex.lock();
+
+	_custom_keyed_material_cache_mutex.unlock();
 }
 
 #if TEXTURE_PACKER_PRESENT

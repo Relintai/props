@@ -37,11 +37,15 @@ SOFTWARE.
 #include "core/vector.h"
 #endif
 
+#include "core/os/mutex.h"
+
 #include "../props/prop_data.h"
 
 #if TEXTURE_PACKER_PRESENT
 class TexturePacker;
 #endif
+
+class PropMaterialCache;
 
 class PropCache : public Object {
 	GDCLASS(PropCache, Object);
@@ -57,8 +61,14 @@ public:
 public:
 	static PropCache *get_singleton();
 
-	String get_default_prop_material_cache_class();
-	void set_default_prop_material_cache_class(const String& cls_name);
+	StringName get_default_prop_material_cache_class();
+	void set_default_prop_material_cache_class(const StringName &cls_name);
+
+	Ref<PropMaterialCache> material_cache_get(const Ref<PropData> &prop);
+	void material_cache_unref(const Ref<PropData> &prop);
+
+	Ref<PropMaterialCache> material_cache_custom_key_get(const uint64_t key);
+	void material_cache_custom_key_unref(const uint64_t key);
 
 	bool has_texture(const Ref<PropData> &prop);
 	void set_texture(const Ref<PropData> &prop, const Ref<TexturePacker> &merger);
@@ -86,7 +96,13 @@ public:
 protected:
 	static void _bind_methods();
 
-	String _default_prop_material_cache_class;
+	StringName _default_prop_material_cache_class;
+
+	Map<uint64_t, Ref<PropMaterialCache>> _material_cache;
+	Map<uint64_t, Ref<PropMaterialCache>> _custom_keyed_material_cache;
+
+	Mutex _material_cache_mutex;
+	Mutex _custom_keyed_material_cache_mutex;
 };
 
 #endif
