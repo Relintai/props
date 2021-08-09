@@ -32,13 +32,17 @@ SOFTWARE.
 #endif
 
 #ifdef MESH_UTILS_PRESENT
-#include "../mesh_utils/fast_quadratic_mesh_simplifier.h"
+#include "../../mesh_utils/fast_quadratic_mesh_simplifier.h"
 #endif
 
 class PropMesherJobStep : public Reference {
 	GDCLASS(PropMesherJobStep, Reference);
 
 public:
+	//todo add:
+	//type generate lighting,
+	//type skip (this would leave the mesh empty)
+	//type previous mesh (this would set the previous mesh's rid to the current lod level)
 	enum PropMesherJobStepType {
 		TYPE_NORMAL = 0,
 		TYPE_NORMAL_LOD,
@@ -46,12 +50,10 @@ public:
 		TYPE_MERGE_VERTS,
 		TYPE_BAKE_TEXTURE,
 		TYPE_SIMPLIFY_MESH,
-		TYPE_BAKE_VERTEX_COLOR_AO,
-		TYPE_BAKE_VERTEX_COLOR_RAO,
 		TYPE_OTHER,
 	};
 
-	static const String BINDING_STRING_TERRA_TERRARIN_JOB_STEP_TYPE;
+	static const String BINDING_STRING_PROP_MESHER_JOB_STEP_TYPE;
 
 	PropMesherJobStepType get_job_type() const;
 	void set_job_type(const PropMesherJobStepType value);

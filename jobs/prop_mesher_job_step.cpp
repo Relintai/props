@@ -22,7 +22,7 @@ SOFTWARE.
 
 #include "prop_mesher_job_step.h"
 
-const String PropMesherJobStep::BINDING_STRING_TERRA_TERRARIN_JOB_STEP_TYPE = "Normal,Normal LOD,Drop UV2,Merge Verts,Bake Texture,Simplify Mesh";
+const String PropMesherJobStep::BINDING_STRING_PROP_MESHER_JOB_STEP_TYPE = "Normal,Normal LOD,Drop UV2,Merge Verts,Bake Texture,Simplify Mesh";
 
 PropMesherJobStep::PropMesherJobStepType PropMesherJobStep::get_job_type() const {
 	return _job_type;
@@ -89,7 +89,7 @@ PropMesherJobStep::~PropMesherJobStep() {
 void PropMesherJobStep::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_job_type"), &PropMesherJobStep::get_job_type);
 	ClassDB::bind_method(D_METHOD("set_job_type", "value"), &PropMesherJobStep::set_job_type);
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "job_type", PROPERTY_HINT_ENUM, PropMesherJobStep::BINDING_STRING_TERRA_TERRARIN_JOB_STEP_TYPE), "set_job_type", "get_job_type");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "job_type", PROPERTY_HINT_ENUM, PropMesherJobStep::BINDING_STRING_PROP_MESHER_JOB_STEP_TYPE), "set_job_type", "get_job_type");
 
 	ClassDB::bind_method(D_METHOD("get_lod_index"), &PropMesherJobStep::get_lod_index);
 	ClassDB::bind_method(D_METHOD("set_lod_index", "value"), &PropMesherJobStep::set_lod_index);
@@ -119,7 +119,5 @@ void PropMesherJobStep::_bind_methods() {
 	BIND_ENUM_CONSTANT(TYPE_MERGE_VERTS);
 	BIND_ENUM_CONSTANT(TYPE_BAKE_TEXTURE);
 	BIND_ENUM_CONSTANT(TYPE_SIMPLIFY_MESH);
-	BIND_ENUM_CONSTANT(TYPE_BAKE_VERTEX_COLOR_AO);
-	BIND_ENUM_CONSTANT(TYPE_BAKE_VERTEX_COLOR_RAO);
 	BIND_ENUM_CONSTANT(TYPE_OTHER);
 }

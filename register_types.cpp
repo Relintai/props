@@ -47,10 +47,9 @@ SOFTWARE.
 #include "prop_instance_prop_job.h"
 
 #include "jobs/prop_texture_job.h"
+#include "jobs/prop_mesher_job_step.h"
 
 #include "prop_scene_instance.h"
-
-#include "prop_mesher_job_step.h"
 
 #include "singleton/prop_texture_cache.h"
 #include "singleton/prop_utils.h"

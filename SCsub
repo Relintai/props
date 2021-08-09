@@ -50,7 +50,7 @@ sources = [
 
     "jobs/prop_texture_job.cpp",
 
-    "prop_mesher_job_step.cpp",
+    "jobs/prop_mesher_job_step.cpp",
 ]
 
 if ARGUMENTS.get('custom_modules_shared', 'no') == 'yes':
