@@ -32,6 +32,7 @@ class TexturePacker;
 class PropMesher;
 class PropInstance;
 class PropInstanceMerger;
+class PropMesherJobStep;
 
 #if MESH_DATA_RESOURCE_PRESENT
 class PropDataMeshData;
@@ -45,6 +46,12 @@ public:
 	Ref<TexturePacker> get_texture_packer();
 	void set_texture_packer(const Ref<TexturePacker> &packer);
 #endif
+
+	Ref<PropMesherJobStep> get_jobs_step(const int index) const;
+	void set_jobs_step(const int index, const Ref<PropMesherJobStep> &step);
+	void remove_jobs_step(const int index);
+	void add_jobs_step(const Ref<PropMesherJobStep> &step);
+	int get_jobs_step_count() const;
 
 	PropInstanceMerger *get_prop_instace();
 	void set_prop_instace(PropInstanceMerger *prop);
@@ -82,6 +89,11 @@ protected:
 #if TEXTURE_PACKER_PRESENT
 	Ref<TexturePacker> _texture_packer;
 #endif
+
+	Vector<Ref<PropMesherJobStep>> _job_steps;
+	int _current_job_step;
+	int _current_mesh;
+
 	Ref<PropMesher> _prop_mesher;
 	PropInstanceMerger *_prop_instace;
 

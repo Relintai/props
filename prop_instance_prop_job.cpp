@@ -33,6 +33,7 @@ SOFTWARE.
 #include "prop_instance.h"
 #include "prop_instance_merger.h"
 #include "prop_mesher.h"
+#include "jobs/prop_mesher_job_step.h"
 
 #ifdef MESH_DATA_RESOURCE_PRESENT
 #include "../mesh_data_resource/mesh_data_resource.h"
@@ -61,6 +62,29 @@ void PropInstancePropJob::set_texture_packer(const Ref<TexturePacker> &packer) {
 	_texture_packer = packer;
 }
 #endif
+
+Ref<PropMesherJobStep> PropInstancePropJob::get_jobs_step(int index) const {
+	ERR_FAIL_INDEX_V(index, _job_steps.size(), Ref<PropMesherJobStep>());
+
+	return _job_steps.get(index);
+}
+void PropInstancePropJob::set_jobs_step(int index, const Ref<PropMesherJobStep> &step) {
+	ERR_FAIL_INDEX(index, _job_steps.size());
+
+	_job_steps.set(index, step);
+}
+void PropInstancePropJob::remove_jobs_step(const int index) {
+	ERR_FAIL_INDEX(index, _job_steps.size());
+
+	_job_steps.remove(index);
+}
+void PropInstancePropJob::add_jobs_step(const Ref<PropMesherJobStep> &step) {
+	_job_steps.push_back(step);
+}
+int PropInstancePropJob::get_jobs_step_count() const {
+	return _job_steps.size();
+}
+
 
 PropInstanceMerger *PropInstancePropJob::get_prop_instace() {
 	return _prop_instace;
@@ -478,6 +502,12 @@ void PropInstancePropJob::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_texture_packer", "packer"), &PropInstancePropJob::set_texture_packer);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "texture_packer", PROPERTY_HINT_RESOURCE_TYPE, "TexturePacker", 0), "set_texture_packer", "get_texture_packer");
 #endif
+
+	ClassDB::bind_method(D_METHOD("get_jobs_step", "index"), &PropInstancePropJob::get_jobs_step);
+	ClassDB::bind_method(D_METHOD("set_jobs_step", "index", "mesher"), &PropInstancePropJob::set_jobs_step);
+	ClassDB::bind_method(D_METHOD("remove_jobs_step", "index"), &PropInstancePropJob::remove_jobs_step);
+	ClassDB::bind_method(D_METHOD("add_jobs_step", "mesher"), &PropInstancePropJob::add_jobs_step);
+	ClassDB::bind_method(D_METHOD("get_jobs_step_count"), &PropInstancePropJob::get_jobs_step_count);
 
 	ClassDB::bind_method(D_METHOD("get_prop_mesher"), &PropInstancePropJob::get_prop_mesher);
 	ClassDB::bind_method(D_METHOD("set_prop_mesher", "mesher"), &PropInstancePropJob::set_prop_mesher);
