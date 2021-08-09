@@ -31,12 +31,14 @@ SOFTWARE.
 #include "core/object/reference.h"
 #include "core/templates/hash_map.h"
 #include "core/templates/vector.h"
+#include "core/core_bind.h"
 #else
 #include "core/hash_map.h"
 #include "core/color.h"
 #include "core/object.h"
 #include "core/reference.h"
 #include "core/vector.h"
+#include "core/bind/core_bind.h"
 #endif
 
 #include "scene/resources/material.h"
@@ -91,6 +93,8 @@ public:
 
 	Ref<PropMaterialCache> material_cache_custom_key_get(const uint64_t key);
 	void material_cache_custom_key_unref(const uint64_t key);
+
+	Ref<Resource> load_resource(const String &path, const String &type_hint = "");
 
 private:
 	static PropCache *_instance;

@@ -147,7 +147,19 @@ void PropCache::materials_clear() {
 }
 
 void PropCache::materials_load() {
+	_materials.clear();
 
+	for (int i = 0; i < _material_paths.size(); ++i) {
+		StringName path = _material_paths[i];
+
+		ERR_CONTINUE(path == "");
+
+		Ref<Material> d = load_resource(path, "Material");
+
+		ERR_CONTINUE(!d.is_valid());
+
+		_materials.push_back(d);
+	}
 }
 
 Vector<Variant> PropCache::materials_get() {
@@ -235,6 +247,22 @@ void PropCache::material_cache_custom_key_unref(const uint64_t key) {
 	_custom_keyed_material_cache_mutex.unlock();
 }
 
+Ref<Resource> PropCache::load_resource(const String &path, const String &type_hint) {
+	_ResourceLoader *rl = _ResourceLoader::get_singleton();
+
+#if VERSION_MAJOR < 4
+	Ref<ResourceInteractiveLoader> resl = rl->load_interactive(path, type_hint);
+
+	ERR_FAIL_COND_V(!resl.is_valid(), Ref<Resource>());
+
+	resl->wait();
+
+	return resl->get_resource();
+#else
+	return rl->load(path, type_hint);
+#endif
+}
+
 PropCache::PropCache() {
 	_instance = this;
 
@@ -305,4 +333,6 @@ void PropCache::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("materials_get"), &PropCache::materials_get);
 	ClassDB::bind_method(D_METHOD("materials_set"), &PropCache::materials_set);
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "materials", PROPERTY_HINT_NONE, "17/17:Material", PROPERTY_USAGE_DEFAULT, "Material"), "materials_set", "materials_get");
+
+	ClassDB::bind_method(D_METHOD("load_resource", "path", "type_hint"), &PropCache::load_resource, "");
 }
