@@ -37,6 +37,7 @@ SOFTWARE.
 
 #include "core/math/rect2.h"
 #include "scene/resources/material.h"
+#include "core/os/mutex.h"
 
 class PropData;
 
@@ -46,6 +47,10 @@ class PropMaterialCache : public Resource {
 public:
 	bool get_initialized();
 	void set_initialized(const bool value);
+
+	bool mutex_locked();
+	void mutex_lock();
+	void mutex_unlock();
 
 	int get_ref_count();
 	void set_ref_count(const int value);
@@ -85,12 +90,15 @@ public:
 protected:
 	static void _bind_methods();
 
+	bool _locked;
 	bool _initialized;
 
 	Vector<Ref<Material>> _materials;
 	Vector<Ref<Texture>> _textures;
 
 	int _ref_count;
+
+	Mutex _mutex;
 };
 
 #endif

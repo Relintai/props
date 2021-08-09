@@ -51,12 +51,21 @@ SOFTWARE.
 
 #endif
 
-
 bool PropMaterialCache::get_initialized() {
 	return _initialized;
 }
 void PropMaterialCache::set_initialized(const bool value) {
 	_initialized = value;
+}
+
+bool PropMaterialCache::mutex_locked() {
+	return _locked;
+}
+void PropMaterialCache::mutex_lock() {
+	_mutex.lock();
+}
+void PropMaterialCache::mutex_unlock() {
+	_mutex.unlock();
 }
 
 int PropMaterialCache::get_ref_count() {
@@ -170,7 +179,6 @@ Rect2 PropMaterialCache::texture_get_uv_rect(const Ref<Texture> &texture) {
 	return Rect2(0, 0, 1, 1);
 }
 
-
 void PropMaterialCache::prop_add_textures(const Ref<PropData> &prop) {
 	if (!prop.is_valid()) {
 		return;
@@ -236,6 +244,7 @@ void PropMaterialCache::setup_material_albedo(Ref<Texture> texture) {
 PropMaterialCache::PropMaterialCache() {
 	_ref_count = 0;
 	_initialized = false;
+	_locked = false;
 }
 
 PropMaterialCache::~PropMaterialCache() {
@@ -246,6 +255,10 @@ void PropMaterialCache::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_initialized"), &PropMaterialCache::get_initialized);
 	ClassDB::bind_method(D_METHOD("set_initialized", "value"), &PropMaterialCache::set_initialized);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "initialized"), "set_initialized", "get_initialized");
+
+	ClassDB::bind_method(D_METHOD("mutex_locked"), &PropMaterialCache::mutex_locked);
+	ClassDB::bind_method(D_METHOD("mutex_lock"), &PropMaterialCache::mutex_lock);
+	ClassDB::bind_method(D_METHOD("mutex_unlock"), &PropMaterialCache::mutex_unlock);
 
 	ClassDB::bind_method(D_METHOD("get_ref_count"), &PropMaterialCache::get_ref_count);
 	ClassDB::bind_method(D_METHOD("set_ref_count", "value"), &PropMaterialCache::set_ref_count);
