@@ -22,13 +22,13 @@ SOFTWARE.
 
 #include "prop_material_cache.h"
 
-#ifdef PROPS_PRESENT
 #include "../../props/props/prop_data.h"
 #include "../../props/props/prop_data_prop.h"
 
 #if MESH_DATA_RESOURCE_PRESENT
+#define PROPS_PRESENT 1
 #include "../../mesh_data_resource/props/prop_data_mesh_data.h"
-#endif
+#undef PROPS_PRESENT
 #endif
 
 #if VERSION_MAJOR > 3
@@ -171,7 +171,6 @@ Rect2 PropMaterialCache::texture_get_uv_rect(const Ref<Texture> &texture) {
 }
 
 
-#ifdef PROPS_PRESENT
 void PropMaterialCache::prop_add_textures(const Ref<PropData> &prop) {
 	if (!prop.is_valid()) {
 		return;
@@ -224,7 +223,6 @@ void PropMaterialCache::prop_remove_textures(const Ref<PropData> &prop) {
 		}
 	}
 }
-#endif
 
 void PropMaterialCache::refresh_rects() {
 	_initialized = true;
@@ -279,10 +277,8 @@ void PropMaterialCache::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("texture_get_atlas_tex", "index"), &PropMaterialCache::texture_get_atlas_tex);
 	ClassDB::bind_method(D_METHOD("texture_get_uv_rect", "texture"), &PropMaterialCache::texture_get_uv_rect);
 
-#ifdef PROPS_PRESENT
 	ClassDB::bind_method(D_METHOD("prop_add_textures", "prop"), &PropMaterialCache::prop_add_textures);
 	ClassDB::bind_method(D_METHOD("prop_remove_textures", "prop"), &PropMaterialCache::prop_remove_textures);
-#endif
 
 	ClassDB::bind_method(D_METHOD("refresh_rects"), &PropMaterialCache::refresh_rects);
 

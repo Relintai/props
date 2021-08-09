@@ -38,6 +38,8 @@ SOFTWARE.
 #include "core/math/rect2.h"
 #include "scene/resources/material.h"
 
+class PropData;
+
 class PropMaterialCache : public Resource {
 	GDCLASS(PropMaterialCache, Resource)
 
@@ -71,11 +73,8 @@ public:
 	virtual Ref<AtlasTexture> texture_get_atlas_tex(const Ref<Texture> &texture);
 	virtual Rect2 texture_get_uv_rect(const Ref<Texture> &texture);
 
-#ifdef PROPS_PRESENT
 	void prop_add_textures(const Ref<PropData> &prop);
 	void prop_remove_textures(const Ref<PropData> &prop);
-#endif
-
 	virtual void refresh_rects();
 
 	void setup_material_albedo(Ref<Texture> texture);
