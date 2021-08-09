@@ -72,6 +72,18 @@ public:
 	void _execute_phase();
 	void _reset();
 
+	void phase_steps();
+
+	void step_type_normal();
+	void step_type_normal_lod();
+	void step_type_drop_uv2();
+	void step_type_merge_verts();
+	void step_type_bake_texture();
+	void step_type_simplify_mesh();
+
+	Array merge_mesh_array(Array arr) const;
+	Array bake_mesh_array_uv(Array arr, Ref<Texture> tex, float mul_color = 0.7) const;
+
 	PropInstancePropJob();
 	~PropInstancePropJob();
 
