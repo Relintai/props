@@ -162,6 +162,12 @@ void PropCache::materials_load() {
 	}
 }
 
+void PropCache::ensure_materials_loaded() {
+	if (_materials.size() != _material_paths.size()) {
+		materials_load();
+	}
+}
+
 Vector<Variant> PropCache::materials_get() {
 	VARIANT_ARRAY_GET(_materials);
 }
@@ -329,6 +335,7 @@ void PropCache::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("material_get_num"), &PropCache::material_get_num);
 	ClassDB::bind_method(D_METHOD("materials_clear"), &PropCache::materials_clear);
 	ClassDB::bind_method(D_METHOD("materials_load"), &PropCache::materials_load);
+	ClassDB::bind_method(D_METHOD("ensure_materials_loaded"), &PropCache::ensure_materials_loaded);
 
 	ClassDB::bind_method(D_METHOD("materials_get"), &PropCache::materials_get);
 	ClassDB::bind_method(D_METHOD("materials_set"), &PropCache::materials_set);

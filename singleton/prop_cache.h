@@ -84,6 +84,7 @@ public:
 	int material_get_num() const;
 	void materials_clear();
 	void materials_load();
+	void ensure_materials_loaded();
 
 	Vector<Variant> materials_get();
 	void materials_set(const Vector<Variant> &materials);
