@@ -58,6 +58,43 @@ void PropCache::set_default_prop_material_cache_class(const StringName &cls_name
 	_default_prop_material_cache_class = cls_name;
 }
 
+#ifdef TEXTURE_PACKER_PRESENT
+int PropCache::get_texture_flags() const {
+	return _texture_flags;
+}
+void PropCache::set_texture_flags(const int flags) {
+	_texture_flags = flags;
+}
+
+int PropCache::get_max_atlas_size() const {
+	return _max_atlas_size;
+}
+void PropCache::set_max_atlas_size(const int size) {
+	_max_atlas_size = size;
+}
+
+bool PropCache::get_keep_original_atlases() const {
+	return _keep_original_atlases;
+}
+void PropCache::set_keep_original_atlases(const bool value) {
+	_keep_original_atlases = value;
+}
+
+Color PropCache::get_background_color() const {
+	return _background_color;
+}
+void PropCache::set_background_color(const Color &color) {
+	_background_color = color;
+}
+
+int PropCache::get_margin() const {
+	return _margin;
+}
+void PropCache::set_margin(const int margin) {
+	_margin = margin;
+}
+#endif
+
 Ref<PropMaterialCache> PropCache::material_cache_get(const Ref<PropData> &prop) {
 	ERR_FAIL_COND_V(!prop.is_valid(), Ref<PropMaterialCache>());
 
@@ -137,6 +174,19 @@ PropCache::PropCache() {
 #else
 	_default_prop_material_cache_class = GLOBAL_DEF("props/default_prop_material_cache_class", "PropMaterialCache");
 #endif
+
+#ifdef TEXTURE_PACKER_PRESENT
+#if VERSION_MAJOR < 4
+	_texture_flags = GLOBAL_DEF("props/texture_flags", Texture::FLAG_MIPMAPS | Texture::FLAG_FILTER);
+#else
+	_texture_flags = GLOBAL_DEF("props/texture_flags", 0);
+#endif
+
+	_max_atlas_size = GLOBAL_DEF("props/max_atlas_size", 1024);
+	_keep_original_atlases = GLOBAL_DEF("props/keep_original_atlases", false);
+	_background_color = GLOBAL_DEF("props/background_color", Color());
+	_margin = GLOBAL_DEF("props/margin", 0);
+#endif
 }
 
 PropCache::~PropCache() {
@@ -147,4 +197,26 @@ void PropCache::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_default_prop_material_cache_class"), &PropCache::get_default_prop_material_cache_class);
 	ClassDB::bind_method(D_METHOD("set_default_prop_material_cache_class", "cls_name"), &PropCache::set_default_prop_material_cache_class);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "default_prop_material_cache_class"), "set_default_prop_material_cache_class", "get_default_prop_material_cache_class");
+
+#ifdef TEXTURE_PACKER_PRESENT
+	ClassDB::bind_method(D_METHOD("get_texture_flags"), &PropCache::get_texture_flags);
+	ClassDB::bind_method(D_METHOD("set_texture_flags", "flags"), &PropCache::set_texture_flags);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "texture_flags", PROPERTY_HINT_FLAGS, "Mipmaps,Repeat,Filter,Anisotropic Linear,Convert to Linear,Mirrored Repeat,Video Surface"), "set_texture_flags", "get_texture_flags");
+
+	ClassDB::bind_method(D_METHOD("get_max_atlas_size"), &PropCache::get_max_atlas_size);
+	ClassDB::bind_method(D_METHOD("set_max_atlas_size", "size"), &PropCache::set_max_atlas_size);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "max_atlas_size"), "set_max_atlas_size", "get_max_atlas_size");
+
+	ClassDB::bind_method(D_METHOD("get_keep_original_atlases"), &PropCache::get_keep_original_atlases);
+	ClassDB::bind_method(D_METHOD("set_keep_original_atlases", "value"), &PropCache::set_keep_original_atlases);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "keep_original_atlases"), "set_keep_original_atlases", "get_keep_original_atlases");
+
+	ClassDB::bind_method(D_METHOD("get_background_color"), &PropCache::get_background_color);
+	ClassDB::bind_method(D_METHOD("set_background_color", "color"), &PropCache::set_background_color);
+	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "background_color"), "set_background_color", "get_background_color");
+
+	ClassDB::bind_method(D_METHOD("get_margin"), &PropCache::get_margin);
+	ClassDB::bind_method(D_METHOD("set_margin", "size"), &PropCache::set_margin);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "margin"), "set_margin", "get_margin");
+#endif
 }

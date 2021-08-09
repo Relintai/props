@@ -27,11 +27,13 @@ SOFTWARE.
 
 #if VERSION_MAJOR > 3
 #include "core/object/object.h"
+#include "core/math/color.h"
 #include "core/object/reference.h"
 #include "core/templates/hash_map.h"
 #include "core/templates/vector.h"
 #else
 #include "core/hash_map.h"
+#include "core/color.h"
 #include "core/object.h"
 #include "core/reference.h"
 #include "core/vector.h"
@@ -51,6 +53,23 @@ public:
 
 	StringName get_default_prop_material_cache_class();
 	void set_default_prop_material_cache_class(const StringName &cls_name);
+
+#ifdef TEXTURE_PACKER_PRESENT
+	int get_texture_flags() const;
+	void set_texture_flags(const int flags);
+
+	int get_max_atlas_size() const;
+	void set_max_atlas_size(const int size);
+
+	bool get_keep_original_atlases() const;
+	void set_keep_original_atlases(const bool value);
+
+	Color get_background_color() const;
+	void set_background_color(const Color &color);
+
+	int get_margin() const;
+	void set_margin(const int margin);
+#endif
 
 	Ref<PropMaterialCache> material_cache_get(const Ref<PropData> &prop);
 	void material_cache_unref(const Ref<PropData> &prop);
@@ -75,6 +94,14 @@ protected:
 
 	Mutex _material_cache_mutex;
 	Mutex _custom_keyed_material_cache_mutex;
+
+#ifdef TEXTURE_PACKER_PRESENT
+	int _texture_flags;
+	int _max_atlas_size;
+	bool _keep_original_atlases;
+	Color _background_color;
+	int _margin;
+#endif
 };
 
 #endif
