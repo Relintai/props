@@ -67,6 +67,8 @@ public:
 
 	void refresh_rects();
 
+	void initial_setup_default();
+
 	void _setup_material_albedo(Ref<Texture> texture);
 
 	PropMaterialCachePCM();

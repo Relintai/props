@@ -128,6 +128,12 @@ void PropMaterialCachePCM::refresh_rects() {
 	_initialized = true;
 }
 
+void PropMaterialCache::initial_setup_default() {
+	PropMaterialCache::initial_setup_default();
+
+	//copy settings
+}
+
 void PropMaterialCachePCM::_setup_material_albedo(Ref<Texture> texture) {
 	int count = material_get_num();
 

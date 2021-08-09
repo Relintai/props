@@ -236,6 +236,10 @@ void PropMaterialCache::refresh_rects() {
 	_initialized = true;
 }
 
+void PropMaterialCache::initial_setup_default() {
+	
+}
+
 void PropMaterialCache::setup_material_albedo(Ref<Texture> texture) {
 	if (has_method("_setup_material_albedo"))
 		call("_setup_material_albedo", texture);

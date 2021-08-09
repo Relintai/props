@@ -80,7 +80,10 @@ public:
 
 	void prop_add_textures(const Ref<PropData> &prop);
 	void prop_remove_textures(const Ref<PropData> &prop);
+
 	virtual void refresh_rects();
+
+	virtual void initial_setup_default();
 
 	void setup_material_albedo(Ref<Texture> texture);
 
