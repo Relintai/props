@@ -57,6 +57,9 @@ public:
 public:
 	static PropCache *get_singleton();
 
+	String get_default_prop_material_cache_class();
+	void set_default_prop_material_cache_class(const String& cls_name);
+
 	bool has_texture(const Ref<PropData> &prop);
 	void set_texture(const Ref<PropData> &prop, const Ref<TexturePacker> &merger);
 
@@ -82,6 +85,8 @@ public:
 
 protected:
 	static void _bind_methods();
+
+	String _default_prop_material_cache_class;
 };
 
 #endif

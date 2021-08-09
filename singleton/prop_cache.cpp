@@ -29,8 +29,10 @@ SOFTWARE.
 
 #if VERSION_MAJOR > 3
 #include "core/config/engine.h"
+#include "core/config/project_settings.h"
 #else
 #include "core/engine.h"
+#include "core/project_settings.h"
 #endif
 
 #include "../jobs/prop_texture_job.h"
@@ -47,6 +49,13 @@ PropCache *PropCache::_instance;
 
 PropCache *PropCache::get_singleton() {
 	return _instance;
+}
+
+String PropCache::get_default_prop_material_cache_class() {
+	return _default_prop_material_cache_class;
+}
+void PropCache::set_default_prop_material_cache_class(const String &cls_name) {
+	_default_prop_material_cache_class = cls_name;
 }
 
 #if TEXTURE_PACKER_PRESENT
@@ -136,7 +145,6 @@ Ref<TexturePacker> PropCache::create_texture(const Ref<PropData> &prop) {
 
 Ref<TexturePacker> PropCache::get_or_create_texture_immediate(const Ref<PropData> &prop) {
 	if (!has_texture(prop)) {
-
 		Ref<TexturePacker> merger = create_texture(prop);
 
 		merger->merge();
@@ -151,7 +159,6 @@ Ref<TexturePacker> PropCache::get_or_create_texture_threaded(const Ref<PropData>
 #if THREAD_POOL_PRESENT
 
 	if (!has_texture(prop)) {
-
 		Ref<TexturePacker> merger = create_texture(prop);
 
 		Ref<PropTextureJob> job;
@@ -173,6 +180,12 @@ Ref<TexturePacker> PropCache::get_or_create_texture_threaded(const Ref<PropData>
 
 PropCache::PropCache() {
 	_instance = this;
+
+#if TEXTURE_PACKER_PRESENT
+	_default_prop_material_cache_class = GLOBAL_DEF("props/default_prop_material_cache_class", "PropMaterialCachePCM");
+#else
+	_default_prop_material_cache_class = GLOBAL_DEF("props/default_prop_material_cache_class", "PropMaterialCache");
+#endif
 }
 
 PropCache::~PropCache() {
@@ -183,6 +196,10 @@ PropCache::~PropCache() {
 }
 
 void PropCache::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("get_default_prop_material_cache_class"), &PropCache::get_default_prop_material_cache_class);
+	ClassDB::bind_method(D_METHOD("set_default_prop_material_cache_class", "cls_name"), &PropCache::set_default_prop_material_cache_class);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "default_prop_material_cache_class"), "set_default_prop_material_cache_class", "get_default_prop_material_cache_class");
+
 #if TEXTURE_PACKER_PRESENT
 	ClassDB::bind_method(D_METHOD("has_texture", "prop"), &PropCache::has_texture);
 	ClassDB::bind_method(D_METHOD("set_texture", "prop", "merger"), &PropCache::set_texture);
