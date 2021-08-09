@@ -128,7 +128,7 @@ void PropMaterialCachePCM::refresh_rects() {
 	_initialized = true;
 }
 
-void PropMaterialCache::initial_setup_default() {
+void PropMaterialCachePCM::initial_setup_default() {
 	PropMaterialCache::initial_setup_default();
 
 	//copy settings
