@@ -51,7 +51,7 @@ SOFTWARE.
 
 #include "prop_scene_instance.h"
 
-#include "singleton/prop_texture_cache.h"
+#include "singleton/prop_cache.h"
 #include "singleton/prop_utils.h"
 
 #include "./editor/prop_editor_plugin.h"
@@ -65,7 +65,7 @@ SOFTWARE.
 #endif
 
 static PropUtils *prop_utils = NULL;
-static PropTextureCache *prop_texture_cache = NULL;
+static PropCache *prop_texture_cache = NULL;
 
 void register_props_types() {
 	ClassDB::register_class<PropData>();
@@ -102,9 +102,9 @@ void register_props_types() {
 	ClassDB::register_class<PropUtils>();
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PropUtils", PropUtils::get_singleton()));
 
-	prop_texture_cache = memnew(PropTextureCache);
-	ClassDB::register_class<PropTextureCache>();
-	Engine::get_singleton()->add_singleton(Engine::Singleton("PropTextureCache", PropTextureCache::get_singleton()));
+	prop_texture_cache = memnew(PropCache);
+	ClassDB::register_class<PropCache>();
+	Engine::get_singleton()->add_singleton(Engine::Singleton("PropCache", PropCache::get_singleton()));
 
 	Ref<PropDataLight> light_processor = Ref<PropDataLight>(memnew(PropDataLight));
 	PropUtils::add_processor(light_processor);

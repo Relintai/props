@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "prop_texture_cache.h"
+#include "prop_cache.h"
 
 #include "../props/prop_data.h"
 #include "../props/prop_data_entry.h"
@@ -43,14 +43,14 @@ SOFTWARE.
 #include "../../texture_packer/texture_packer.h"
 #endif
 
-PropTextureCache *PropTextureCache::_instance;
+PropCache *PropCache::_instance;
 
-PropTextureCache *PropTextureCache::get_singleton() {
+PropCache *PropCache::get_singleton() {
 	return _instance;
 }
 
 #if TEXTURE_PACKER_PRESENT
-bool PropTextureCache::has_texture(const Ref<PropData> &prop) {
+bool PropCache::has_texture(const Ref<PropData> &prop) {
 	for (int i = 0; i < _entries.size(); ++i) {
 		if (_entries[i].prop == prop) {
 			return true;
@@ -60,9 +60,9 @@ bool PropTextureCache::has_texture(const Ref<PropData> &prop) {
 	return false;
 }
 
-void PropTextureCache::set_texture(const Ref<PropData> &prop, const Ref<TexturePacker> &merger) {
+void PropCache::set_texture(const Ref<PropData> &prop, const Ref<TexturePacker> &merger) {
 	for (int i = 0; i < _entries.size(); ++i) {
-		PropTextureCacheEntry &e = _entries.write[i];
+		PropCacheEntry &e = _entries.write[i];
 
 		if (e.prop == prop) {
 			e.merger = merger;
@@ -70,9 +70,9 @@ void PropTextureCache::set_texture(const Ref<PropData> &prop, const Ref<TextureP
 	}
 }
 
-Ref<TexturePacker> PropTextureCache::get_texture(const Ref<PropData> &prop) {
+Ref<TexturePacker> PropCache::get_texture(const Ref<PropData> &prop) {
 	for (int i = 0; i < _entries.size(); ++i) {
-		PropTextureCacheEntry &e = _entries.write[i];
+		PropCacheEntry &e = _entries.write[i];
 
 		if (e.prop == prop) {
 			e.refcount++;
@@ -84,9 +84,9 @@ Ref<TexturePacker> PropTextureCache::get_texture(const Ref<PropData> &prop) {
 	return Ref<TexturePacker>();
 }
 
-void PropTextureCache::ref_texture(const Ref<PropData> &prop) {
+void PropCache::ref_texture(const Ref<PropData> &prop) {
 	for (int i = 0; i < _entries.size(); ++i) {
-		PropTextureCacheEntry &e = _entries.write[i];
+		PropCacheEntry &e = _entries.write[i];
 
 		if (e.prop == prop) {
 			e.refcount++;
@@ -96,9 +96,9 @@ void PropTextureCache::ref_texture(const Ref<PropData> &prop) {
 	}
 }
 
-void PropTextureCache::unref_texture(const Ref<PropData> &prop) {
+void PropCache::unref_texture(const Ref<PropData> &prop) {
 	for (int i = 0; i < _entries.size(); ++i) {
-		PropTextureCacheEntry &e = _entries.write[i];
+		PropCacheEntry &e = _entries.write[i];
 
 		if (e.prop == prop) {
 			e.refcount--;
@@ -112,7 +112,7 @@ void PropTextureCache::unref_texture(const Ref<PropData> &prop) {
 	}
 }
 
-Ref<TexturePacker> PropTextureCache::create_texture(const Ref<PropData> &prop) {
+Ref<TexturePacker> PropCache::create_texture(const Ref<PropData> &prop) {
 	ERR_FAIL_COND_V(has_texture(prop), Ref<TexturePacker>());
 
 	Ref<TexturePacker> merger;
@@ -124,7 +124,7 @@ Ref<TexturePacker> PropTextureCache::create_texture(const Ref<PropData> &prop) {
 		e->add_textures_into(merger);
 	}
 
-	PropTextureCacheEntry e;
+	PropCacheEntry e;
 	e.merger = merger;
 	e.prop = prop;
 	e.refcount = 1;
@@ -134,7 +134,7 @@ Ref<TexturePacker> PropTextureCache::create_texture(const Ref<PropData> &prop) {
 	return merger;
 }
 
-Ref<TexturePacker> PropTextureCache::get_or_create_texture_immediate(const Ref<PropData> &prop) {
+Ref<TexturePacker> PropCache::get_or_create_texture_immediate(const Ref<PropData> &prop) {
 	if (!has_texture(prop)) {
 
 		Ref<TexturePacker> merger = create_texture(prop);
@@ -147,7 +147,7 @@ Ref<TexturePacker> PropTextureCache::get_or_create_texture_immediate(const Ref<P
 	return get_texture(prop);
 }
 
-Ref<TexturePacker> PropTextureCache::get_or_create_texture_threaded(const Ref<PropData> &prop) {
+Ref<TexturePacker> PropCache::get_or_create_texture_threaded(const Ref<PropData> &prop) {
 #if THREAD_POOL_PRESENT
 
 	if (!has_texture(prop)) {
@@ -171,29 +171,29 @@ Ref<TexturePacker> PropTextureCache::get_or_create_texture_threaded(const Ref<Pr
 
 #endif
 
-PropTextureCache::PropTextureCache() {
+PropCache::PropCache() {
 	_instance = this;
 }
 
-PropTextureCache::~PropTextureCache() {
+PropCache::~PropCache() {
 	_instance = NULL;
 #if TEXTURE_PACKER_PRESENT
 	_entries.clear();
 #endif
 }
 
-void PropTextureCache::_bind_methods() {
+void PropCache::_bind_methods() {
 #if TEXTURE_PACKER_PRESENT
-	ClassDB::bind_method(D_METHOD("has_texture", "prop"), &PropTextureCache::has_texture);
-	ClassDB::bind_method(D_METHOD("set_texture", "prop", "merger"), &PropTextureCache::set_texture);
+	ClassDB::bind_method(D_METHOD("has_texture", "prop"), &PropCache::has_texture);
+	ClassDB::bind_method(D_METHOD("set_texture", "prop", "merger"), &PropCache::set_texture);
 
-	ClassDB::bind_method(D_METHOD("get_texture", "prop"), &PropTextureCache::get_texture);
+	ClassDB::bind_method(D_METHOD("get_texture", "prop"), &PropCache::get_texture);
 
-	ClassDB::bind_method(D_METHOD("ref_texture", "prop"), &PropTextureCache::ref_texture);
-	ClassDB::bind_method(D_METHOD("unref_texture", "prop"), &PropTextureCache::unref_texture);
+	ClassDB::bind_method(D_METHOD("ref_texture", "prop"), &PropCache::ref_texture);
+	ClassDB::bind_method(D_METHOD("unref_texture", "prop"), &PropCache::unref_texture);
 
-	ClassDB::bind_method(D_METHOD("create_texture", "prop"), &PropTextureCache::create_texture);
-	ClassDB::bind_method(D_METHOD("get_or_create_texture_immediate", "prop"), &PropTextureCache::get_or_create_texture_immediate);
-	ClassDB::bind_method(D_METHOD("get_or_create_texture_threaded", "prop"), &PropTextureCache::get_or_create_texture_threaded);
+	ClassDB::bind_method(D_METHOD("create_texture", "prop"), &PropCache::create_texture);
+	ClassDB::bind_method(D_METHOD("get_or_create_texture_immediate", "prop"), &PropCache::get_or_create_texture_immediate);
+	ClassDB::bind_method(D_METHOD("get_or_create_texture_threaded", "prop"), &PropCache::get_or_create_texture_threaded);
 #endif
 }

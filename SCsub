@@ -45,7 +45,7 @@ sources = [
     "prop_scene_instance.cpp",
 
     "singleton/prop_utils.cpp",
-    "singleton/prop_texture_cache.cpp",
+    "singleton/prop_cache.cpp",
 
     "editor/prop_editor_plugin.cpp",
 

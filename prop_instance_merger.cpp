@@ -50,7 +50,7 @@ typedef class RenderingServer VS;
 #include "./props/prop_data_scene.h"
 
 #if TEXTURE_PACKER_PRESENT
-#include "./singleton/prop_texture_cache.h"
+#include "./singleton/prop_cache.h"
 #endif
 
 #if THREAD_POOL_PRESENT
@@ -411,7 +411,7 @@ void PropInstanceMerger::_build() {
 	}
 
 #if TEXTURE_PACKER_PRESENT
-	Ref<TexturePacker> packer = PropTextureCache::get_singleton()->get_or_create_texture_threaded(_prop_data);
+	Ref<TexturePacker> packer = PropCache::get_singleton()->get_or_create_texture_threaded(_prop_data);
 
 	if (packer->get_generated_texture_count() == 0) {
 		_building = false;

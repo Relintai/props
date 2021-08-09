@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PROP_TEXTURE_CACHE_H
-#define PROP_TEXTURE_CACHE_H
+#ifndef PROP_CACHE_H
+#define PROP_CACHE_H
 
 #include "core/version.h"
 
@@ -43,19 +43,19 @@ SOFTWARE.
 class TexturePacker;
 #endif
 
-class PropTextureCache : public Object {
-	GDCLASS(PropTextureCache, Object);
+class PropCache : public Object {
+	GDCLASS(PropCache, Object);
 
 #if TEXTURE_PACKER_PRESENT
 public:
-	struct PropTextureCacheEntry {
+	struct PropCacheEntry {
 		int refcount;
 		Ref<TexturePacker> merger;
 		Ref<PropData> prop;
 	};
 
 public:
-	static PropTextureCache *get_singleton();
+	static PropCache *get_singleton();
 
 	bool has_texture(const Ref<PropData> &prop);
 	void set_texture(const Ref<PropData> &prop, const Ref<TexturePacker> &merger);
@@ -70,15 +70,15 @@ public:
 	Ref<TexturePacker> get_or_create_texture_threaded(const Ref<PropData> &prop);
 
 private:
-	Vector<PropTextureCacheEntry> _entries;
+	Vector<PropCacheEntry> _entries;
 
-	static PropTextureCache *_instance;
+	static PropCache *_instance;
 
 #endif
 
 public:
-	PropTextureCache();
-	~PropTextureCache();
+	PropCache();
+	~PropCache();
 
 protected:
 	static void _bind_methods();
