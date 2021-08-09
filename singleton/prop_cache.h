@@ -71,6 +71,9 @@ public:
 	void set_margin(const int margin);
 #endif
 
+	PoolStringArray material_paths_get() const;
+	void material_paths_set(const PoolStringArray &array);
+
 	Ref<PropMaterialCache> material_cache_get(const Ref<PropData> &prop);
 	void material_cache_unref(const Ref<PropData> &prop);
 
@@ -102,6 +105,8 @@ protected:
 	Color _background_color;
 	int _margin;
 #endif
+
+	PoolStringArray _material_paths;
 };
 
 #endif

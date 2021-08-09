@@ -95,6 +95,13 @@ void PropCache::set_margin(const int margin) {
 }
 #endif
 
+PoolStringArray PropCache::material_paths_get() const {
+	return _material_paths;
+}
+void PropCache::material_paths_set(const PoolStringArray &value) {
+	_material_paths = value;
+}
+
 Ref<PropMaterialCache> PropCache::material_cache_get(const Ref<PropData> &prop) {
 	ERR_FAIL_COND_V(!prop.is_valid(), Ref<PropMaterialCache>());
 
@@ -187,6 +194,8 @@ PropCache::PropCache() {
 	_background_color = GLOBAL_DEF("props/background_color", Color());
 	_margin = GLOBAL_DEF("props/margin", 0);
 #endif
+
+	_material_paths = GLOBAL_DEF("props/material_paths", PoolStringArray());
 }
 
 PropCache::~PropCache() {
@@ -219,4 +228,8 @@ void PropCache::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_margin", "size"), &PropCache::set_margin);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "margin"), "set_margin", "get_margin");
 #endif
+
+	ClassDB::bind_method(D_METHOD("material_paths_get"), &PropCache::material_paths_get);
+	ClassDB::bind_method(D_METHOD("material_paths_set", "value"), &PropCache::material_paths_set);
+	ADD_PROPERTY(PropertyInfo(Variant::POOL_STRING_ARRAY, "material_paths"), "material_paths_set", "material_paths_get");
 }
