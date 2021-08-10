@@ -448,7 +448,7 @@ void PropInstanceMerger::_build() {
 
 	prop_preprocess(Transform(), _prop_data);
 
-/*
+	/*
 
 Don't submit here, as it starts in physics process mode
 
@@ -550,6 +550,8 @@ PropInstanceMerger::PropInstanceMerger() {
 	_build_queued = false;
 	set_building(false);
 
+	set_notify_transform(true);
+
 	_first_lod_distance_squared = 20;
 	_lod_reduction_distance_squared = 10;
 
@@ -601,7 +603,6 @@ void PropInstanceMerger::_notification(int p_what) {
 			break;
 		}
 		case NOTIFICATION_INTERNAL_PHYSICS_PROCESS: {
-
 			if (_building) {
 				if (!_job.is_valid()) {
 					return;
@@ -623,7 +624,6 @@ void PropInstanceMerger::_notification(int p_what) {
 			break;
 		}
 		case NOTIFICATION_INTERNAL_PROCESS: {
-
 			if (_building) {
 				if (!_job.is_valid()) {
 					return;
@@ -640,6 +640,29 @@ void PropInstanceMerger::_notification(int p_what) {
 #endif
 					}
 				}
+			}
+
+			break;
+		}
+		case NOTIFICATION_TRANSFORM_CHANGED: {
+			VisualServer *vs = VisualServer::get_singleton();
+
+			for (int i = 0; i < _meshes.size(); ++i) {
+				RID mir = _meshes[i].mesh_instance;
+
+				if (mir != RID()) {
+					vs->instance_set_transform(mir, get_transform());
+				}
+			}
+
+			if (_debug_mesh_instance != RID()) {
+				vs->instance_set_transform(_debug_mesh_instance, get_transform());
+			}
+
+			for (int i = 0; i < _colliders.size(); ++i) {
+				const ColliderBody &c = _colliders[i];
+
+				PhysicsServer::get_singleton()->body_set_shape_transform(c.body, 0, get_transform() * c.transform);
 			}
 
 			break;
