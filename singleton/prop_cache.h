@@ -79,6 +79,7 @@ public:
 	void material_paths_set(const PoolStringArray &array);
 
 	void material_add(const Ref<Material> &value);
+	Ref<Material> material_get(const int index);
 	void material_set(const int index, const Ref<Material> &value);
 	void material_remove(const int index);
 	int material_get_num() const;

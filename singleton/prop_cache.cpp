@@ -128,6 +128,12 @@ void PropCache::material_add(const Ref<Material> &value) {
 	_materials.push_back(value);
 }
 
+Ref<Material> PropCache::material_get(const int index) {
+	ERR_FAIL_INDEX_V(index, _materials.size(), Ref<Material>());
+
+	return _materials[index];
+}
+
 void PropCache::material_set(const int index, const Ref<Material> &value) {
 	ERR_FAIL_INDEX(index, _materials.size());
 
@@ -363,6 +369,7 @@ void PropCache::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::POOL_STRING_ARRAY, "material_paths"), "material_paths_set", "material_paths_get");
 
 	ClassDB::bind_method(D_METHOD("material_add", "value"), &PropCache::material_add);
+	ClassDB::bind_method(D_METHOD("material_get", "index"), &PropCache::material_get);
 	ClassDB::bind_method(D_METHOD("material_set", "index", "value"), &PropCache::material_set);
 	ClassDB::bind_method(D_METHOD("material_remove", "index"), &PropCache::material_remove);
 	ClassDB::bind_method(D_METHOD("material_get_num"), &PropCache::material_get_num);
