@@ -386,11 +386,20 @@ void PropInstanceMerger::_build() {
 	_building = true;
 	_build_queued = false;
 
-	if (!_prop_data.is_valid()) {
-		if (_job.is_valid()) {
-			_job->reset_meshes();
-		}
+	if (_job.is_valid()) {
+		_job->reset_meshes();
+	}
 
+	for (int i = 0; i < get_child_count(); ++i) {
+		Node *n = get_child(i);
+
+		//this way we won't delete the user's nodes
+		if (n->get_owner() == NULL) {
+			n->queue_delete();
+		}
+	}
+
+	if (!_prop_data.is_valid()) {
 		_building = false;
 		return;
 	}
@@ -440,18 +449,6 @@ void PropInstanceMerger::_build() {
 	}
 
 	_job->set_material_cache(cache);
-
-	for (int i = 0; i < get_child_count(); ++i) {
-		Node *n = get_child(i);
-
-		//this way we won't delete the user's nodes
-		if (n->get_owner() == NULL) {
-			n->queue_delete();
-		}
-	}
-
-	if (!_prop_data.is_valid())
-		return;
 
 	prop_preprocess(Transform(), _prop_data);
 
