@@ -271,7 +271,7 @@ void PropCache::material_cache_custom_key_unref(const uint64_t key) {
 	if (!_material_cache.has(key)) {
 		_custom_keyed_material_cache_mutex.unlock();
 
-		ERR_PRINT("PropCache::material_cache_unref: can't find cache!");
+		ERR_PRINT("PropCache::material_cache_custom_key_unref: can't find cache!");
 
 		return;
 	}
