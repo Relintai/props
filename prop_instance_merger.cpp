@@ -392,8 +392,8 @@ void PropInstanceMerger::_build() {
 	}
 
 	if (!_job.is_valid()) {
-		//todo this should probably be in a virtual method, lik ein Terraman or Voxelman
-		_job = Ref<PropInstanceJob>(memnew(PropInstancePropJob()));
+		//todo this should probably be in a virtual method, lik in Terraman or Voxelman
+		_job = Ref<PropInstancePropJob>(memnew(PropInstancePropJob()));
 		_job->set_prop_instace(this);
 
 		Ref<PropMesherJobStep> js;
@@ -546,7 +546,7 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 PropInstanceMerger::PropInstanceMerger() {
 	_build_queued = false;
 	_building = false;
-	
+
 	_first_lod_distance_squared = 20;
 	_lod_reduction_distance_squared = 10;
 }
