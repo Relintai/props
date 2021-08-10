@@ -546,11 +546,7 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 PropInstanceMerger::PropInstanceMerger() {
 	_build_queued = false;
 	_building = false;
-
-#ifdef TEXTURE_PACKER_PRESENT
-	_merge_textures = true;
-#endif
-
+	
 	_first_lod_distance_squared = 20;
 	_lod_reduction_distance_squared = 10;
 }
