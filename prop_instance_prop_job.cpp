@@ -36,6 +36,7 @@ SOFTWARE.
 #include "prop_instance_merger.h"
 #include "prop_mesher.h"
 #include "singleton/prop_cache.h"
+#include "scene/resources/shape.h"
 
 #ifdef MESH_DATA_RESOURCE_PRESENT
 #include "../mesh_data_resource/mesh_data_resource.h"
@@ -86,6 +87,18 @@ int PropInstancePropJob::get_jobs_step_count() const {
 	return _job_steps.size();
 }
 
+void PropInstancePropJob::add_collision_shape(const Ref<Shape> &shape, const Transform &transform) {
+	CollisionShapeEntry e;
+
+	e.shape = shape;
+	e.transform = transform;
+
+	_collision_shapes.push_back(e);
+}
+void PropInstancePropJob::clear_collision_shapes() {
+	_collision_shapes.clear();
+}
+
 PropInstanceMerger *PropInstancePropJob::get_prop_instace() {
 	return _prop_instace;
 }
@@ -126,54 +139,34 @@ void PropInstancePropJob::phase_physics_process() {
 
 	_prop_instace->colliders_clear();
 
-#ifdef MESH_DATA_RESOURCE_PRESENT
-	for (int i = 0; i < _prop_mesh_datas.size(); ++i) {
-		PMDREntry &e = _prop_mesh_datas.write[i];
+	for (int i = 0; i < _collision_shapes.size(); ++i) {
+		CollisionShapeEntry &e = _collision_shapes.write[i];
 
-		Ref<PropDataMeshData> pe = e.mesh_data;
-
-		ERR_CONTINUE(!pe.is_valid());
-
-		Ref<MeshDataResource> mdr = pe->get_mesh();
-
-		ERR_CONTINUE(!mdr.is_valid());
-
-		Transform t = pe->get_transform();
-		t *= e.base_transform;
-
-		for (int j = 0; j < mdr->get_collision_shape_count(); ++j) {
-			Ref<Shape> shape = mdr->get_collision_shape(j);
-			Transform offset = mdr->get_collision_shape_offset(j);
-
-			if (!shape.is_valid()) {
-				continue;
-			}
-
-			RID body = PhysicsServer::get_singleton()->body_create(PhysicsServer::BODY_MODE_STATIC);
-
-			Transform transform = t;
-			transform *= offset;
-
-			PhysicsServer::get_singleton()->body_add_shape(body, shape->get_rid());
-
-			//TODO store the layer mask somewhere
-			PhysicsServer::get_singleton()->body_set_collision_layer(body, 1);
-			PhysicsServer::get_singleton()->body_set_collision_mask(body, 1);
-
-			if (_prop_instace->is_inside_tree() && _prop_instace->is_inside_world()) {
-				Ref<World> world = _prop_instace->GET_WORLD();
-
-				if (world.is_valid() && world->get_space() != RID()) {
-					PhysicsServer::get_singleton()->body_set_space(body, world->get_space());
-				}
-			}
-
-			PhysicsServer::get_singleton()->body_set_state(body, PhysicsServer::BODY_STATE_TRANSFORM, _prop_instace->get_transform() * transform);
-
-			_prop_instace->collider_add(transform, shape, shape->get_rid(), body);
+		if (!e.shape.is_valid()) {
+			continue;
 		}
+
+		RID body = PhysicsServer::get_singleton()->body_create(PhysicsServer::BODY_MODE_STATIC);
+
+		PhysicsServer::get_singleton()->body_add_shape(body, e.shape->get_rid());
+
+		//TODO store the layer mask somewhere
+		PhysicsServer::get_singleton()->body_set_collision_layer(body, 1);
+
+		PhysicsServer::get_singleton()->body_set_collision_mask(body, 1);
+
+		if (_prop_instace->is_inside_tree() && _prop_instace->is_inside_world()) {
+			Ref<World> world = _prop_instace->GET_WORLD();
+
+			if (world.is_valid() && world->get_space() != RID()) {
+				PhysicsServer::get_singleton()->body_set_space(body, world->get_space());
+			}
+		}
+
+		PhysicsServer::get_singleton()->body_set_state(body, PhysicsServer::BODY_STATE_TRANSFORM, e.transform);
+
+		_prop_instace->collider_add(e.transform, e.shape, e.shape->get_rid(), body);
 	}
-#endif
 
 #if TOOLS_ENABLED
 	if (SceneTree::get_singleton()->is_debugging_collisions_hint() && _prop_instace->collider_get_num() > 0) {
@@ -338,6 +331,7 @@ void PropInstancePropJob::_reset() {
 	}
 
 	_prop_mesh_datas.clear();
+	clear_collision_shapes();
 
 	set_build_phase_type(BUILD_PHASE_TYPE_PHYSICS_PROCESS);
 }

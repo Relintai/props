@@ -30,6 +30,7 @@ class PropInstance;
 class PropInstanceMerger;
 class PropMesherJobStep;
 class PropMaterialCache;
+class Shape;
 
 #if MESH_DATA_RESOURCE_PRESENT
 class PropDataMeshData;
@@ -47,6 +48,9 @@ public:
 	void remove_jobs_step(const int index);
 	void add_jobs_step(const Ref<PropMesherJobStep> &step);
 	int get_jobs_step_count() const;
+
+	void add_collision_shape(const Ref<Shape> &shape, const Transform &transform);
+	void clear_collision_shapes();
 
 	PropInstanceMerger *get_prop_instace();
 	void set_prop_instace(PropInstanceMerger *prop);
@@ -95,6 +99,11 @@ protected:
 	};
 #endif
 
+	struct CollisionShapeEntry {
+		Ref<Shape> shape;
+		Transform transform;
+	};
+
 	Ref<PropMaterialCache> _material_cache;
 
 	Vector<Ref<PropMesherJobStep>> _job_steps;
@@ -107,6 +116,8 @@ protected:
 #if MESH_DATA_RESOURCE_PRESENT
 	Vector<PMDREntry> _prop_mesh_datas;
 #endif
+
+	Vector<CollisionShapeEntry> _collision_shapes;
 
 	Array temp_mesh_arr;
 };

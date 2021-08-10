@@ -346,6 +346,8 @@ void PropInstanceMerger::draw_debug_mdr_colliders() {
 
 		shape->add_vertices_to_array(_debug_mesh_array, t);
 	}
+
+	debug_mesh_send();
 }
 
 float PropInstanceMerger::get_first_lod_distance_squared() {
@@ -544,7 +546,9 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 
 			_job->add_mesh(mesh_data, transform);
 
-			continue;
+			for (int j = 0; j < mdr->get_collision_shape_count(); ++j) {
+				_job->add_collision_shape(mdr->get_collision_shape(j), transform * mdr->get_collision_shape_offset(j));
+			}
 		}
 #endif
 	}
