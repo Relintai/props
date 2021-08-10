@@ -54,6 +54,7 @@ void PropInstance::build() {
 }
 
 void PropInstance::queue_build() {
+	_build_queued = true;
 }
 
 void PropInstance::build_finished() {
