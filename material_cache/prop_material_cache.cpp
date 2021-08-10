@@ -202,7 +202,7 @@ void PropMaterialCache::prop_add_textures(const Ref<PropData> &prop) {
 		Ref<PropDataProp> pdp = prop->get_prop(i);
 
 		if (pdp.is_valid()) {
-			prop_add_textures(pdp);
+			prop_add_textures(pdp->get_prop());
 		}
 	}
 }
