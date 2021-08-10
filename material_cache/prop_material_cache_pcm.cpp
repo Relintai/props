@@ -23,6 +23,7 @@ SOFTWARE.
 #include "prop_material_cache_pcm.h"
 
 #include "../../texture_packer/texture_packer.h"
+#include "../singleton/prop_cache.h"
 #include "scene/resources/texture.h"
 
 int PropMaterialCachePCM::get_texture_flags() const {
@@ -131,7 +132,13 @@ void PropMaterialCachePCM::refresh_rects() {
 void PropMaterialCachePCM::initial_setup_default() {
 	PropMaterialCache::initial_setup_default();
 
-	//copy settings
+	PropCache *pc = PropCache::get_singleton();
+
+	set_texture_flags(pc->get_texture_flags());
+	set_max_atlas_size(pc->get_max_atlas_size());
+	set_keep_original_atlases(pc->get_keep_original_atlases());
+	set_background_color(pc->get_background_color());
+	set_margin(pc->get_margin());
 }
 
 void PropMaterialCachePCM::_setup_material_albedo(Ref<Texture> texture) {

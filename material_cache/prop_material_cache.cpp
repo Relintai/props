@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include "../../props/props/prop_data.h"
 #include "../../props/props/prop_data_prop.h"
+#include "../singleton/prop_cache.h"
 
 #if MESH_DATA_RESOURCE_PRESENT
 #define PROPS_PRESENT 1
@@ -237,7 +238,20 @@ void PropMaterialCache::refresh_rects() {
 }
 
 void PropMaterialCache::initial_setup_default() {
-	
+	PropCache* pc = PropCache::get_singleton();
+
+	pc->ensure_materials_loaded();
+
+	int matc = pc->material_get_num();
+	for (int i = 0; i < matc; ++i) {
+		Ref<Material> m = pc->material_get(i);
+
+		ERR_CONTINUE(!m.is_valid());
+
+		Ref<Material> md = m->duplicate();
+
+		_materials.push_back(md);
+	}
 }
 
 void PropMaterialCache::setup_material_albedo(Ref<Texture> texture) {
