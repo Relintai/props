@@ -387,6 +387,10 @@ void PropInstanceMerger::_build() {
 	_build_queued = false;
 
 	if (!_prop_data.is_valid()) {
+		if (_job.is_valid()) {
+			_job->reset_meshes();
+		}
+
 		_building = false;
 		return;
 	}

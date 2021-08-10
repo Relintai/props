@@ -194,6 +194,7 @@ void PropInstancePropJob::phase_prop() {
 
 	if (should_do()) {
 		if (_prop_mesh_datas.size() == 0) {
+			//reset_meshes();
 			set_complete(true); //So threadpool knows it's done
 			return;
 		}
@@ -214,6 +215,8 @@ void PropInstancePropJob::phase_prop() {
 		}
 
 		if (get_prop_mesher()->get_vertex_count() == 0) {
+			//reset_meshes();
+
 			reset_stages();
 
 			set_complete(true); //So threadpool knows it's done
@@ -301,13 +304,16 @@ void PropInstancePropJob::_physics_process(float delta) {
 
 void PropInstancePropJob::_execute_phase() {
 	if (!_material_cache.is_valid()) {
-		ERR_PRINT("!PropInstancePropJob::_execute_phase(): _material_cache.is_valid()");
+		ERR_PRINT("!PropInstancePropJob::_execute_phase(): !_material_cache.is_valid()");
+		//reset_meshes();
 		set_complete(true); //So threadpool knows it's done
 		finished();
 	}
 
 #ifdef MESH_DATA_RESOURCE_PRESENT
 	if (_prop_mesh_datas.size() == 0) {
+		//reset_meshes();
+
 		set_complete(true);
 		finished();
 		return;
@@ -674,6 +680,28 @@ Array PropInstancePropJob::bake_mesh_array_uv(Array arr, Ref<Texture> tex, const
 	arr[VisualServer::ARRAY_COLOR] = colors;
 
 	return arr;
+}
+
+void PropInstancePropJob::reset_meshes() {
+	if (!_prop_instace) {
+		return;
+	}
+
+	//we have meshes, clear
+	if (_prop_instace->mesh_get_num() != 0) {
+		int count = _prop_instace->mesh_get_num();
+
+		for (int i = 0; i < count; ++i) {
+			RID mesh_rid = _prop_instace->mesh_get(i);
+
+			if (VS::get_singleton()->mesh_get_surface_count(mesh_rid) > 0)
+#if !GODOT4
+				VS::get_singleton()->mesh_remove_surface(mesh_rid, 0);
+#else
+				VS::get_singleton()->mesh_clear(mesh_rid);
+#endif
+		}
+	}
 }
 
 PropInstancePropJob::PropInstancePropJob() {
