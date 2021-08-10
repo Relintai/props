@@ -47,6 +47,9 @@ class PropInstanceMerger : public PropInstance {
 	GDCLASS(PropInstanceMerger, PropInstance);
 
 public:
+	bool get_building();
+	void set_building(const bool value);
+
 	Ref<PropInstanceJob> get_job();
 	void set_job(const Ref<PropInstanceJob> &job);
 

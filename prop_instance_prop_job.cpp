@@ -313,7 +313,6 @@ void PropInstancePropJob::_execute_phase() {
 #ifdef MESH_DATA_RESOURCE_PRESENT
 	if (_prop_mesh_datas.size() == 0) {
 		//reset_meshes();
-
 		set_complete(true);
 		finished();
 		return;
@@ -329,9 +328,6 @@ void PropInstancePropJob::_execute_phase() {
 		finished();
 		ERR_FAIL_MSG("PropInstancePropJob: _phase is too high!");
 	}
-
-	//set_complete(true); //So threadpool knows it's done
-	//finished();
 }
 
 void PropInstancePropJob::_reset() {
@@ -339,6 +335,8 @@ void PropInstancePropJob::_reset() {
 
 	_build_done = false;
 	_phase = 0;
+
+	reset_stages();
 
 	if (get_prop_mesher().is_valid()) {
 		get_prop_mesher()->reset();
@@ -358,6 +356,7 @@ void PropInstancePropJob::phase_steps() {
 		reset_stages();
 		//next_phase();
 		set_complete(true); //So threadpool knows it's done
+		finished();
 		return;
 	}
 
@@ -458,7 +457,9 @@ void PropInstancePropJob::phase_steps() {
 	}
 
 	reset_stages();
-	next_phase();
+	//next_phase();
+	set_complete(true); //So threadpool knows it's done
+	finished();
 }
 
 void PropInstancePropJob::step_type_normal() {
@@ -519,8 +520,8 @@ void PropInstancePropJob::step_type_merge_verts() {
 }
 
 void PropInstancePropJob::step_type_bake_texture() {
-	Ref<ShaderMaterial> mat; // = chunk->get_library()->material_lod_get(0);
-	Ref<SpatialMaterial> spmat; // = chunk->get_library()->material_lod_get(0);
+	Ref<ShaderMaterial> mat = _material_cache->material_lod_get(0);
+	Ref<SpatialMaterial> spmat = _material_cache->material_lod_get(0);
 	Ref<Texture> tex;
 
 	if (mat.is_valid()) {
@@ -708,6 +709,10 @@ PropInstancePropJob::PropInstancePropJob() {
 	set_build_phase_type(BUILD_PHASE_TYPE_PHYSICS_PROCESS);
 
 	_prop_instace = NULL;
+
+	//todo allocate this in a virtual method
+	_prop_mesher.instance();
+	_prop_mesher->set_build_flags(PropMesher::BUILD_FLAG_USE_LIGHTING | PropMesher::BUILD_FLAG_USE_AO | PropMesher::BUILD_FLAG_USE_RAO | PropMesher::BUILD_FLAG_GENERATE_AO | PropMesher::BUILD_FLAG_AUTO_GENERATE_RAO | PropMesher::BUILD_FLAG_BAKE_LIGHTS);
 }
 
 PropInstancePropJob::~PropInstancePropJob() {

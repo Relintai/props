@@ -81,15 +81,10 @@ void PropInstanceJob::_reset() {
 }
 
 void PropInstanceJob::_execute() {
-
 	ActiveBuildPhaseType origpt = _build_phase_type;
 
 	while (!get_cancelled() && _in_tree && !_build_done && origpt == _build_phase_type && !should_return()) {
 		execute_phase();
-	}
-
-	if (!_in_tree) {
-		_prop.unref();
 	}
 }
 
@@ -110,8 +105,11 @@ void PropInstanceJob::physics_process(const float delta) {
 		call("_physics_process", delta);
 }
 
-void PropInstanceJob::prop_instance_exit_tree() {
+void PropInstanceJob::prop_instance_enter_tree() {
+	_in_tree = true;
+}
 
+void PropInstanceJob::prop_instance_exit_tree() {
 	_in_tree = false;
 
 	if (get_complete()) {

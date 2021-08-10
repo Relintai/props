@@ -59,6 +59,16 @@ typedef class RenderingServer VS;
 #include "../thread_pool/thread_pool.h"
 #endif
 
+bool PropInstanceMerger::get_building() {
+	return _building;
+}
+void PropInstanceMerger::set_building(const bool value) {
+	_building = value;
+
+	set_physics_process_internal(_building);
+	set_process_internal(_building);
+}
+
 Ref<PropInstanceJob> PropInstanceMerger::get_job() {
 	return _job;
 }
@@ -383,7 +393,7 @@ void PropInstanceMerger::_init_materials() {
 }
 
 void PropInstanceMerger::_build() {
-	_building = true;
+	set_building(true);
 	_build_queued = false;
 
 	if (_job.is_valid()) {
@@ -400,35 +410,17 @@ void PropInstanceMerger::_build() {
 	}
 
 	if (!_prop_data.is_valid()) {
-		_building = false;
+		set_building(false);
 		return;
-	}
-
-	if (!_job.is_valid()) {
-		//todo this should probably be in a virtual method, lik in Terraman or Voxelman
-		_job = Ref<PropInstancePropJob>(memnew(PropInstancePropJob()));
-		_job->set_prop_instace(this);
-
-		Ref<PropMesherJobStep> js;
-
-		js.instance();
-		js->set_job_type(PropMesherJobStep::TYPE_NORMAL);
-		_job->add_jobs_step(js);
-
-		js.instance();
-		js->set_job_type(PropMesherJobStep::TYPE_MERGE_VERTS);
-		_job->add_jobs_step(js);
-
-		js.instance();
-		js->set_job_type(PropMesherJobStep::TYPE_BAKE_TEXTURE);
-		_job->add_jobs_step(js);
 	}
 
 	if (!is_inside_tree()) {
-		_building = false;
+		set_building(false);
 		_build_queued = true;
 		return;
 	}
+
+	_job->reset();
 
 	Ref<PropMaterialCache> cache = PropCache::get_singleton()->material_cache_get(_prop_data);
 
@@ -460,6 +452,7 @@ void PropInstanceMerger::_build() {
 }
 
 void PropInstanceMerger::_build_finished() {
+	set_building(false);
 }
 
 void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropData> &prop) {
@@ -546,10 +539,28 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 
 PropInstanceMerger::PropInstanceMerger() {
 	_build_queued = false;
-	_building = false;
+	set_building(false);
 
 	_first_lod_distance_squared = 20;
 	_lod_reduction_distance_squared = 10;
+
+	//todo this should probably be in a virtual method, lik in Terraman or Voxelman
+	_job = Ref<PropInstancePropJob>(memnew(PropInstancePropJob()));
+	_job->set_prop_instace(this);
+
+	Ref<PropMesherJobStep> js;
+
+	js.instance();
+	js->set_job_type(PropMesherJobStep::TYPE_NORMAL);
+	_job->add_jobs_step(js);
+
+	js.instance();
+	js->set_job_type(PropMesherJobStep::TYPE_MERGE_VERTS);
+	_job->add_jobs_step(js);
+
+	js.instance();
+	js->set_job_type(PropMesherJobStep::TYPE_BAKE_TEXTURE);
+	_job->add_jobs_step(js);
 }
 
 PropInstanceMerger::~PropInstanceMerger() {
@@ -564,16 +575,15 @@ void PropInstanceMerger::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_ENTER_TREE: {
 			if (_prop_data.is_valid()) {
+				_job->prop_instance_enter_tree();
 				build();
 			}
-
-			set_physics_process_internal(true);
-			set_process_internal(true);
 
 			break;
 		}
 		case NOTIFICATION_EXIT_TREE: {
 			if (_job.is_valid()) {
+				_job->prop_instance_exit_tree();
 				_job->set_cancelled(true);
 			}
 
@@ -585,8 +595,20 @@ void PropInstanceMerger::_notification(int p_what) {
 			//todo turn this on and off properly
 
 			if (_building) {
+				if (!_job.is_valid()) {
+					return;
+				}
+
 				if (_job->get_build_phase_type() == PropInstanceJob::BUILD_PHASE_TYPE_PHYSICS_PROCESS) {
 					_job->physics_process(get_physics_process_delta_time());
+
+					if (_job->get_build_phase_type() == PropInstanceJob::BUILD_PHASE_TYPE_NORMAL) {
+#if THREAD_POOL_PRESENT
+						ThreadPool::get_singleton()->add_job(_job);
+#else
+						job->execute();
+#endif
+					}
 				}
 			}
 
@@ -596,8 +618,20 @@ void PropInstanceMerger::_notification(int p_what) {
 			//todo turn this on and off properly
 
 			if (_building) {
+				if (!_job.is_valid()) {
+					return;
+				}
+
 				if (_job->get_build_phase_type() == PropInstanceJob::BUILD_PHASE_TYPE_PROCESS) {
 					_job->process(get_process_delta_time());
+
+					if (_job->get_build_phase_type() == PropInstanceJob::BUILD_PHASE_TYPE_NORMAL) {
+#if THREAD_POOL_PRESENT
+						ThreadPool::get_singleton()->add_job(_job);
+#else
+						job->execute();
+#endif
+					}
 				}
 			}
 

@@ -88,6 +88,7 @@ public:
 	void process(const float delta);
 	void physics_process(const float delta);
 
+	void prop_instance_enter_tree();
 	void prop_instance_exit_tree();
 
 	PropInstanceJob();
