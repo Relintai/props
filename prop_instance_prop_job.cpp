@@ -463,15 +463,7 @@ void PropInstancePropJob::step_type_normal() {
 
 	VS::get_singleton()->mesh_add_surface_from_arrays(mesh_rid, VisualServer::PRIMITIVE_TRIANGLES, temp_mesh_arr);
 
-	Ref<Material> lmat;
-
-	/*
-	if (chunk->prop_material_cache_key_has()) {
-		lmat = chunk->get_library()->prop_material_cache_get(_chunk->prop_material_cache_key_get())->material_lod_get(_current_mesh);
-	} else {
-		lmat = chunk->get_library()->prop_material_lod_get(_current_mesh);
-	}
-*/
+	Ref<Material> lmat = _material_cache->material_lod_get(_current_mesh);
 
 	if (lmat.is_valid()) {
 		VisualServer::get_singleton()->mesh_surface_set_material(mesh_rid, 0, lmat->get_rid());
@@ -493,15 +485,7 @@ void PropInstancePropJob::step_type_drop_uv2() {
 
 	VisualServer::get_singleton()->mesh_add_surface_from_arrays(mesh_rid, VisualServer::PRIMITIVE_TRIANGLES, temp_mesh_arr);
 
-	Ref<Material> lmat;
-
-	/*
-	if (chunk->prop_material_cache_key_has()) {
-		lmat = chunk->get_library()->prop_material_cache_get(_chunk->prop_material_cache_key_get())->material_lod_get(_current_mesh);
-	} else {
-		lmat = chunk->get_library()->prop_material_lod_get(_current_mesh);
-	}
-*/
+	Ref<Material> lmat = _material_cache->material_lod_get(_current_mesh);
 
 	if (lmat.is_valid()) {
 		VisualServer::get_singleton()->mesh_surface_set_material(mesh_rid, 0, lmat->get_rid());
@@ -518,15 +502,7 @@ void PropInstancePropJob::step_type_merge_verts() {
 
 	VisualServer::get_singleton()->mesh_add_surface_from_arrays(mesh_rid, VisualServer::PRIMITIVE_TRIANGLES, temp_mesh_arr);
 
-	Ref<Material> lmat;
-
-	/*
-	if (chunk->prop_material_cache_key_has()) {
-		lmat = chunk->get_library()->prop_material_cache_get(_chunk->prop_material_cache_key_get())->material_lod_get(_current_mesh);
-	} else {
-		lmat = chunk->get_library()->prop_material_lod_get(_current_mesh);
-	}
-*/
+	Ref<Material> lmat = _material_cache->material_lod_get(_current_mesh);
 
 	if (lmat.is_valid()) {
 		VisualServer::get_singleton()->mesh_surface_set_material(mesh_rid, 0, lmat->get_rid());
@@ -554,15 +530,7 @@ void PropInstancePropJob::step_type_bake_texture() {
 
 		VisualServer::get_singleton()->mesh_add_surface_from_arrays(mesh_rid, VisualServer::PRIMITIVE_TRIANGLES, temp_mesh_arr);
 
-		Ref<Material> lmat;
-
-		/*
-		if (chunk->prop_material_cache_key_has()) {
-			lmat = chunk->get_library()->prop_material_cache_get(_chunk->prop_material_cache_key_get())->material_lod_get(_current_mesh);
-		} else {
-			lmat = chunk->get_library()->prop_material_lod_get(_current_mesh);
-		}
-*/
+		Ref<Material> lmat = _material_cache->material_lod_get(_current_mesh);
 
 		if (lmat.is_valid()) {
 			VisualServer::get_singleton()->mesh_surface_set_material(mesh_rid, 0, lmat->get_rid());
@@ -590,15 +558,7 @@ void PropInstancePropJob::step_type_simplify_mesh() {
 
 		VisualServer::get_singleton()->mesh_add_surface_from_arrays(mesh_rid, VisualServer::PRIMITIVE_TRIANGLES, temp_mesh_arr);
 
-		Ref<Material> lmat;
-
-		/*
-		if (chunk->prop_material_cache_key_has()) {
-			lmat = chunk->get_library()->prop_material_cache_get(_chunk->prop_material_cache_key_get())->material_lod_get(_current_mesh);
-		} else {
-			lmat = chunk->get_library()->prop_material_lod_get(_current_mesh);
-		}
-*/
+		Ref<Material> lmat = _material_cache->material_lod_get(_current_mesh);
 
 		if (lmat.is_valid()) {
 			VisualServer::get_singleton()->mesh_surface_set_material(mesh_rid, 0, lmat->get_rid());
