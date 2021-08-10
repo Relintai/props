@@ -215,7 +215,25 @@ Ref<PropMaterialCache> PropCache::material_cache_get(const Ref<PropData> &prop) 
 	return m;
 }
 void PropCache::material_cache_unref(const Ref<PropData> &prop) {
+	//get pointer's value as uint64
+	uint64_t k = make_uint64_t<const PropData *>(*prop);
+
 	_material_cache_mutex.lock();
+
+	if (!_material_cache.has(k)) {
+		_material_cache_mutex.unlock();
+
+		ERR_PRINT("PropCache::material_cache_unref: can't find cache!");
+
+		return;
+	}
+
+	Ref<PropMaterialCache> m = _material_cache[k];
+
+	m->dec_ref_count();
+	if (m->get_ref_count() <= 0) {
+		_material_cache.erase(k);
+	}
 
 	_material_cache_mutex.unlock();
 }
@@ -249,6 +267,21 @@ Ref<PropMaterialCache> PropCache::material_cache_custom_key_get(const uint64_t k
 }
 void PropCache::material_cache_custom_key_unref(const uint64_t key) {
 	_custom_keyed_material_cache_mutex.lock();
+
+	if (!_material_cache.has(key)) {
+		_custom_keyed_material_cache_mutex.unlock();
+
+		ERR_PRINT("PropCache::material_cache_unref: can't find cache!");
+
+		return;
+	}
+
+	Ref<PropMaterialCache> m = _custom_keyed_material_cache[key];
+
+	m->dec_ref_count();
+	if (m->get_ref_count() <= 0) {
+		_custom_keyed_material_cache.erase(key);
+	}
 
 	_custom_keyed_material_cache_mutex.unlock();
 }
