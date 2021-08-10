@@ -48,6 +48,7 @@ typedef class RenderingServer VS;
 #include "./props/prop_data_light.h"
 #include "./props/prop_data_prop.h"
 #include "./props/prop_data_scene.h"
+#include "material_cache/prop_material_cache.h"
 
 #if TEXTURE_PACKER_PRESENT
 #include "./singleton/prop_cache.h"
@@ -410,24 +411,25 @@ void PropInstanceMerger::_build() {
 		return;
 	}
 
-//!
-//job->cache
-//this->cache
-//job->cache = cache
-//job ->  if !has cache query -> buildings can use this to only have one material per building
+	Ref<PropMaterialCache> cache = PropCache::get_singleton()->material_cache_get(_prop_data);
 
-//move this to job
-//#if TEXTURE_PACKER_PRESENT
-	//Ref<TexturePacker> packer; // = PropCache::get_singleton()->get_or_create_texture_threaded(_prop_data);
-	/*
-	if (packer->get_generated_texture_count() == 0) {
-		_building = false;
-		_build_queued = true;
-		return;
+	if (!cache->get_initialized()) {
+		cache->mutex_lock();
+
+		//check again, this thread might have gotten here after an another one already did the initialization!
+		if (!cache->get_initialized()) {
+			//this will set up materials, and settings
+			cache->initial_setup_default();
+
+			cache->prop_add_textures(_prop_data);
+
+			cache->refresh_rects();
+		}
+
+		cache->mutex_unlock();
 	}
-*/
-//	_job->set_texture_packer(packer);
-//#endif
+
+	_job->set_material_cache(cache);
 
 	for (int i = 0; i < get_child_count(); ++i) {
 		Node *n = get_child(i);
