@@ -25,7 +25,6 @@ SOFTWARE.
 const String PropMesher::BINDING_STRING_BUILD_FLAGS = "Use Isolevel,Use Lighting,Use AO,Use RAO,Generate AO,Generate RAO,Bake Lights,Create Collider,Create Lods";
 
 bool PropMesher::Vertex::operator==(const Vertex &p_vertex) const {
-
 	if (vertex != p_vertex.vertex)
 		return false;
 
@@ -61,7 +60,6 @@ bool PropMesher::Vertex::operator==(const Vertex &p_vertex) const {
 }
 
 uint32_t PropMesher::VertexHasher::hash(const Vertex &p_vtx) {
-
 	uint32_t h = hash_djb2_buffer((const uint8_t *)&p_vtx.vertex, sizeof(real_t) * 3);
 	h = hash_djb2_buffer((const uint8_t *)&p_vtx.normal, sizeof(real_t) * 3, h);
 	h = hash_djb2_buffer((const uint8_t *)&p_vtx.binormal, sizeof(real_t) * 3, h);
@@ -174,7 +172,11 @@ Array PropMesher::build_mesh() {
 #endif
 
 		for (int i = 0; i < _vertices.size(); ++i) {
+#if !GODOT4
+			w[i] = _vertices[i].vertex;
+#else
 			array.set(i, _vertices[i].vertex);
+#endif
 		}
 
 #if !GODOT4
@@ -196,7 +198,11 @@ Array PropMesher::build_mesh() {
 #endif
 
 		for (int i = 0; i < _vertices.size(); ++i) {
+#if !GODOT4
+			w[i] = _vertices[i].normal;
+#else
 			array.set(i, _vertices[i].normal);
+#endif
 		}
 
 #if !GODOT4
@@ -213,7 +219,11 @@ Array PropMesher::build_mesh() {
 #endif
 
 		for (int i = 0; i < _vertices.size(); ++i) {
+#if !GODOT4
+			w[i] = _vertices[i].color;
+#else
 			array.set(i, _vertices[i].color);
+#endif
 		}
 
 #if !GODOT4
@@ -230,7 +240,11 @@ Array PropMesher::build_mesh() {
 #endif
 
 		for (int i = 0; i < _vertices.size(); ++i) {
+#if !GODOT4
+			w[i] = _vertices[i].uv;
+#else
 			array.set(i, _vertices[i].uv);
+#endif
 		}
 
 #if !GODOT4
@@ -248,7 +262,11 @@ Array PropMesher::build_mesh() {
 #endif
 
 		for (int i = 0; i < _vertices.size(); ++i) {
+#if !GODOT4
+			w[i] = _vertices[i].uv2;
+#else
 			array.set(i, _vertices[i].uv2);
+#endif
 		}
 
 #if !GODOT4
@@ -265,7 +283,11 @@ Array PropMesher::build_mesh() {
 #endif
 
 		for (int i = 0; i < _indices.size(); ++i) {
+#if !GODOT4
+			w[i] = _indices[i];
+#else
 			array.set(i, _indices[i]);
+#endif
 		}
 
 #if !GODOT4
@@ -296,7 +318,6 @@ void PropMesher::build_mesh_into(RID mesh) {
 }
 
 void PropMesher::generate_normals(bool p_flip) {
-
 	_format = _format | VisualServer::ARRAY_FORMAT_NORMAL;
 
 	for (int i = 0; i < _indices.size(); i += 3) {
@@ -641,11 +662,9 @@ PoolVector<Vector3> PropMesher::build_collider() const {
 		return face_points;
 
 	if (_indices.size() == 0) {
-
 		int len = (_vertices.size() / 4);
 
 		for (int i = 0; i < len; ++i) {
-
 			face_points.push_back(_vertices.get(i * 4).vertex);
 			face_points.push_back(_vertices.get((i * 4) + 2).vertex);
 			face_points.push_back(_vertices.get((i * 4) + 1).vertex);
@@ -667,7 +686,7 @@ PoolVector<Vector3> PropMesher::build_collider() const {
 }
 
 #ifdef TERRAMAN_PRESENT
-void PropMesher::bake_lights(MeshInstance *node, Vector<Ref<TerraLight> > &lights) {
+void PropMesher::bake_lights(MeshInstance *node, Vector<Ref<TerraLight>> &lights) {
 	ERR_FAIL_COND(node == NULL);
 
 	Color darkColor(0, 0, 0, 1);
