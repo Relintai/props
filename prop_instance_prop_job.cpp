@@ -30,10 +30,11 @@ SOFTWARE.
 #define GET_WORLD get_world
 #endif
 
+#include "jobs/prop_mesher_job_step.h"
 #include "prop_instance.h"
 #include "prop_instance_merger.h"
 #include "prop_mesher.h"
-#include "jobs/prop_mesher_job_step.h"
+#include "material_cache/prop_material_cache.h"
 
 #ifdef MESH_DATA_RESOURCE_PRESENT
 #include "../mesh_data_resource/mesh_data_resource.h"
@@ -63,6 +64,13 @@ void PropInstancePropJob::set_texture_packer(const Ref<TexturePacker> &packer) {
 }
 #endif
 
+Ref<PropMaterialCache> PropInstancePropJob::get_material_cache() {
+	return _material_cache;
+}
+void PropInstancePropJob::set_material_cache(const Ref<PropMaterialCache> &cache) {
+	_material_cache = cache;
+}
+
 Ref<PropMesherJobStep> PropInstancePropJob::get_jobs_step(int index) const {
 	ERR_FAIL_INDEX_V(index, _job_steps.size(), Ref<PropMesherJobStep>());
 
@@ -84,7 +92,6 @@ void PropInstancePropJob::add_jobs_step(const Ref<PropMesherJobStep> &step) {
 int PropInstancePropJob::get_jobs_step_count() const {
 	return _job_steps.size();
 }
-
 
 PropInstanceMerger *PropInstancePropJob::get_prop_instace() {
 	return _prop_instace;
@@ -118,7 +125,6 @@ void PropInstancePropJob::clear_meshes() {
 #endif
 
 void PropInstancePropJob::phase_physics_process() {
-
 	//TODO this should only update the differences
 	for (int i = 0; i < _prop_instace->collider_get_num(); ++i) {
 		PhysicsServer::get_singleton()->free(_prop_instace->collider_body_get(i));
@@ -326,7 +332,6 @@ void PropInstancePropJob::phase_prop() {
 		}
 
 		if (should_do()) {
-
 			RID mesh_rid = _prop_instace->mesh_get(0);
 
 			VS::get_singleton()->mesh_add_surface_from_arrays(mesh_rid, VisualServer::PRIMITIVE_TRIANGLES, temp_mesh_arr);
@@ -614,7 +619,7 @@ void PropInstancePropJob::step_type_normal() {
 
 	Ref<Material> lmat;
 
-/*
+	/*
 	if (chunk->prop_material_cache_key_has()) {
 		lmat = chunk->get_library()->prop_material_cache_get(_chunk->prop_material_cache_key_get())->material_lod_get(_current_mesh);
 	} else {
@@ -644,7 +649,7 @@ void PropInstancePropJob::step_type_drop_uv2() {
 
 	Ref<Material> lmat;
 
-/*
+	/*
 	if (chunk->prop_material_cache_key_has()) {
 		lmat = chunk->get_library()->prop_material_cache_get(_chunk->prop_material_cache_key_get())->material_lod_get(_current_mesh);
 	} else {
@@ -669,7 +674,7 @@ void PropInstancePropJob::step_type_merge_verts() {
 
 	Ref<Material> lmat;
 
-/*
+	/*
 	if (chunk->prop_material_cache_key_has()) {
 		lmat = chunk->get_library()->prop_material_cache_get(_chunk->prop_material_cache_key_get())->material_lod_get(_current_mesh);
 	} else {
@@ -685,8 +690,8 @@ void PropInstancePropJob::step_type_merge_verts() {
 }
 
 void PropInstancePropJob::step_type_bake_texture() {
-	Ref<ShaderMaterial> mat;// = chunk->get_library()->material_lod_get(0);
-	Ref<SpatialMaterial> spmat;// = chunk->get_library()->material_lod_get(0);
+	Ref<ShaderMaterial> mat; // = chunk->get_library()->material_lod_get(0);
+	Ref<SpatialMaterial> spmat; // = chunk->get_library()->material_lod_get(0);
 	Ref<Texture> tex;
 
 	if (mat.is_valid()) {
@@ -705,7 +710,7 @@ void PropInstancePropJob::step_type_bake_texture() {
 
 		Ref<Material> lmat;
 
-/*
+		/*
 		if (chunk->prop_material_cache_key_has()) {
 			lmat = chunk->get_library()->prop_material_cache_get(_chunk->prop_material_cache_key_get())->material_lod_get(_current_mesh);
 		} else {
@@ -741,7 +746,7 @@ void PropInstancePropJob::step_type_simplify_mesh() {
 
 		Ref<Material> lmat;
 
-/*
+		/*
 		if (chunk->prop_material_cache_key_has()) {
 			lmat = chunk->get_library()->prop_material_cache_get(_chunk->prop_material_cache_key_get())->material_lod_get(_current_mesh);
 		} else {
@@ -879,6 +884,10 @@ void PropInstancePropJob::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_texture_packer", "packer"), &PropInstancePropJob::set_texture_packer);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "texture_packer", PROPERTY_HINT_RESOURCE_TYPE, "TexturePacker", 0), "set_texture_packer", "get_texture_packer");
 #endif
+
+	ClassDB::bind_method(D_METHOD("get_material_cache"), &PropInstancePropJob::get_material_cache);
+	ClassDB::bind_method(D_METHOD("set_material_cache", "packer"), &PropInstancePropJob::set_material_cache);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "material_cache", PROPERTY_HINT_RESOURCE_TYPE, "PropMaterialCache", 0), "set_material_cache", "get_material_cache");
 
 	ClassDB::bind_method(D_METHOD("get_jobs_step", "index"), &PropInstancePropJob::get_jobs_step);
 	ClassDB::bind_method(D_METHOD("set_jobs_step", "index", "mesher"), &PropInstancePropJob::set_jobs_step);

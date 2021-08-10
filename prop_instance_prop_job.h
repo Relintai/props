@@ -33,6 +33,7 @@ class PropMesher;
 class PropInstance;
 class PropInstanceMerger;
 class PropMesherJobStep;
+class PropMaterialCache;
 
 #if MESH_DATA_RESOURCE_PRESENT
 class PropDataMeshData;
@@ -46,6 +47,9 @@ public:
 	Ref<TexturePacker> get_texture_packer();
 	void set_texture_packer(const Ref<TexturePacker> &packer);
 #endif
+
+	Ref<PropMaterialCache> get_material_cache();
+	void set_material_cache(const Ref<PropMaterialCache> &cache);
 
 	Ref<PropMesherJobStep> get_jobs_step(const int index) const;
 	void set_jobs_step(const int index, const Ref<PropMesherJobStep> &step);
@@ -101,6 +105,8 @@ protected:
 #if TEXTURE_PACKER_PRESENT
 	Ref<TexturePacker> _texture_packer;
 #endif
+
+	Ref<PropMaterialCache> _material_cache;
 
 	Vector<Ref<PropMesherJobStep>> _job_steps;
 	int _current_job_step;
