@@ -53,6 +53,7 @@ SOFTWARE.
 //but not when included from here.
 #define PROPS_PRESENT 1
 #include "../mesh_data_resource/props/prop_data_mesh_data.h"
+#undef PROPS_PRESENT
 #endif
 
 #if TEXTURE_PACKER_PRESENT
