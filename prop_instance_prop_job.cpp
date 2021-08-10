@@ -286,145 +286,11 @@ void PropInstancePropJob::phase_prop() {
 				return;
 			}
 		}
-
-		if (should_do()) {
-			if (_prop_instace->mesh_get_num() == 0) {
-				_prop_instace->meshes_create(1);
-			}
-
-			RID mesh_rid = _prop_instace->mesh_get(0);
-
-			/*
-			if (mesh_rid == RID()) {
-				if ((chunk->get_build_flags() & TerraChunkDefault::BUILD_FLAG_CREATE_LODS) != 0)
-					chunk->meshes_create(TerraChunkDefault::MESH_INDEX_PROP, chunk->get_lod_num() + 1);
-				else
-					chunk->meshes_create(TerraChunkDefault::MESH_INDEX_PROP, 1);
-
-				mesh_rid = chunk->mesh_rid_get_index(TerraChunkDefault::MESH_INDEX_PROP, TerraChunkDefault::MESH_TYPE_INDEX_MESH, 0);
-			}*/
-
-			if (VS::get_singleton()->mesh_get_surface_count(mesh_rid) > 0)
-#if !GODOT4
-				VS::get_singleton()->mesh_remove_surface(mesh_rid, 0);
-#else
-				VS::get_singleton()->mesh_clear(mesh_rid);
-#endif
-
-			if (should_return()) {
-				return;
-			}
-		}
-
-		if (should_do()) {
-			RID mesh_rid = _prop_instace->mesh_get(0);
-
-			VS::get_singleton()->mesh_add_surface_from_arrays(mesh_rid, VisualServer::PRIMITIVE_TRIANGLES, temp_mesh_arr);
-
-			Ref<Material> mat = _prop_instace->material_get(0);
-
-			if (mat.is_valid())
-				VS::get_singleton()->mesh_surface_set_material(mesh_rid, 0, mat->get_rid());
-
-			if (should_return()) {
-				return;
-			}
-		}
-
-		/* 
-		//skip lod generation for now
-		if ((chunk->get_build_flags() & TerraChunkDefault::BUILD_FLAG_CREATE_LODS) != 0) {
-			if (should_do()) {
-
-				if (chunk->get_lod_num() >= 1) {
-					//for lod 1 just remove uv2
-					temp_mesh_arr[VisualServer::ARRAY_TEX_UV2] = Variant();
-
-					VisualServer::get_singleton()->mesh_add_surface_from_arrays(chunk->mesh_rid_get_index(TerraChunkDefault::MESH_INDEX_PROP, TerraChunkDefault::MESH_TYPE_INDEX_MESH, 1), VisualServer::PRIMITIVE_TRIANGLES, temp_mesh_arr);
-
-					if (chunk->get_library()->prop_material_get(1).is_valid())
-						VisualServer::get_singleton()->mesh_surface_set_material(chunk->mesh_rid_get_index(TerraChunkDefault::MESH_INDEX_PROP, TerraChunkDefault::MESH_TYPE_INDEX_MESH, 1), 0, chunk->get_library()->prop_material_get(1)->get_rid());
-				}
-
-				if (should_return()) {
-					return;
-				}
-			}
-
-			if (should_do()) {
-				if (chunk->get_lod_num() >= 2) {
-					Array temp_mesh_arr2 = merge_mesh_array(temp_mesh_arr);
-					temp_mesh_arr = temp_mesh_arr2;
-
-					VisualServer::get_singleton()->mesh_add_surface_from_arrays(chunk->mesh_rid_get_index(TerraChunkDefault::MESH_INDEX_PROP, TerraChunkDefault::MESH_TYPE_INDEX_MESH, 2), VisualServer::PRIMITIVE_TRIANGLES, temp_mesh_arr2);
-
-					if (chunk->get_library()->prop_material_get(2).is_valid())
-						VisualServer::get_singleton()->mesh_surface_set_material(chunk->mesh_rid_get_index(TerraChunkDefault::MESH_INDEX_PROP, TerraChunkDefault::MESH_TYPE_INDEX_MESH, 2), 0, chunk->get_library()->prop_material_get(2)->get_rid());
-				}
-				if (should_return()) {
-					return;
-				}
-			}
-
-			//	if (should_do()) {
-			if (chunk->get_lod_num() >= 3) {
-				Ref<ShaderMaterial> mat = chunk->get_library()->prop_material_get(0);
-				Ref<SpatialMaterial> spmat = chunk->get_library()->prop_material_get(0);
-				Ref<Texture> tex;
-
-				if (mat.is_valid()) {
-					tex = mat->get_shader_param("texture_albedo");
-				} else if (spmat.is_valid()) {
-					tex = spmat->get_texture(SpatialMaterial::TEXTURE_ALBEDO);
-				}
-
-				if (tex.is_valid()) {
-					temp_mesh_arr = bake_mesh_array_uv(temp_mesh_arr, tex);
-					temp_mesh_arr[VisualServer::ARRAY_TEX_UV] = Variant();
-
-					VisualServer::get_singleton()->mesh_add_surface_from_arrays(chunk->mesh_rid_get_index(TerraChunkDefault::MESH_INDEX_PROP, TerraChunkDefault::MESH_TYPE_INDEX_MESH, 3), VisualServer::PRIMITIVE_TRIANGLES, temp_mesh_arr);
-
-					if (chunk->get_library()->prop_material_get(3).is_valid())
-						VisualServer::get_singleton()->mesh_surface_set_material(chunk->mesh_rid_get_index(TerraChunkDefault::MESH_INDEX_PROP, TerraChunkDefault::MESH_TYPE_INDEX_MESH, 3), 0, chunk->get_library()->prop_material_get(3)->get_rid());
-				}
-			}
-
-#ifdef MESH_UTILS_PRESENT
-			if (should_do()) {
-				if (chunk->get_lod_num() > 4) {
-					Ref<FastQuadraticMeshSimplifier> fqms;
-					fqms.instance();
-					fqms->set_preserve_border_edges(true);
-					fqms->initialize(temp_mesh_arr);
-
-					for (int i = 4; i < chunk->get_lod_num(); ++i) {
-						fqms->simplify_mesh(temp_mesh_arr.size() * 0.8, 7);
-						temp_mesh_arr = fqms->get_arrays();
-
-						VisualServer::get_singleton()->mesh_add_surface_from_arrays(
-								chunk->mesh_rid_get_index(TerraChunkDefault::MESH_INDEX_TERRARIN, TerraChunkDefault::MESH_TYPE_INDEX_MESH, i),
-								VisualServer::PRIMITIVE_TRIANGLES, temp_mesh_arr);
-
-						if (chunk->get_library()->prop_material_get(i).is_valid())
-							VisualServer::get_singleton()->mesh_surface_set_material(
-									chunk->mesh_rid_get_index(TerraChunkDefault::MESH_INDEX_TERRARIN, TerraChunkDefault::MESH_TYPE_INDEX_MESH, i), 0,
-									chunk->get_library()->prop_material_get(i)->get_rid());
-					}
-				}
-
-				if (should_return()) {
-					return;
-				}
-			}
-#endif
-		}
-		*/
 	}
 
 #endif
 
-	set_complete(true); //So threadpool knows it's done
-	finished();
+	next_phase();
 }
 
 void PropInstancePropJob::_physics_process(float delta) {
@@ -449,7 +315,9 @@ void PropInstancePropJob::_execute_phase() {
 
 	if (_phase == 1) {
 		phase_prop();
-	} else if (_phase > 1) {
+	} else if (_phase == 2) {
+		phase_steps();
+	} else if (_phase > 2) {
 		set_complete(true); //So threadpool knows it's done
 		finished();
 		ERR_FAIL_MSG("PropInstancePropJob: _phase is too high!");
@@ -583,9 +451,7 @@ void PropInstancePropJob::phase_steps() {
 	}
 
 	reset_stages();
-	//next_phase();
-
-	set_complete(true); //So threadpool knows it's done
+	next_phase();
 }
 
 void PropInstancePropJob::step_type_normal() {
