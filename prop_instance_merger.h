@@ -129,8 +129,6 @@ protected:
 	};
 
 private:
-	Ref<PropData> _prop_data;
-
 	bool _build_queued;
 	bool _building;
 
