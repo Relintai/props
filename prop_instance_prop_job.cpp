@@ -31,10 +31,11 @@ SOFTWARE.
 #endif
 
 #include "jobs/prop_mesher_job_step.h"
+#include "material_cache/prop_material_cache.h"
 #include "prop_instance.h"
 #include "prop_instance_merger.h"
 #include "prop_mesher.h"
-#include "material_cache/prop_material_cache.h"
+#include "singleton/prop_cache.h"
 
 #ifdef MESH_DATA_RESOURCE_PRESENT
 #include "../mesh_data_resource/mesh_data_resource.h"
@@ -54,15 +55,6 @@ SOFTWARE.
 #define PROPS_PRESENT 1
 #include "../mesh_data_resource/props/prop_data_mesh_data.h"
 #undef PROPS_PRESENT
-#endif
-
-#if TEXTURE_PACKER_PRESENT
-Ref<TexturePacker> PropInstancePropJob::get_texture_packer() {
-	return _texture_packer;
-}
-void PropInstancePropJob::set_texture_packer(const Ref<TexturePacker> &packer) {
-	_texture_packer = packer;
-}
 #endif
 
 Ref<PropMaterialCache> PropInstancePropJob::get_material_cache() {
@@ -216,15 +208,7 @@ void PropInstancePropJob::phase_prop() {
 			Transform t = pmd->get_transform();
 			t *= e.base_transform;
 
-			Rect2 uvr = Rect2(0, 0, 1, 1);
-
-			if (_texture_packer.is_valid() && tex.is_valid()) {
-				Ref<AtlasTexture> at = _texture_packer->get_texture(tex);
-
-				if (at.is_valid()) {
-					uvr = at->get_region();
-				}
-			}
+			Rect2 uvr = _material_cache->texture_get_uv_rect(tex);
 
 			get_prop_mesher()->add_mesh_data_resource_transform(mesh, t, uvr);
 		}
@@ -449,35 +433,30 @@ void PropInstancePropJob::_physics_process(float delta) {
 }
 
 void PropInstancePropJob::_execute_phase() {
-	/*
-	ERR_FAIL_COND(!_chunk.is_valid());
+	if (!_material_cache.is_valid()) {
+		ERR_PRINT("!PropInstancePropJob::_execute_phase(): _material_cache.is_valid()");
+		set_complete(true); //So threadpool knows it's done
+		finished();
+	}
 
-	Ref<TerramanLibrary> library = _chunk->get_library();
-
-	ERR_FAIL_COND(!library.is_valid());
-
-	Ref<TerraChunkDefault> chunk = _chunk;
-
-	if (!chunk.is_valid()
 #ifdef MESH_DATA_RESOURCE_PRESENT
-			|| chunk->mesh_data_resource_get_count() == 0
-#endif
-	) {
+	if (_prop_mesh_datas.size() == 0) {
 		set_complete(true);
 		finished();
 		return;
 	}
-*/
+#endif
+
 	if (_phase == 1) {
-		//phase_prop();
+		phase_prop();
 	} else if (_phase > 1) {
 		set_complete(true); //So threadpool knows it's done
 		finished();
 		ERR_FAIL_MSG("PropInstancePropJob: _phase is too high!");
 	}
 
-	set_complete(true); //So threadpool knows it's done
-	finished();
+	//set_complete(true); //So threadpool knows it's done
+	//finished();
 }
 
 void PropInstancePropJob::_reset() {
@@ -880,12 +859,6 @@ PropInstancePropJob::~PropInstancePropJob() {
 }
 
 void PropInstancePropJob::_bind_methods() {
-#if TEXTURE_PACKER_PRESENT
-	ClassDB::bind_method(D_METHOD("get_texture_packer"), &PropInstancePropJob::get_texture_packer);
-	ClassDB::bind_method(D_METHOD("set_texture_packer", "packer"), &PropInstancePropJob::set_texture_packer);
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "texture_packer", PROPERTY_HINT_RESOURCE_TYPE, "TexturePacker", 0), "set_texture_packer", "get_texture_packer");
-#endif
-
 	ClassDB::bind_method(D_METHOD("get_material_cache"), &PropInstancePropJob::get_material_cache);
 	ClassDB::bind_method(D_METHOD("set_material_cache", "packer"), &PropInstancePropJob::set_material_cache);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "material_cache", PROPERTY_HINT_RESOURCE_TYPE, "PropMaterialCache", 0), "set_material_cache", "get_material_cache");

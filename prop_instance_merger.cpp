@@ -417,8 +417,8 @@ void PropInstanceMerger::_build() {
 //job ->  if !has cache query -> buildings can use this to only have one material per building
 
 //move this to job
-#if TEXTURE_PACKER_PRESENT
-	Ref<TexturePacker> packer; // = PropCache::get_singleton()->get_or_create_texture_threaded(_prop_data);
+//#if TEXTURE_PACKER_PRESENT
+	//Ref<TexturePacker> packer; // = PropCache::get_singleton()->get_or_create_texture_threaded(_prop_data);
 	/*
 	if (packer->get_generated_texture_count() == 0) {
 		_building = false;
@@ -426,8 +426,8 @@ void PropInstanceMerger::_build() {
 		return;
 	}
 */
-	_job->set_texture_packer(packer);
-#endif
+//	_job->set_texture_packer(packer);
+//#endif
 
 	for (int i = 0; i < get_child_count(); ++i) {
 		Node *n = get_child(i);

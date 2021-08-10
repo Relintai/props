@@ -25,10 +25,6 @@ SOFTWARE.
 
 #include "prop_instance_job.h"
 
-#if TEXTURE_PACKER_PRESENT
-class TexturePacker;
-#endif
-
 class PropMesher;
 class PropInstance;
 class PropInstanceMerger;
@@ -43,11 +39,6 @@ class PropInstancePropJob : public PropInstanceJob {
 	GDCLASS(PropInstancePropJob, PropInstanceJob);
 
 public:
-#if TEXTURE_PACKER_PRESENT
-	Ref<TexturePacker> get_texture_packer();
-	void set_texture_packer(const Ref<TexturePacker> &packer);
-#endif
-
 	Ref<PropMaterialCache> get_material_cache();
 	void set_material_cache(const Ref<PropMaterialCache> &cache);
 
@@ -100,10 +91,6 @@ protected:
 		Ref<PropDataMeshData> mesh_data;
 		Transform base_transform;
 	};
-#endif
-
-#if TEXTURE_PACKER_PRESENT
-	Ref<TexturePacker> _texture_packer;
 #endif
 
 	Ref<PropMaterialCache> _material_cache;
