@@ -91,6 +91,7 @@ PropInstanceMerger *PropInstancePropJob::get_prop_instace() {
 }
 void PropInstancePropJob::set_prop_instace(PropInstanceMerger *prop) {
 	_prop_instace = prop;
+	_instance = prop;
 }
 void PropInstancePropJob::set_prop_instace_bind(Node *prop) {
 	set_prop_instace(Object::cast_to<PropInstanceMerger>(prop));
@@ -327,6 +328,7 @@ void PropInstancePropJob::_reset() {
 	_build_done = false;
 	_phase = 0;
 
+	_current_mesh = 0;
 	_current_job_step = 0;
 
 	reset_stages();

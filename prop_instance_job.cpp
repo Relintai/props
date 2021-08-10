@@ -70,6 +70,10 @@ void PropInstanceJob::set_build_done(const bool val) {
 
 void PropInstanceJob::finished() {
 	set_build_done(true);
+
+	if (_instance) {
+		_instance->build_finished();
+	}
 }
 
 void PropInstanceJob::reset() {

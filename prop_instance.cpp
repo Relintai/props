@@ -33,7 +33,11 @@ void PropInstance::set_prop_data(const Ref<PropData> &data) {
 
 	_prop_data = data;
 
-	queue_build();
+	if (_building) {
+		queue_build();
+	} else {
+		call_deferred("build");
+	}
 }
 
 Ref<Material> PropInstance::get_material() {
@@ -58,11 +62,7 @@ void PropInstance::queue_build() {
 }
 
 void PropInstance::build_finished() {
-	_building = false;
-
-	if (_build_queued) {
-		call_deferred("build");
-	}
+	call("_build_finished");
 }
 
 void PropInstance::_build() {
@@ -89,6 +89,11 @@ void PropInstance::_build() {
 }
 
 void PropInstance::_build_finished() {
+	_building = false;
+
+	if (_build_queued) {
+		call_deferred("build");
+	}
 }
 
 void PropInstance::prop_preprocess(Transform transform, const Ref<PropData> &prop) {

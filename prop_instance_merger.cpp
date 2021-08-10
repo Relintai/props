@@ -462,6 +462,10 @@ Don't submit here, as it starts in physics process mode
 
 void PropInstanceMerger::_build_finished() {
 	set_building(false);
+
+	if (_build_queued) {
+		call_deferred("build");
+	}
 }
 
 void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropData> &prop) {
