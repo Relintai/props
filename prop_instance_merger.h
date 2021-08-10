@@ -50,11 +50,6 @@ public:
 	Ref<PropInstanceJob> get_job();
 	void set_job(const Ref<PropInstanceJob> &job);
 
-#ifdef TEXTURE_PACKER_PRESENT
-	bool get_merge_textures() const;
-	void set_merge_textures(const bool value);
-#endif
-
 	///Materials
 	Ref<Material> material_get(const int index);
 	void material_add(const Ref<Material> &value);
@@ -140,10 +135,6 @@ private:
 	bool _building;
 
 	Ref<PropInstancePropJob> _job;
-
-#ifdef TEXTURE_PACKER_PRESENT
-	bool _merge_textures;
-#endif
 
 	Vector<Ref<Material> > _materials;
 	Vector<MeshEntry> _meshes;

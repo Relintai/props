@@ -66,16 +66,6 @@ void PropInstanceMerger::set_job(const Ref<PropInstanceJob> &job) {
 	_job = job;
 }
 
-#ifdef TEXTURE_PACKER_PRESENT
-bool PropInstanceMerger::get_merge_textures() const {
-	return _merge_textures;
-}
-
-void PropInstanceMerger::set_merge_textures(const bool value) {
-	_merge_textures = value;
-}
-#endif
-
 //Materials
 Ref<Material> PropInstanceMerger::material_get(const int index) {
 	ERR_FAIL_INDEX_V(index, _materials.size(), Ref<Material>(NULL));
@@ -623,12 +613,6 @@ void PropInstanceMerger::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_job"), &PropInstanceMerger::get_job);
 	ClassDB::bind_method(D_METHOD("set_job", "value"), &PropInstanceMerger::set_job);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "job", PROPERTY_HINT_RESOURCE_TYPE, "PropInstanceJob", 0), "set_job", "get_job");
-
-#ifdef TEXTURE_PACKER_PRESENT
-	ClassDB::bind_method(D_METHOD("get_merge_textures"), &PropInstanceMerger::get_merge_textures);
-	ClassDB::bind_method(D_METHOD("set_merge_textures", "value"), &PropInstanceMerger::set_merge_textures);
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "merge_textures"), "set_merge_textures", "get_merge_textures");
-#endif
 
 	///Materials
 	ClassDB::bind_method(D_METHOD("material_get", "index"), &PropInstanceMerger::material_get);
