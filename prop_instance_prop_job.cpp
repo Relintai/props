@@ -214,7 +214,7 @@ void PropInstancePropJob::phase_prop() {
 		}
 
 		if (get_prop_mesher()->get_vertex_count() == 0) {
-			//reset_stages();
+			reset_stages();
 
 			set_complete(true); //So threadpool knows it's done
 			return;
@@ -290,6 +290,7 @@ void PropInstancePropJob::phase_prop() {
 
 #endif
 
+	reset_stages();
 	next_phase();
 }
 
