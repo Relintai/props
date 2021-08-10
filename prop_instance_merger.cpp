@@ -48,6 +48,7 @@ typedef class RenderingServer VS;
 #include "./props/prop_data_light.h"
 #include "./props/prop_data_prop.h"
 #include "./props/prop_data_scene.h"
+#include "jobs/prop_mesher_job_step.h"
 #include "material_cache/prop_material_cache.h"
 
 #if TEXTURE_PACKER_PRESENT
@@ -401,8 +402,23 @@ void PropInstanceMerger::_build() {
 	}
 
 	if (!_job.is_valid()) {
+		//todo this should probably be in a virtual method, lik ein Terraman or Voxelman
 		_job = Ref<PropInstanceJob>(memnew(PropInstancePropJob()));
 		_job->set_prop_instace(this);
+
+		Ref<PropMesherJobStep> js;
+
+		js.instance();
+		js->set_job_type(PropMesherJobStep::TYPE_NORMAL);
+		_job->add_jobs_step(js);
+
+		js.instance();
+		js->set_job_type(PropMesherJobStep::TYPE_MERGE_VERTS);
+		_job->add_jobs_step(js);
+
+		js.instance();
+		js->set_job_type(PropMesherJobStep::TYPE_BAKE_TEXTURE);
+		_job->add_jobs_step(js);
 	}
 
 	if (!is_inside_tree()) {
