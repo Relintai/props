@@ -195,6 +195,7 @@ void PropInstancePropJob::phase_prop() {
 	if (should_do()) {
 		if (_prop_mesh_datas.size() == 0) {
 			//reset_meshes();
+			reset_stages();
 			set_complete(true); //So threadpool knows it's done
 			return;
 		}
@@ -211,10 +212,10 @@ void PropInstancePropJob::phase_prop() {
 
 			Rect2 uvr = _material_cache->texture_get_uv_rect(tex);
 
-			get_prop_mesher()->add_mesh_data_resource_transform(mesh, t, uvr);
+			_prop_mesher->add_mesh_data_resource_transform(mesh, t, uvr);
 		}
 
-		if (get_prop_mesher()->get_vertex_count() == 0) {
+		if (_prop_mesher->get_vertex_count() == 0) {
 			//reset_meshes();
 
 			reset_stages();
@@ -281,16 +282,6 @@ void PropInstancePropJob::phase_prop() {
 	}
 	*/
 
-	if (get_prop_mesher()->get_vertex_count() != 0) {
-		if (should_do()) {
-			temp_mesh_arr = get_prop_mesher()->build_mesh();
-
-			if (should_return()) {
-				return;
-			}
-		}
-	}
-
 #endif
 
 	reset_stages();
@@ -336,11 +327,15 @@ void PropInstancePropJob::_reset() {
 	_build_done = false;
 	_phase = 0;
 
+	_current_job_step = 0;
+
 	reset_stages();
 
-	if (get_prop_mesher().is_valid()) {
-		get_prop_mesher()->reset();
+	if (_prop_mesher.is_valid()) {
+		_prop_mesher->reset();
 	}
+
+	_prop_mesh_datas.clear();
 
 	set_build_phase_type(BUILD_PHASE_TYPE_PHYSICS_PROCESS);
 }
@@ -710,9 +705,11 @@ PropInstancePropJob::PropInstancePropJob() {
 
 	_prop_instace = NULL;
 
+	_current_job_step = 0;
+
 	//todo allocate this in a virtual method
 	_prop_mesher.instance();
-	_prop_mesher->set_build_flags(PropMesher::BUILD_FLAG_USE_LIGHTING | PropMesher::BUILD_FLAG_USE_AO | PropMesher::BUILD_FLAG_USE_RAO | PropMesher::BUILD_FLAG_GENERATE_AO | PropMesher::BUILD_FLAG_AUTO_GENERATE_RAO | PropMesher::BUILD_FLAG_BAKE_LIGHTS);
+	//_prop_mesher->set_build_flags(PropMesher::BUILD_FLAG_USE_LIGHTING | PropMesher::BUILD_FLAG_USE_AO | PropMesher::BUILD_FLAG_USE_RAO | PropMesher::BUILD_FLAG_GENERATE_AO | PropMesher::BUILD_FLAG_AUTO_GENERATE_RAO | PropMesher::BUILD_FLAG_BAKE_LIGHTS);
 }
 
 PropInstancePropJob::~PropInstancePropJob() {

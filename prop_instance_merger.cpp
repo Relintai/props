@@ -393,6 +393,10 @@ void PropInstanceMerger::_init_materials() {
 }
 
 void PropInstanceMerger::_build() {
+	if (_building) {
+		return;
+	}
+
 	set_building(true);
 	_build_queued = false;
 
@@ -444,11 +448,16 @@ void PropInstanceMerger::_build() {
 
 	prop_preprocess(Transform(), _prop_data);
 
+/*
+
+Don't submit here, as it starts in physics process mode
+
 #if THREAD_POOL_PRESENT
 	ThreadPool::get_singleton()->add_job(_job);
 #else
 	_job->execute();
 #endif
+*/
 }
 
 void PropInstanceMerger::_build_finished() {
@@ -544,7 +553,7 @@ PropInstanceMerger::PropInstanceMerger() {
 	_first_lod_distance_squared = 20;
 	_lod_reduction_distance_squared = 10;
 
-	//todo this should probably be in a virtual method, lik in Terraman or Voxelman
+	//todo this should probably be in a virtual method, like in Terraman or Voxelman
 	_job = Ref<PropInstancePropJob>(memnew(PropInstancePropJob()));
 	_job->set_prop_instace(this);
 
@@ -576,7 +585,7 @@ void PropInstanceMerger::_notification(int p_what) {
 		case NOTIFICATION_ENTER_TREE: {
 			if (_prop_data.is_valid()) {
 				_job->prop_instance_enter_tree();
-				build();
+				call_deferred("build");
 			}
 
 			break;
@@ -592,7 +601,6 @@ void PropInstanceMerger::_notification(int p_what) {
 			break;
 		}
 		case NOTIFICATION_INTERNAL_PHYSICS_PROCESS: {
-			//todo turn this on and off properly
 
 			if (_building) {
 				if (!_job.is_valid()) {
@@ -615,7 +623,6 @@ void PropInstanceMerger::_notification(int p_what) {
 			break;
 		}
 		case NOTIFICATION_INTERNAL_PROCESS: {
-			//todo turn this on and off properly
 
 			if (_building) {
 				if (!_job.is_valid()) {
