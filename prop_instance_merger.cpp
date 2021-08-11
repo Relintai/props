@@ -545,10 +545,10 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 			if (!mdr.is_valid())
 				continue;
 
-			_job->add_mesh(mesh_data, transform);
+			_job->add_mesh(mesh_data, t);
 
 			for (int j = 0; j < mdr->get_collision_shape_count(); ++j) {
-				_job->add_collision_shape(mdr->get_collision_shape(j), transform * mdr->get_collision_shape_offset(j));
+				_job->add_collision_shape(mdr->get_collision_shape(j), t * mdr->get_collision_shape_offset(j));
 			}
 		}
 #endif
