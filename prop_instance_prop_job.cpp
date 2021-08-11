@@ -31,13 +31,13 @@ SOFTWARE.
 #endif
 
 #include "jobs/prop_mesher_job_step.h"
+#include "lights/prop_light.h"
 #include "material_cache/prop_material_cache.h"
 #include "prop_instance.h"
 #include "prop_instance_merger.h"
 #include "prop_mesher.h"
-#include "singleton/prop_cache.h"
 #include "scene/resources/shape.h"
-#include "lights/prop_light.h"
+#include "singleton/prop_cache.h"
 
 #ifdef MESH_DATA_RESOURCE_PRESENT
 #include "../mesh_data_resource/mesh_data_resource.h"
@@ -132,7 +132,6 @@ void PropInstancePropJob::clear_meshes() {
 }
 #endif
 
-
 void PropInstancePropJob::add_light(const Ref<PropLight> &light) {
 	_prop_mesher->add_light(light);
 }
@@ -188,8 +187,6 @@ void PropInstancePropJob::phase_physics_process() {
 }
 
 void PropInstancePropJob::phase_prop() {
-#ifdef MESH_DATA_RESOURCE_PRESENT
-
 	if (!_prop_mesher.is_valid()) {
 		set_complete(true); //So threadpool knows it's done
 		return;
@@ -203,6 +200,7 @@ void PropInstancePropJob::phase_prop() {
 			return;
 		}
 
+#ifdef MESH_DATA_RESOURCE_PRESENT
 		for (int i = 0; i < _prop_mesh_datas.size(); ++i) {
 			PMDREntry &e = _prop_mesh_datas.write[i];
 
@@ -217,6 +215,7 @@ void PropInstancePropJob::phase_prop() {
 
 			_prop_mesher->add_mesh_data_resource_transform(mesh, t, uvr);
 		}
+#endif
 
 		if (_prop_mesher->get_vertex_count() == 0) {
 			//reset_meshes();
@@ -232,60 +231,15 @@ void PropInstancePropJob::phase_prop() {
 		}
 	}
 
-	/*
 	if (should_do()) {
-		if ((chunk->get_build_flags() & TerraChunkDefault::BUILD_FLAG_USE_LIGHTING) != 0) {
-			_prop_mesher->bake_colors(_chunk);
+		if ((_prop_mesher->get_build_flags() & PropMesher::BUILD_FLAG_USE_LIGHTING) != 0) {
+			_prop_mesher->bake_colors();
 		}
 
 		if (should_return()) {
 			return;
 		}
 	}
-*/
-	/*
-	//lights should be added here by the prop instance preemtively
-	//Also this system should use it's own lights
-	if (should_do()) {
-		if ((chunk->get_build_flags() & TerraChunkDefault::BUILD_FLAG_USE_LIGHTING) != 0) {
-			TerraWorldDefault *world = Object::cast_to<TerraWorldDefault>(chunk->get_voxel_world());
-
-			if (world) {
-				for (int i = 0; i < chunk->mesh_data_resource_get_count(); ++i) {
-					if (!chunk->mesh_data_resource_get_is_inside(i)) {
-						Ref<MeshDataResource> mdr = chunk->mesh_data_resource_get(i);
-
-						ERR_CONTINUE(!mdr.is_valid());
-
-						Transform trf = chunk->mesh_data_resource_get_transform(i);
-
-						Array arr = mdr->get_array();
-
-						if (arr.size() <= Mesh::ARRAY_VERTEX) {
-							continue;
-						}
-
-						PoolVector3Array varr = arr[Mesh::ARRAY_VERTEX];
-
-						if (varr.size() == 0) {
-							continue;
-						}
-
-						PoolColorArray carr = world->get_vertex_colors(trf, varr);
-
-						get_prop_mesher()->add_mesh_data_resource_transform_colored(mdr, trf, carr, chunk->mesh_data_resource_get_uv_rect(i));
-					}
-				}
-			}
-		}
-
-		if (should_return()) {
-			return;
-		}
-	}
-	*/
-
-#endif
 
 	reset_stages();
 	next_phase();
@@ -714,7 +668,7 @@ PropInstancePropJob::PropInstancePropJob() {
 
 	//todo allocate this in a virtual method
 	_prop_mesher.instance();
-	//_prop_mesher->set_build_flags(PropMesher::BUILD_FLAG_USE_LIGHTING | PropMesher::BUILD_FLAG_USE_AO | PropMesher::BUILD_FLAG_USE_RAO | PropMesher::BUILD_FLAG_GENERATE_AO | PropMesher::BUILD_FLAG_AUTO_GENERATE_RAO | PropMesher::BUILD_FLAG_BAKE_LIGHTS);
+	_prop_mesher->set_build_flags(PropMesher::BUILD_FLAG_USE_LIGHTING | PropMesher::BUILD_FLAG_USE_AO | PropMesher::BUILD_FLAG_USE_RAO | PropMesher::BUILD_FLAG_BAKE_LIGHTS);
 }
 
 PropInstancePropJob::~PropInstancePropJob() {

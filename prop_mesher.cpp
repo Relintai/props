@@ -598,7 +598,7 @@ void PropMesher::generate_ao() {
 	}*/
 }
 
-uint8_t PropMesher::get_random_ao(const Vector3 &position) {
+float PropMesher::get_random_ao(const Vector3 &position) {
 	float val = _noise->get_noise_3d(position.x, position.y, position.z);
 
 	val *= _rao_scale_factor;
@@ -609,7 +609,49 @@ uint8_t PropMesher::get_random_ao(const Vector3 &position) {
 	if (val < 0)
 		val = -val;
 
-	return static_cast<uint8_t>(val * 255.0);
+	return val;
+}
+
+Color PropMesher::get_light_color_at(const Vector3 &position, const Vector3 &normal) {
+	Vector3 v_lightDiffuse;
+
+	//calculate the lights value
+	for (int i = 0; i < _lights.size(); ++i) {
+		Ref<PropLight> light = _lights.get(i);
+
+		Vector3 lightDir = light->get_position() - position;
+
+		float dist2 = lightDir.dot(lightDir);
+		//inverse sqrt
+		lightDir *= (1.0 / sqrt(dist2));
+
+		float NdotL = normal.dot(lightDir);
+
+		if (NdotL > 1.0) {
+			NdotL = 1.0;
+		} else if (NdotL < 0.0) {
+			NdotL = 0.0;
+		}
+
+		Color cc = light->get_color();
+		Vector3 cv(cc.r, cc.g, cc.b);
+
+		Vector3 value = cv * (NdotL / (1.0 + dist2));
+
+		value *= light->get_size();
+		v_lightDiffuse += value;
+
+		/*
+                    float dist2 = Mathf.Clamp(Vector3.Distance(transformedLights[i], vertices), 0f, 15f);
+                    dist2 /= 35f;
+
+                    Vector3 value = Vector3.one;
+                    value *= ((float) lights[i].Strength) / 255f;
+                    value *= (1 - dist2);
+                    v_lightDiffuse += value;*/
+	}
+
+	return Color(v_lightDiffuse.x, v_lightDiffuse.y, v_lightDiffuse.z);
 }
 
 void PropMesher::add_mesher(const Ref<PropMesher> &mesher) {
@@ -671,63 +713,102 @@ PoolVector<Vector3> PropMesher::build_collider() const {
 }
 
 void PropMesher::bake_colors() {
-	//if ((get_build_flags() & TerraChunkDefault::BUILD_FLAG_USE_LIGHTING) == 0)
-	//	return;
-
-	/*
-	if (_vertices.size() == 0)
+	if ((get_build_flags() & PropMesher::BUILD_FLAG_USE_LIGHTING) == 0) {
 		return;
+	}
 
-	uint8_t *channel_color_r = chunk->channel_get_valid(TerraChunkDefault::DEFAULT_CHANNEL_LIGHT_COLOR_R);
-	uint8_t *channel_color_g = chunk->channel_get_valid(TerraChunkDefault::DEFAULT_CHANNEL_LIGHT_COLOR_G);
-	uint8_t *channel_color_b = chunk->channel_get_valid(TerraChunkDefault::DEFAULT_CHANNEL_LIGHT_COLOR_B);
-	uint8_t *channel_ao = chunk->channel_get_valid(TerraChunkDefault::DEFAULT_CHANNEL_AO);
-	uint8_t *channel_rao = chunk->channel_get_valid(TerraChunkDefault::DEFAULT_CHANNEL_RANDOM_AO);
+	bool rao = (get_build_flags() & PropMesher::BUILD_FLAG_USE_RAO) != 0;
+	bool lights = (get_build_flags() & PropMesher::BUILD_FLAG_BAKE_LIGHTS) != 0;
 
-	Color base_light(_base_light_value, _base_light_value, _base_light_value);
+	if (rao && lights) {
+		bake_colors_lights_rao();
+		return;
+	}
 
+	if (rao) {
+		bake_colors_rao();
+		return;
+	}
+
+	if (lights) {
+		bake_colors_lights();
+		return;
+	}
+}
+
+void PropMesher::bake_colors_rao() {
 	for (int i = 0; i < _vertices.size(); ++i) {
 		Vertex vertex = _vertices[i];
 		Vector3 vert = vertex.vertex;
 
-		unsigned int x = (unsigned int)(vert.x / _voxel_scale);
-		unsigned int z = (unsigned int)(vert.z / _voxel_scale);
+		Color light = Color(_base_light_value, _base_light_value, _base_light_value);
 
-		if (chunk->validate_data_position(x, z)) {
-			int indx = chunk->get_data_index(x, z);
+		float rao = get_random_ao(vert) * _ao_strength;
 
-			Color light = Color(
-					channel_color_r[indx] / 255.0,
-					channel_color_g[indx] / 255.0,
-					channel_color_b[indx] / 255.0);
+		light.r -= rao;
+		light.g -= rao;
+		light.b -= rao;
 
-			float ao = (channel_ao[indx] / 255.0) * _ao_strength;
-			float rao = channel_rao[indx] / 255.0;
+		light.r = CLAMP(light.r, 0, 1.0);
+		light.g = CLAMP(light.g, 0, 1.0);
+		light.b = CLAMP(light.b, 0, 1.0);
 
-			ao += rao;
+		Color c = vertex.color;
+		light.a = c.a;
+		vertex.color = light;
 
-			light.r += _base_light_value;
-			light.g += _base_light_value;
-			light.b += _base_light_value;
+		_vertices.set(i, vertex);
+	}
+}
+void PropMesher::bake_colors_lights_rao() {
+	for (int i = 0; i < _vertices.size(); ++i) {
+		Vertex vertex = _vertices[i];
+		Vector3 vert = vertex.vertex;
 
-			light.r -= ao;
-			light.g -= ao;
-			light.b -= ao;
+		Color light = get_light_color_at(vert, vertex.normal);
 
-			light.r = CLAMP(light.r, 0, 1.0);
-			light.g = CLAMP(light.g, 0, 1.0);
-			light.b = CLAMP(light.b, 0, 1.0);
+		float rao = get_random_ao(vert) * _ao_strength;
 
-			Color c = vertex.color;
-			light.a = c.a;
-			vertex.color = light;
+		light.r += _base_light_value;
+		light.g += _base_light_value;
+		light.b += _base_light_value;
 
-			_vertices.set(i, vertex);
-		} else {
-			vertex.color = base_light;
-			_vertices.set(i, vertex);
-		}
-	}*/
+		light.r -= rao;
+		light.g -= rao;
+		light.b -= rao;
+
+		light.r = CLAMP(light.r, 0, 1.0);
+		light.g = CLAMP(light.g, 0, 1.0);
+		light.b = CLAMP(light.b, 0, 1.0);
+
+		Color c = vertex.color;
+		light.a = c.a;
+		vertex.color = light;
+
+		_vertices.set(i, vertex);
+	}
+}
+void PropMesher::bake_colors_lights() {
+	for (int i = 0; i < _vertices.size(); ++i) {
+		Vertex vertex = _vertices[i];
+		Vector3 vert = vertex.vertex;
+
+		Color light = get_light_color_at(vert, vertex.normal);
+
+		light.r += _base_light_value;
+		light.g += _base_light_value;
+		light.b += _base_light_value;
+
+		light.r = CLAMP(light.r, 0, 1.0);
+		light.g = CLAMP(light.g, 0, 1.0);
+		light.b = CLAMP(light.b, 0, 1.0);
+
+		Color c = vertex.color;
+		light.a = c.a;
+		vertex.color = light;
+
+		_vertices.set(i, vertex);
+	}
 }
 
 #ifdef TERRAMAN_PRESENT

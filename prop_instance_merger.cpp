@@ -407,6 +407,8 @@ void PropInstanceMerger::_build() {
 		_job->reset_meshes();
 	}
 
+	_job->clear_lights();
+
 	for (int i = 0; i < get_child_count(); ++i) {
 		Node *n = get_child(i);
 

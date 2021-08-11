@@ -150,7 +150,8 @@ public:
 #endif
 
 	void generate_ao();
-	uint8_t get_random_ao(const Vector3 &position);
+	float get_random_ao(const Vector3 &position);
+	Color get_light_color_at(const Vector3 &position, const Vector3 &normal);
 
 	void add_mesher(const Ref<PropMesher> &mesher);
 	void _add_mesher(const Ref<PropMesher> &mesher);
@@ -161,6 +162,9 @@ public:
 	PoolVector<Vector3> build_collider() const;
 
 	void bake_colors();
+	void bake_colors_rao();
+	void bake_colors_lights_rao();
+	void bake_colors_lights();
 
 #ifdef TERRAMAN_PRESENT
 	void bake_lights(MeshInstance *node, Vector<Ref<TerraLight>> &lights);
