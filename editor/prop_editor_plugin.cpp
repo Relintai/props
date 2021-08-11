@@ -65,15 +65,20 @@ void PropEditorPlugin::convert_scene(Node *root, const String &path) {
 
 	ResourceLoader l;
 	if (l.exists(path)) {
-		Ref<Resource> res = l.load(path);
+		Ref<PropData> res = l.load(path, "PropData");
 
-		ERR_FAIL_COND((res.is_valid() && res->get_class() != "PropData"));
+		ERR_FAIL_COND(!res.is_valid());
+
+		res->copy_from(data);
+
+		ResourceSaver s;
+		s.save(path, res);
 
 		res.unref();
+	} else {
+		ResourceSaver s;
+		s.save(path, data);
 	}
-
-	ResourceSaver s;
-	s.save(path, data);
 }
 
 void PropEditorPlugin::_quick_convert_button_pressed() {

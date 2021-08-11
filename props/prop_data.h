@@ -42,7 +42,6 @@ SOFTWARE.
 
 #include "prop_data_entry.h"
 
-
 #if TEXTURE_PACKER_PRESENT
 #include "../../texture_packer/texture_packer.h"
 #endif
@@ -73,6 +72,8 @@ public:
 #if TEXTURE_PACKER_PRESENT
 	void add_textures_into(Ref<TexturePacker> texture_packer);
 #endif
+
+	void copy_from(const Ref<PropData> &prop_data);
 
 	PropData();
 	~PropData();

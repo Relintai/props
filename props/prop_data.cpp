@@ -112,6 +112,20 @@ void PropData::add_textures_into(Ref<TexturePacker> texture_packer) {
 }
 #endif
 
+void PropData::copy_from(const Ref<PropData> &prop_data) {
+	_id = prop_data->_id;
+	_snap_to_mesh = prop_data->_snap_to_mesh;
+	_snap_axis = prop_data->_snap_axis;
+
+	_props.clear();
+
+	for (int i = 0; i < prop_data->_props.size(); ++i) {
+		_props.push_back(prop_data->_props[i]);
+	}
+
+	emit_changed();
+}
+
 PropData::PropData() {
 	_id = 0;
 	_snap_to_mesh = false;
@@ -144,4 +158,6 @@ void PropData::_bind_methods() {
 #if TEXTURE_PACKER_PRESENT
 	ClassDB::bind_method(D_METHOD("add_textures_into", "texture_packer"), &PropData::add_textures_into);
 #endif
+
+	ClassDB::bind_method(D_METHOD("copy_from", "prop_data"), &PropData::copy_from);
 }
