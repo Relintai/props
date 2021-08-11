@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include "modules/opensimplex/open_simplex_noise.h"
 
-const String PropMesher::BINDING_STRING_BUILD_FLAGS = "Use Isolevel,Use Lighting,Use AO,Use RAO,Generate AO,Generate RAO,Bake Lights,Create Collider,Create Lods";
+const String PropMesher::BINDING_STRING_BUILD_FLAGS = "Use Lighting,Use AO,Use RAO,Bake Lights";
 
 bool PropMesher::Vertex::operator==(const Vertex &p_vertex) const {
 	if (vertex != p_vertex.vertex)
@@ -961,7 +961,7 @@ PropMesher::PropMesher() {
 	_channel_index_isolevel = 0;
 	_texture_scale = 1;
 
-	_build_flags = PropMesher::BUILD_FLAG_CREATE_COLLIDER | PropMesher::BUILD_FLAG_CREATE_LODS;
+	_build_flags = 0;
 
 	_format = VisualServer::ARRAY_FORMAT_NORMAL | VisualServer::ARRAY_FORMAT_TEX_UV;
 
