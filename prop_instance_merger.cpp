@@ -50,6 +50,7 @@ typedef class RenderingServer VS;
 #include "./props/prop_data_scene.h"
 #include "jobs/prop_mesher_job_step.h"
 #include "material_cache/prop_material_cache.h"
+#include "lights/prop_light.h"
 
 #if TEXTURE_PACKER_PRESENT
 #include "./singleton/prop_cache.h"
@@ -516,24 +517,24 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 			continue;
 		}
 
-		/*
 		//Will create a Terralight node, and prop
 		//PropDataLight could use standard godot light nodes
-		Ref<PropDataLight> light_data = entry;
+		Ref<PropDataLight> light_data = e;
 
 		if (light_data.is_valid()) {
-			Ref<VoxelLight> light;
+			Ref<PropLight> light;
 			light.instance();
 
-			light->set_world_position(wp.x / get_voxel_scale(), wp.y / get_voxel_scale(), wp.z / get_voxel_scale());
+			Vector3 v = t.xform(Vector3());
+
+			light->set_position(v);
 			light->set_color(light_data->get_light_color());
 			light->set_size(light_data->get_light_size());
 
-			light_add(light);
+			_job->add_light(light);
 
 			continue;
 		}
-		*/
 
 #if MESH_DATA_RESOURCE_PRESENT
 		Ref<PropDataMeshData> mesh_data = e;

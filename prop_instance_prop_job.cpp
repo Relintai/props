@@ -37,6 +37,7 @@ SOFTWARE.
 #include "prop_mesher.h"
 #include "singleton/prop_cache.h"
 #include "scene/resources/shape.h"
+#include "lights/prop_light.h"
 
 #ifdef MESH_DATA_RESOURCE_PRESENT
 #include "../mesh_data_resource/mesh_data_resource.h"
@@ -130,6 +131,14 @@ void PropInstancePropJob::clear_meshes() {
 	_prop_mesh_datas.clear();
 }
 #endif
+
+
+void PropInstancePropJob::add_light(const Ref<PropLight> &light) {
+	_prop_mesher->add_light(light);
+}
+void PropInstancePropJob::clear_lights() {
+	_prop_mesher->clear_lights();
+}
 
 void PropInstancePropJob::phase_physics_process() {
 	//TODO this should only update the differences
@@ -725,6 +734,9 @@ void PropInstancePropJob::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_prop_mesher"), &PropInstancePropJob::get_prop_mesher);
 	ClassDB::bind_method(D_METHOD("set_prop_mesher", "mesher"), &PropInstancePropJob::set_prop_mesher);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "prop_mesher", PROPERTY_HINT_RESOURCE_TYPE, "PropMesher", 0), "set_prop_mesher", "get_prop_mesher");
+
+	ClassDB::bind_method(D_METHOD("add_light", "light"), &PropInstancePropJob::add_light);
+	ClassDB::bind_method(D_METHOD("clear_lights"), &PropInstancePropJob::clear_lights);
 
 	ClassDB::bind_method(D_METHOD("_physics_process", "delta"), &PropInstancePropJob::_physics_process);
 }

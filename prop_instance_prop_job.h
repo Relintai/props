@@ -31,6 +31,7 @@ class PropInstanceMerger;
 class PropMesherJobStep;
 class PropMaterialCache;
 class Shape;
+class PropLight;
 
 #if MESH_DATA_RESOURCE_PRESENT
 class PropDataMeshData;
@@ -63,6 +64,9 @@ public:
 	void add_mesh(const Ref<PropDataMeshData> &mesh_data, const Transform &base_transform);
 	void clear_meshes();
 #endif
+
+	void add_light(const Ref<PropLight> &light);
+	void clear_lights();
 
 	void phase_physics_process();
 	void phase_prop();
