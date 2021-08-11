@@ -60,6 +60,8 @@ using PoolVector = Vector<N>;
 #include "../terraman/data/terra_light.h"
 #endif
 
+class OpenSimplexNoise;
+
 class PropMesher : public Reference {
 	GDCLASS(PropMesher, Reference);
 
@@ -153,7 +155,7 @@ public:
 #endif
 
 	void generate_ao();
-	void generate_random_ao(int seed, int octaves = 4, int period = 30, float persistence = 0.3, float scale_factor = 0.6);
+	uint8_t get_random_ao(const Vector3 &position);
 
 	void add_mesher(const Ref<PropMesher> &mesher);
 	void _add_mesher(const Ref<PropMesher> &mesher);
@@ -239,6 +241,10 @@ protected:
 	float _base_light_value;
 	Rect2 _uv_margin;
 	int _build_flags;
+
+	Ref<OpenSimplexNoise> _noise;
+	float _rao_scale_factor;
+	int _rao_seed;
 };
 
 VARIANT_ENUM_CAST(PropMesher::BuildFlags);

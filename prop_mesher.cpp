@@ -22,6 +22,8 @@ SOFTWARE.
 
 #include "prop_mesher.h"
 
+#include "modules/opensimplex/open_simplex_noise.h"
+
 const String PropMesher::BINDING_STRING_BUILD_FLAGS = "Use Isolevel,Use Lighting,Use AO,Use RAO,Generate AO,Generate RAO,Bake Lights,Create Collider,Create Lods";
 
 bool PropMesher::Vertex::operator==(const Vertex &p_vertex) const {
@@ -595,43 +597,18 @@ void PropMesher::generate_ao() {
 	}*/
 }
 
-void PropMesher::generate_random_ao(int seed, int octaves, int period, float persistence, float scale_factor) {
-	/*
-	ERR_FAIL_COND(!_chunk.is_valid());
+uint8_t PropMesher::get_random_ao(const Vector3 &position) {
+	float val = _noise->get_noise_3d(position.x, position.y, position.z);
 
-	int margin_start = _chunk->get_margin_start();
-	int margin_end = _chunk->get_margin_end();
+	val *= _rao_scale_factor;
 
-	int size_x = _chunk->get_size_x();
-	int size_z = _chunk->get_size_z();
+	if (val > 1)
+		val = 1;
 
-	int position_x = _chunk->get_position_x();
-	int position_z = _chunk->get_position_z();
+	if (val < 0)
+		val = -val;
 
-	Ref<OpenSimplexNoise> noise;
-	noise.instance();
-
-	noise->set_seed(seed);
-	noise->set_octaves(octaves);
-	noise->set_period(period);
-	noise->set_persistence(persistence);
-
-	for (int x = -margin_start; x < size_x + margin_end; ++x) {
-		for (int z = -margin_start; z < size_z + margin_end; ++z) {
-
-			float val = noise->get_noise_3d(x + (position_x * size_x), 0, z + (position_z * size_z));
-
-			val *= scale_factor;
-
-			if (val > 1)
-				val = 1;
-
-			if (val < 0)
-				val = -val;
-
-			_chunk->set_voxel(int(val * 255.0), x, z, TerraChunkDefault::DEFAULT_CHANNEL_RANDOM_AO);
-		}
-	}*/
+	return static_cast<uint8_t>(val * 255.0);
 }
 
 void PropMesher::add_mesher(const Ref<PropMesher> &mesher) {
@@ -987,6 +964,15 @@ PropMesher::PropMesher() {
 	_build_flags = PropMesher::BUILD_FLAG_CREATE_COLLIDER | PropMesher::BUILD_FLAG_CREATE_LODS;
 
 	_format = VisualServer::ARRAY_FORMAT_NORMAL | VisualServer::ARRAY_FORMAT_TEX_UV;
+
+	_noise.instance();
+	//todo add properties for these if needed
+	_noise->set_octaves(4);
+	_noise->set_period(30);
+	_noise->set_persistence(0.3);
+
+	_rao_scale_factor = 0.6;
+	_rao_seed = 2134;
 }
 
 PropMesher::~PropMesher() {
@@ -1044,7 +1030,7 @@ void PropMesher::_bind_methods() {
 #endif
 
 	ClassDB::bind_method(D_METHOD("generate_ao"), &PropMesher::generate_ao);
-	ClassDB::bind_method(D_METHOD("generate_random_ao", "seed", "octaves", "period", "persistence", "scale_factor"), &PropMesher::generate_random_ao, DEFVAL(4), DEFVAL(30), DEFVAL(0.3), DEFVAL(0.6));
+	ClassDB::bind_method(D_METHOD("get_random_ao", "position"),&PropMesher::get_random_ao);
 
 	BIND_VMETHOD(MethodInfo("_add_mesher", PropertyInfo(Variant::OBJECT, "mesher", PROPERTY_HINT_RESOURCE_TYPE, "PropMesher")));
 	ClassDB::bind_method(D_METHOD("add_mesher", "mesher"), &PropMesher::add_mesher);
