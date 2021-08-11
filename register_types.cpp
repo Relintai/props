@@ -54,6 +54,8 @@ SOFTWARE.
 #include "singleton/prop_cache.h"
 #include "singleton/prop_utils.h"
 
+#include "lights/prop_light.h"
+
 #include "./editor/prop_editor_plugin.h"
 
 #include "prop_mesher.h"
@@ -68,6 +70,8 @@ static PropUtils *prop_utils = NULL;
 static PropCache *prop_texture_cache = NULL;
 
 void register_props_types() {
+	ClassDB::register_class<PropLight>();
+
 	ClassDB::register_class<PropData>();
 	ClassDB::register_class<PropDataEntry>();
 	ClassDB::register_class<PropDataScene>();

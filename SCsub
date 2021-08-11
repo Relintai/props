@@ -27,6 +27,8 @@ sources = [
 
     "register_types.cpp",
 
+    "lights/prop_light.cpp",
+
     "props/prop_data.cpp",
     "props/prop_data_entry.cpp",
     "props/prop_data_scene.cpp",
