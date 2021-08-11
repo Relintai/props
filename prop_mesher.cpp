@@ -22,6 +22,7 @@ SOFTWARE.
 
 #include "prop_mesher.h"
 
+#include "lights/prop_light.h"
 #include "modules/opensimplex/open_simplex_noise.h"
 
 const String PropMesher::BINDING_STRING_BUILD_FLAGS = "Use Lighting,Use AO,Use RAO,Bake Lights";
@@ -632,6 +633,13 @@ void PropMesher::_add_mesher(const Ref<PropMesher> &mesher) {
 	}
 }
 
+void PropMesher::add_light(const Ref<PropLight> &light) {
+	_lights.push_back(light);
+}
+void PropMesher::clear_lights() {
+	_lights.clear();
+}
+
 PoolVector<Vector3> PropMesher::build_collider() const {
 	PoolVector<Vector3> face_points;
 
@@ -666,7 +674,7 @@ void PropMesher::bake_colors() {
 	//if ((get_build_flags() & TerraChunkDefault::BUILD_FLAG_USE_LIGHTING) == 0)
 	//	return;
 
-/*
+	/*
 	if (_vertices.size() == 0)
 		return;
 
@@ -1090,11 +1098,14 @@ void PropMesher::_bind_methods() {
 #endif
 
 	ClassDB::bind_method(D_METHOD("generate_ao"), &PropMesher::generate_ao);
-	ClassDB::bind_method(D_METHOD("get_random_ao", "position"),&PropMesher::get_random_ao);
+	ClassDB::bind_method(D_METHOD("get_random_ao", "position"), &PropMesher::get_random_ao);
 
 	BIND_VMETHOD(MethodInfo("_add_mesher", PropertyInfo(Variant::OBJECT, "mesher", PROPERTY_HINT_RESOURCE_TYPE, "PropMesher")));
 	ClassDB::bind_method(D_METHOD("add_mesher", "mesher"), &PropMesher::add_mesher);
 	ClassDB::bind_method(D_METHOD("_add_mesher", "mesher"), &PropMesher::_add_mesher);
+
+	ClassDB::bind_method(D_METHOD("add_light", "light"), &PropMesher::add_light);
+	ClassDB::bind_method(D_METHOD("clear_lights"), &PropMesher::clear_lights);
 
 	ClassDB::bind_method(D_METHOD("get_vertices"), &PropMesher::get_vertices);
 	ClassDB::bind_method(D_METHOD("set_vertices", "values"), &PropMesher::set_vertices);
@@ -1139,7 +1150,7 @@ void PropMesher::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("build_collider"), &PropMesher::build_collider);
 
 	ClassDB::bind_method(D_METHOD("bake_colors"), &PropMesher::bake_colors);
-	
+
 	ClassDB::bind_method(D_METHOD("generate_normals", "flip"), &PropMesher::generate_normals, DEFVAL(false));
 
 	ClassDB::bind_method(D_METHOD("remove_doubles"), &PropMesher::remove_doubles);

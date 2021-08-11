@@ -39,9 +39,9 @@ using PoolVector = Vector<N>;
 
 #else
 #include "core/color.h"
+#include "core/pool_vector.h"
 #include "core/reference.h"
 #include "core/vector.h"
-#include "core/pool_vector.h"
 #include "scene/3d/mesh_instance.h"
 #endif
 
@@ -61,6 +61,7 @@ using PoolVector = Vector<N>;
 #endif
 
 class OpenSimplexNoise;
+class PropLight;
 
 class PropMesher : public Reference {
 	GDCLASS(PropMesher, Reference);
@@ -79,7 +80,6 @@ public:
 	};
 
 	struct Vertex {
-
 		Vector3 vertex;
 		Color color;
 		Vector3 normal; // normal, binormal, tangent
@@ -155,12 +155,15 @@ public:
 	void add_mesher(const Ref<PropMesher> &mesher);
 	void _add_mesher(const Ref<PropMesher> &mesher);
 
+	void add_light(const Ref<PropLight> &light);
+	void clear_lights();
+
 	PoolVector<Vector3> build_collider() const;
 
 	void bake_colors();
 
 #ifdef TERRAMAN_PRESENT
-	void bake_lights(MeshInstance *node, Vector<Ref<TerraLight> > &lights);
+	void bake_lights(MeshInstance *node, Vector<Ref<TerraLight>> &lights);
 #endif
 
 	Array build_mesh();
@@ -221,6 +224,7 @@ protected:
 
 	PoolVector<Vertex> _vertices;
 	PoolVector<int> _indices;
+	Vector<Ref<PropLight>> _lights;
 
 	Color _last_color;
 	Vector3 _last_normal;
