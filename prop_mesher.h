@@ -157,6 +157,8 @@ public:
 
 	PoolVector<Vector3> build_collider() const;
 
+	void bake_colors();
+
 #ifdef TERRAMAN_PRESENT
 	void bake_lights(MeshInstance *node, Vector<Ref<TerraLight> > &lights);
 #endif

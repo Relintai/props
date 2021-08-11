@@ -662,6 +662,66 @@ PoolVector<Vector3> PropMesher::build_collider() const {
 	return face_points;
 }
 
+void PropMesher::bake_colors() {
+	//if ((get_build_flags() & TerraChunkDefault::BUILD_FLAG_USE_LIGHTING) == 0)
+	//	return;
+
+/*
+	if (_vertices.size() == 0)
+		return;
+
+	uint8_t *channel_color_r = chunk->channel_get_valid(TerraChunkDefault::DEFAULT_CHANNEL_LIGHT_COLOR_R);
+	uint8_t *channel_color_g = chunk->channel_get_valid(TerraChunkDefault::DEFAULT_CHANNEL_LIGHT_COLOR_G);
+	uint8_t *channel_color_b = chunk->channel_get_valid(TerraChunkDefault::DEFAULT_CHANNEL_LIGHT_COLOR_B);
+	uint8_t *channel_ao = chunk->channel_get_valid(TerraChunkDefault::DEFAULT_CHANNEL_AO);
+	uint8_t *channel_rao = chunk->channel_get_valid(TerraChunkDefault::DEFAULT_CHANNEL_RANDOM_AO);
+
+	Color base_light(_base_light_value, _base_light_value, _base_light_value);
+
+	for (int i = 0; i < _vertices.size(); ++i) {
+		Vertex vertex = _vertices[i];
+		Vector3 vert = vertex.vertex;
+
+		unsigned int x = (unsigned int)(vert.x / _voxel_scale);
+		unsigned int z = (unsigned int)(vert.z / _voxel_scale);
+
+		if (chunk->validate_data_position(x, z)) {
+			int indx = chunk->get_data_index(x, z);
+
+			Color light = Color(
+					channel_color_r[indx] / 255.0,
+					channel_color_g[indx] / 255.0,
+					channel_color_b[indx] / 255.0);
+
+			float ao = (channel_ao[indx] / 255.0) * _ao_strength;
+			float rao = channel_rao[indx] / 255.0;
+
+			ao += rao;
+
+			light.r += _base_light_value;
+			light.g += _base_light_value;
+			light.b += _base_light_value;
+
+			light.r -= ao;
+			light.g -= ao;
+			light.b -= ao;
+
+			light.r = CLAMP(light.r, 0, 1.0);
+			light.g = CLAMP(light.g, 0, 1.0);
+			light.b = CLAMP(light.b, 0, 1.0);
+
+			Color c = vertex.color;
+			light.a = c.a;
+			vertex.color = light;
+
+			_vertices.set(i, vertex);
+		} else {
+			vertex.color = base_light;
+			_vertices.set(i, vertex);
+		}
+	}*/
+}
+
 #ifdef TERRAMAN_PRESENT
 void PropMesher::bake_lights(MeshInstance *node, Vector<Ref<TerraLight>> &lights) {
 	ERR_FAIL_COND(node == NULL);
@@ -1078,6 +1138,8 @@ void PropMesher::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("build_mesh_into", "mesh_rid"), &PropMesher::build_mesh_into);
 	ClassDB::bind_method(D_METHOD("build_collider"), &PropMesher::build_collider);
 
+	ClassDB::bind_method(D_METHOD("bake_colors"), &PropMesher::bake_colors);
+	
 	ClassDB::bind_method(D_METHOD("generate_normals", "flip"), &PropMesher::generate_normals, DEFVAL(false));
 
 	ClassDB::bind_method(D_METHOD("remove_doubles"), &PropMesher::remove_doubles);
