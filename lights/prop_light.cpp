@@ -22,11 +22,11 @@ SOFTWARE.
 
 #include "prop_light.h"
 
-Vector3 PropLight::get_world_position() {
-	return _world_position;
+Vector3 PropLight::get_position() {
+	return _position;
 }
-void PropLight::set_world_position(const Vector3 &pos)  {
-	_world_position = pos;
+void PropLight::set_position(const Vector3 &pos)  {
+	_position = pos;
 }
 
 Color PropLight::get_color() const {
@@ -51,9 +51,9 @@ PropLight::~PropLight() {
 }
 
 void PropLight::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("get_world_position"), &PropLight::get_world_position);
-	ClassDB::bind_method(D_METHOD("set_world_position"), &PropLight::set_color);
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "world_position"), "set_world_position", "get_world_position");
+	ClassDB::bind_method(D_METHOD("get_position"), &PropLight::get_position);
+	ClassDB::bind_method(D_METHOD("set_position"), &PropLight::set_position);
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "world_position"), "set_position", "get_position");
 
 	ClassDB::bind_method(D_METHOD("get_color"), &PropLight::get_color);
 	ClassDB::bind_method(D_METHOD("set_color"), &PropLight::set_color);

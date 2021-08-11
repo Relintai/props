@@ -39,8 +39,8 @@ class PropLight : public Reference {
 	GDCLASS(PropLight, Reference);
 
 public:
-	Vector3 get_world_position();
-	void set_world_position(const Vector3 &pos);
+	Vector3 get_position();
+	void set_position(const Vector3 &pos);
 
 	Color get_color() const;
 	void set_color(const Color &color);
@@ -55,7 +55,7 @@ private:
 	static void _bind_methods();
 
 private:
-	Vector3 _world_position;
+	Vector3 _position;
 
 	Color _color;
 	int _size;
