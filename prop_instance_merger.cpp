@@ -682,8 +682,6 @@ PropInstanceMerger::PropInstanceMerger() {
 	js.instance();
 	js->set_job_type(PropMesherJobStep::TYPE_BAKE_TEXTURE);
 	_job->add_jobs_step(js);
-
-	set_process_internal(true);
 }
 
 PropInstanceMerger::~PropInstanceMerger() {
