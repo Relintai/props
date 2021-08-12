@@ -25,6 +25,8 @@ SOFTWARE.
 #include "../props/prop_data.h"
 #include "../props/prop_data_entry.h"
 
+#include "scene/3d/room.h"
+
 #include "core/version.h"
 
 #if VERSION_MAJOR > 3
@@ -94,6 +96,23 @@ void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transfo
 			}
 		}
 	} else {
+		//only handle the first encountered room per prop
+		if (!prop_data->get_is_room()) {
+			Room *r = Object::cast_to<Room>(sp);
+
+			if (r) {
+				prop_data->set_is_room(true);
+
+				PoolVector3Array points = r->get_points();
+
+				if (points.size() == 0) {
+					//TODO generate points
+				}
+
+				prop_data->set_room_bounds(points);
+			}
+		}
+
 		for (int i = 0; i < node->get_child_count(); ++i) {
 			Node *child = node->get_child(i);
 
