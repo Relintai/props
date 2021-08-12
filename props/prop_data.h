@@ -73,6 +73,12 @@ public:
 	void add_textures_into(Ref<TexturePacker> texture_packer);
 #endif
 
+	bool get_is_room() const;
+	void set_is_room(const bool value);
+
+	PoolVector3Array get_room_bounds();
+	void set_room_bounds(const PoolVector3Array &bounds);
+
 	void copy_from(const Ref<PropData> &prop_data);
 
 	PropData();
@@ -87,6 +93,9 @@ private:
 	Vector3 _snap_axis;
 
 	Vector<Ref<PropDataEntry>> _props;
+
+	bool _is_room;
+	PoolVector3Array _room_bounds;
 };
 
 #endif

@@ -112,6 +112,20 @@ void PropData::add_textures_into(Ref<TexturePacker> texture_packer) {
 }
 #endif
 
+bool PropData::get_is_room() const {
+	return _is_room;
+}
+void PropData::set_is_room(const bool value) {
+	_is_room = value;
+}
+
+PoolVector3Array PropData::get_room_bounds() {
+	return _room_bounds;
+}
+void PropData::set_room_bounds(const PoolVector3Array &bounds) {
+	_room_bounds = bounds;
+}
+
 void PropData::copy_from(const Ref<PropData> &prop_data) {
 	_id = prop_data->_id;
 	_snap_to_mesh = prop_data->_snap_to_mesh;
@@ -129,6 +143,7 @@ void PropData::copy_from(const Ref<PropData> &prop_data) {
 PropData::PropData() {
 	_id = 0;
 	_snap_to_mesh = false;
+	_is_room = false;
 	_snap_axis = Vector3(0, -1, 0);
 }
 PropData::~PropData() {
@@ -158,6 +173,14 @@ void PropData::_bind_methods() {
 #if TEXTURE_PACKER_PRESENT
 	ClassDB::bind_method(D_METHOD("add_textures_into", "texture_packer"), &PropData::add_textures_into);
 #endif
+
+	ClassDB::bind_method(D_METHOD("get_is_room"), &PropData::get_is_room);
+	ClassDB::bind_method(D_METHOD("set_is_room", "value"), &PropData::set_is_room);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "is_room"), "set_is_room", "get_is_room");
+
+	ClassDB::bind_method(D_METHOD("get_room_bounds"), &PropData::get_room_bounds);
+	ClassDB::bind_method(D_METHOD("set_room_bounds", "value"), &PropData::set_room_bounds);
+	ADD_PROPERTY(PropertyInfo(Variant::POOL_VECTOR3_ARRAY, "room_bounds"), "set_room_bounds", "get_room_bounds");
 
 	ClassDB::bind_method(D_METHOD("copy_from", "prop_data"), &PropData::copy_from);
 }
