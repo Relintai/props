@@ -322,6 +322,8 @@ void PropInstanceMerger::check_auto_lod() {
 		if (!_building) {
 			set_process_internal(false);
 		}
+
+		return;
 	}
 
 	_auto_lod_on = true;
