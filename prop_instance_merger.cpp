@@ -804,24 +804,32 @@ void PropInstanceMerger::_notification(int p_what) {
 			break;
 		}
 		case NOTIFICATION_TRANSFORM_CHANGED: {
+			Transform new_transform = get_global_transform();
+
+			if (new_transform == _last_transform) {
+				break;
+			}
+
+			_last_transform = new_transform;
+
 			VisualServer *vs = VisualServer::get_singleton();
 
 			for (int i = 0; i < _meshes.size(); ++i) {
 				RID mir = _meshes[i].mesh_instance;
 
 				if (mir != RID()) {
-					vs->instance_set_transform(mir, get_transform());
+					vs->instance_set_transform(mir, new_transform);
 				}
 			}
 
 			if (_debug_mesh_instance != RID()) {
-				vs->instance_set_transform(_debug_mesh_instance, get_transform());
+				vs->instance_set_transform(_debug_mesh_instance, new_transform);
 			}
 
 			for (int i = 0; i < _colliders.size(); ++i) {
 				const ColliderBody &c = _colliders[i];
 
-				PhysicsServer::get_singleton()->body_set_shape_transform(c.body, 0, get_transform() * c.transform);
+				PhysicsServer::get_singleton()->body_set_shape_transform(c.body, 0, new_transform * c.transform);
 			}
 
 			break;

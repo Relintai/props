@@ -148,6 +148,8 @@ private:
 
 	int _lod_level;
 
+	Transform _last_transform;
+
 	Ref<PropInstancePropJob> _job;
 
 	Vector<Ref<Material>> _materials;
