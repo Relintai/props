@@ -49,8 +49,8 @@ typedef class RenderingServer VS;
 #include "./props/prop_data_prop.h"
 #include "./props/prop_data_scene.h"
 #include "jobs/prop_mesher_job_step.h"
-#include "material_cache/prop_material_cache.h"
 #include "lights/prop_light.h"
+#include "material_cache/prop_material_cache.h"
 
 #if TEXTURE_PACKER_PRESENT
 #include "./singleton/prop_cache.h"
@@ -68,6 +68,33 @@ void PropInstanceMerger::set_building(const bool value) {
 
 	set_physics_process_internal(_building);
 	set_process_internal(_building);
+}
+
+int PropInstanceMerger::get_lod_level() {
+	return _lod_level;
+}
+void PropInstanceMerger::set_lod_level(const int value) {
+	_lod_level = value;
+
+	if (_lod_level < 0) {
+		_lod_level = 0;
+	}
+
+	apply_lod_level();
+}
+
+float PropInstanceMerger::get_first_lod_distance_squared() {
+	return _first_lod_distance_squared;
+}
+void PropInstanceMerger::set_first_lod_distance_squared(const float dist) {
+	_first_lod_distance_squared = dist;
+}
+
+float PropInstanceMerger::get_lod_reduction_distance_squared() {
+	return _lod_reduction_distance_squared;
+}
+void PropInstanceMerger::set_lod_reduction_distance_squared(const float dist) {
+	_lod_reduction_distance_squared = dist;
 }
 
 Ref<PropInstanceJob> PropInstanceMerger::get_job() {
@@ -156,8 +183,7 @@ void PropInstanceMerger::meshes_create(const int num) {
 
 		VS::get_singleton()->instance_set_transform(mesh_instance_rid, get_transform());
 
-		if (i != 0)
-			VS::get_singleton()->instance_set_visible(mesh_instance_rid, false);
+		VS::get_singleton()->instance_set_visible(mesh_instance_rid, false);
 
 		MeshEntry e;
 		e.mesh = mesh_rid;
@@ -165,6 +191,8 @@ void PropInstanceMerger::meshes_create(const int num) {
 
 		_meshes.push_back(e);
 	}
+
+	apply_lod_level();
 }
 
 Vector<Variant> PropInstanceMerger::meshes_get() {
@@ -267,6 +295,46 @@ void PropInstanceMerger::colliders_set(const Vector<Variant> &colliders) {
 	}
 }
 
+void PropInstanceMerger::apply_lod_level() {
+	if (_meshes.size() == 0) {
+		return;
+	}
+
+	VisualServer *vs = VisualServer::get_singleton();
+
+	for (int i = 0; i < _meshes.size(); ++i) {
+		RID mi = _meshes[i].mesh_instance;
+
+		if (mi == RID()) {
+			continue;
+		}
+
+		vs->instance_set_visible(mi, false);
+	}
+
+	if (!is_inside_tree()) {
+		return;
+	}
+
+	if (!is_visible_in_tree()) {
+		return;
+	}
+
+	int indx = _lod_level;
+
+	if (_meshes.size() <= _lod_level) {
+		indx = _meshes.size() - 1;
+	}
+
+	RID mi = _meshes[indx].mesh_instance;
+
+	if (mi == RID()) {
+		return;
+	}
+
+	vs->instance_set_visible(mi, true);
+}
+
 void PropInstanceMerger::debug_mesh_allocate() {
 	if (_debug_mesh_rid == RID()) {
 		_debug_mesh_rid = VisualServer::get_singleton()->mesh_create();
@@ -349,20 +417,6 @@ void PropInstanceMerger::draw_debug_mdr_colliders() {
 	}
 
 	debug_mesh_send();
-}
-
-float PropInstanceMerger::get_first_lod_distance_squared() {
-	return _first_lod_distance_squared;
-}
-void PropInstanceMerger::set_first_lod_distance_squared(const float dist) {
-	_first_lod_distance_squared = dist;
-}
-
-float PropInstanceMerger::get_lod_reduction_distance_squared() {
-	return _lod_reduction_distance_squared;
-}
-void PropInstanceMerger::set_lod_reduction_distance_squared(const float dist) {
-	_lod_reduction_distance_squared = dist;
 }
 
 void PropInstanceMerger::free_meshes() {
@@ -468,6 +522,8 @@ Don't submit here, as it starts in physics process mode
 void PropInstanceMerger::_build_finished() {
 	set_building(false);
 
+	apply_lod_level();
+
 	if (_build_queued) {
 		call_deferred("build");
 	}
@@ -559,6 +615,7 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 
 PropInstanceMerger::PropInstanceMerger() {
 	_build_queued = false;
+	_lod_level = 0;
 	set_building(false);
 
 	set_notify_transform(true);
@@ -678,6 +735,10 @@ void PropInstanceMerger::_notification(int p_what) {
 
 			break;
 		}
+		case NOTIFICATION_VISIBILITY_CHANGED: {
+			apply_lod_level();
+			break;
+		}
 	}
 }
 
@@ -685,6 +746,18 @@ void PropInstanceMerger::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_job"), &PropInstanceMerger::get_job);
 	ClassDB::bind_method(D_METHOD("set_job", "value"), &PropInstanceMerger::set_job);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "job", PROPERTY_HINT_RESOURCE_TYPE, "PropInstanceJob", 0), "set_job", "get_job");
+
+	ClassDB::bind_method(D_METHOD("get_lod_level"), &PropInstanceMerger::get_lod_level);
+	ClassDB::bind_method(D_METHOD("set_lod_level", "value"), &PropInstanceMerger::set_lod_level);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "lod_level"), "set_lod_level", "get_lod_level");
+
+	ClassDB::bind_method(D_METHOD("get_first_lod_distance_squared"), &PropInstanceMerger::get_first_lod_distance_squared);
+	ClassDB::bind_method(D_METHOD("set_first_lod_distance_squared", "value"), &PropInstanceMerger::set_first_lod_distance_squared);
+	ADD_PROPERTY(PropertyInfo(Variant::REAL, "first_lod_distance_squared"), "set_first_lod_distance_squared", "get_first_lod_distance_squared");
+
+	ClassDB::bind_method(D_METHOD("get_lod_reduction_distance_squared"), &PropInstanceMerger::get_lod_reduction_distance_squared);
+	ClassDB::bind_method(D_METHOD("set_lod_reduction_distance_squared", "value"), &PropInstanceMerger::set_lod_reduction_distance_squared);
+	ADD_PROPERTY(PropertyInfo(Variant::REAL, "lod_reduction_distance_squared"), "set_lod_reduction_distance_squared", "get_lod_reduction_distance_squared");
 
 	///Materials
 	ClassDB::bind_method(D_METHOD("material_get", "index"), &PropInstanceMerger::material_get);
@@ -727,14 +800,7 @@ void PropInstanceMerger::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("debug_mesh_send"), &PropInstanceMerger::debug_mesh_send);
 	ClassDB::bind_method(D_METHOD("draw_debug_mdr_colliders"), &PropInstanceMerger::draw_debug_mdr_colliders);
 
-	//---
-	ClassDB::bind_method(D_METHOD("get_first_lod_distance_squared"), &PropInstanceMerger::get_first_lod_distance_squared);
-	ClassDB::bind_method(D_METHOD("set_first_lod_distance_squared", "value"), &PropInstanceMerger::set_first_lod_distance_squared);
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "first_lod_distance_squared"), "set_first_lod_distance_squared", "get_first_lod_distance_squared");
-
-	ClassDB::bind_method(D_METHOD("get_lod_reduction_distance_squared"), &PropInstanceMerger::get_lod_reduction_distance_squared);
-	ClassDB::bind_method(D_METHOD("set_lod_reduction_distance_squared", "value"), &PropInstanceMerger::set_lod_reduction_distance_squared);
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "lod_reduction_distance_squared"), "set_lod_reduction_distance_squared", "get_lod_reduction_distance_squared");
+	ClassDB::bind_method(D_METHOD("apply_lod_level"), &PropInstanceMerger::apply_lod_level);
 
 	//---
 	ClassDB::bind_method(D_METHOD("free_meshes"), &PropInstanceMerger::free_meshes);

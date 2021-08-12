@@ -50,6 +50,15 @@ public:
 	bool get_building();
 	void set_building(const bool value);
 
+	int get_lod_level();
+	void set_lod_level(const int value);
+
+	float get_first_lod_distance_squared();
+	void set_first_lod_distance_squared(const float dist);
+
+	float get_lod_reduction_distance_squared();
+	void set_lod_reduction_distance_squared(const float dist);
+
 	Ref<PropInstanceJob> get_job();
 	void set_job(const Ref<PropInstanceJob> &job);
 
@@ -85,6 +94,8 @@ public:
 	Vector<Variant> colliders_get();
 	void colliders_set(const Vector<Variant> &colliders);
 
+	void apply_lod_level();
+
 	//Debug
 	void debug_mesh_allocate();
 	void debug_mesh_free();
@@ -94,12 +105,6 @@ public:
 	void debug_mesh_add_vertices_to(const PoolVector3Array &arr);
 	void debug_mesh_send();
 	void draw_debug_mdr_colliders();
-
-	float get_first_lod_distance_squared();
-	void set_first_lod_distance_squared(const float dist);
-
-	float get_lod_reduction_distance_squared();
-	void set_lod_reduction_distance_squared(const float dist);
 
 	void free_meshes();
 	void free_colliders();
@@ -135,9 +140,11 @@ private:
 	bool _build_queued;
 	bool _building;
 
+	int _lod_level;
+
 	Ref<PropInstancePropJob> _job;
 
-	Vector<Ref<Material> > _materials;
+	Vector<Ref<Material>> _materials;
 	Vector<MeshEntry> _meshes;
 	Vector<ColliderBody> _colliders;
 
