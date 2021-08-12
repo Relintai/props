@@ -47,11 +47,16 @@ class PropInstanceMerger : public PropInstance {
 	GDCLASS(PropInstanceMerger, PropInstance);
 
 public:
+	static const float LOD_CHECK_INTERVAL;
+
 	bool get_building();
 	void set_building(const bool value);
 
 	int get_lod_level();
 	void set_lod_level(const int value);
+
+	bool get_auto_lod();
+	void set_auto_lod(const bool value);
 
 	float get_first_lod_distance_squared();
 	void set_first_lod_distance_squared(const float dist);
@@ -94,6 +99,7 @@ public:
 	Vector<Variant> colliders_get();
 	void colliders_set(const Vector<Variant> &colliders);
 
+	void check_auto_lod();
 	void apply_lod_level();
 
 	//Debug
@@ -148,8 +154,11 @@ private:
 	Vector<MeshEntry> _meshes;
 	Vector<ColliderBody> _colliders;
 
+	bool _auto_lod;
+	bool _auto_lod_on;
 	float _first_lod_distance_squared;
 	float _lod_reduction_distance_squared;
+	float _lod_check_timer;
 
 	//debug
 	RID _debug_mesh_rid;

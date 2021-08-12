@@ -51,6 +51,7 @@ typedef class RenderingServer VS;
 #include "jobs/prop_mesher_job_step.h"
 #include "lights/prop_light.h"
 #include "material_cache/prop_material_cache.h"
+#include "scene/3d/camera.h"
 
 #if TEXTURE_PACKER_PRESENT
 #include "./singleton/prop_cache.h"
@@ -60,6 +61,8 @@ typedef class RenderingServer VS;
 #include "../thread_pool/thread_pool.h"
 #endif
 
+const float PropInstanceMerger::LOD_CHECK_INTERVAL = 2;
+
 bool PropInstanceMerger::get_building() {
 	return _building;
 }
@@ -67,7 +70,10 @@ void PropInstanceMerger::set_building(const bool value) {
 	_building = value;
 
 	set_physics_process_internal(_building);
-	set_process_internal(_building);
+
+	if (!_auto_lod_on) {
+		set_process_internal(_building);
+	}
 }
 
 int PropInstanceMerger::get_lod_level() {
@@ -81,6 +87,15 @@ void PropInstanceMerger::set_lod_level(const int value) {
 	}
 
 	apply_lod_level();
+}
+
+bool PropInstanceMerger::get_auto_lod() {
+	return _auto_lod;
+}
+void PropInstanceMerger::set_auto_lod(const bool value) {
+	_auto_lod = value;
+
+	check_auto_lod();
 }
 
 float PropInstanceMerger::get_first_lod_distance_squared() {
@@ -293,6 +308,24 @@ void PropInstanceMerger::colliders_set(const Vector<Variant> &colliders) {
 
 		_colliders.push_back(c);
 	}
+}
+
+void PropInstanceMerger::check_auto_lod() {
+	if (!_auto_lod) {
+		_auto_lod_on = false;
+		return;
+	}
+
+	if (_meshes.size() <= 1) {
+		_auto_lod_on = false;
+
+		if (!_building) {
+			set_process_internal(false);
+		}
+	}
+
+	_auto_lod_on = true;
+	set_process_internal(true);
 }
 
 void PropInstanceMerger::apply_lod_level() {
@@ -523,6 +556,7 @@ void PropInstanceMerger::_build_finished() {
 	set_building(false);
 
 	apply_lod_level();
+	check_auto_lod();
 
 	if (_build_queued) {
 		call_deferred("build");
@@ -615,13 +649,19 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 
 PropInstanceMerger::PropInstanceMerger() {
 	_build_queued = false;
+	_auto_lod = true;
+	_auto_lod_on = false;
 	_lod_level = 0;
+
+	//randomize so even if there is a lot they won't check for this at the same frame
+	_lod_check_timer = Math::randf() * LOD_CHECK_INTERVAL;
+
 	set_building(false);
 
 	set_notify_transform(true);
 
-	_first_lod_distance_squared = 20;
-	_lod_reduction_distance_squared = 10;
+	_first_lod_distance_squared = 1000;
+	_lod_reduction_distance_squared = 600;
 
 	//todo this should probably be in a virtual method, like in Terraman or Voxelman
 	_job = Ref<PropInstancePropJob>(memnew(PropInstancePropJob()));
@@ -640,6 +680,8 @@ PropInstanceMerger::PropInstanceMerger() {
 	js.instance();
 	js->set_job_type(PropMesherJobStep::TYPE_BAKE_TEXTURE);
 	_job->add_jobs_step(js);
+
+	set_process_internal(true);
 }
 
 PropInstanceMerger::~PropInstanceMerger() {
@@ -708,6 +750,55 @@ void PropInstanceMerger::_notification(int p_what) {
 #endif
 					}
 				}
+			} else {
+				if (!_auto_lod_on) {
+					return;
+				}
+
+				if (_meshes.size() == 0) {
+					return;
+				}
+
+				_lod_check_timer += get_process_delta_time();
+
+				if (_lod_check_timer > LOD_CHECK_INTERVAL) {
+					_lod_check_timer = 0;
+
+					if (!is_visible_in_tree()) {
+						return;
+					}
+
+					SceneTree *st = get_tree();
+
+					if (st) {
+						Viewport *vp = st->get_root();
+
+						if (vp) {
+							Camera *cam = vp->get_camera();
+
+							if (cam) {
+								Vector3 cam_world_pos = cam->get_global_transform().xform(Vector3());
+								Vector3 world_pos = get_global_transform().xform(Vector3());
+
+								Vector3 dstv = cam_world_pos - world_pos;
+								float dst = dstv.length_squared();
+
+								if (dst <= _first_lod_distance_squared) {
+									set_lod_level(0);
+									return;
+								}
+
+								dst -= _first_lod_distance_squared;
+
+								dst /= _lod_reduction_distance_squared;
+
+								int dstl = static_cast<int>(dst);
+								//the lod udpate method handles it if it's higher that the max generated lod level
+								set_lod_level(dstl + 1);
+							}
+						}
+					}
+				}
 			}
 
 			break;
@@ -750,6 +841,10 @@ void PropInstanceMerger::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_lod_level"), &PropInstanceMerger::get_lod_level);
 	ClassDB::bind_method(D_METHOD("set_lod_level", "value"), &PropInstanceMerger::set_lod_level);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "lod_level"), "set_lod_level", "get_lod_level");
+
+	ClassDB::bind_method(D_METHOD("get_auto_lod"), &PropInstanceMerger::get_auto_lod);
+	ClassDB::bind_method(D_METHOD("set_auto_lod", "value"), &PropInstanceMerger::set_auto_lod);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "auto_lod"), "set_auto_lod", "get_auto_lod");
 
 	ClassDB::bind_method(D_METHOD("get_first_lod_distance_squared"), &PropInstanceMerger::get_first_lod_distance_squared);
 	ClassDB::bind_method(D_METHOD("set_first_lod_distance_squared", "value"), &PropInstanceMerger::set_first_lod_distance_squared);
@@ -800,6 +895,7 @@ void PropInstanceMerger::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("debug_mesh_send"), &PropInstanceMerger::debug_mesh_send);
 	ClassDB::bind_method(D_METHOD("draw_debug_mdr_colliders"), &PropInstanceMerger::draw_debug_mdr_colliders);
 
+	ClassDB::bind_method(D_METHOD("check_auto_lod"), &PropInstanceMerger::check_auto_lod);
 	ClassDB::bind_method(D_METHOD("apply_lod_level"), &PropInstanceMerger::apply_lod_level);
 
 	//---
