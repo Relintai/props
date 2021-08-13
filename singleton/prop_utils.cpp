@@ -28,6 +28,8 @@ SOFTWARE.
 #include "scene/3d/room.h"
 
 #include "core/version.h"
+#include "scene/3d/room.h"
+#include "scene/3d/room_manager.h"
 
 #if VERSION_MAJOR > 3
 #include "core/config/engine.h"
@@ -105,10 +107,6 @@ void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transfo
 
 				PoolVector3Array points = r->get_points();
 
-				if (points.size() == 0) {
-					//TODO generate points
-				}
-
 				prop_data->set_room_bounds(points);
 			}
 		}
@@ -126,6 +124,92 @@ void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transfo
 			}
 		}
 	}
+}
+
+bool PropUtils::generate_room_points_node(Node *node) {
+	ERR_FAIL_COND_V(!ObjectDB::instance_validate(node), false);
+
+	Room *r = Object::cast_to<Room>(node);
+
+	if (r)  {
+		generate_room_points(r);
+
+		return true;
+	}
+
+	for (int i = 0; i < node->get_child_count(); ++i) {
+		if (generate_room_points_node(node->get_child(i))) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void PropUtils::generate_room_points(Room *room) {
+	ERR_FAIL_COND(!ObjectDB::instance_validate(room));
+
+	Node *rn = room->duplicate();
+
+	rn = substitute_prop_classes(rn);
+
+	Room *r = Object::cast_to<Room>(rn);
+	r->set_name("room");
+
+	RoomManager *rm = memnew(RoomManager);
+	rm->set_merge_meshes(false);
+	rm->add_child(r);
+	rm->set_roomlist_path(NodePath("./room"));
+
+	//don't set owner, so it won't show up in the editor
+	room->add_child(rm);
+
+	r->generate_points();
+
+	print_error(String::num(r->get_points().size()));
+
+	room->remove_child(rm);
+
+	room->set_points(r->get_points());
+
+	memdelete(rm);
+}
+
+Node *PropUtils::substitute_prop_classes(Node *node) {
+	ERR_FAIL_COND_V(!ObjectDB::instance_validate(node), nullptr);
+
+	//start with children
+	for (int i = 0; i < node->get_child_count(); ++i) {
+		substitute_prop_classes(node->get_child(i));
+	}
+
+	Node *n = get_substitute_prop_class(node);
+
+	if (n) {
+		for (int i = 0; i < node->get_child_count();) {
+			Node *c = node->get_child(i);
+
+			node->remove_child(c);
+
+			n->add_child(c);
+		}
+
+		memdelete(node);
+
+		return n;
+	}
+
+	return node;
+}
+
+Node *PropUtils::get_substitute_prop_class(Node *node) {
+	if (node->has_method("get_substitute_for_room")) {
+		Node *n = node->call("get_substitute_for_room");
+
+		return n;
+	}
+
+	return nullptr;
 }
 
 int PropUtils::add_processor(const Ref<PropDataEntry> &processor) {

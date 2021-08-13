@@ -41,6 +41,7 @@ SOFTWARE.
 
 class PropData;
 class PropDataEntry;
+class Room;
 
 class PropUtils : public Object {
 	GDCLASS(PropUtils, Object);
@@ -50,6 +51,11 @@ public:
 
 	Ref<PropData> convert_tree(Node *root);
 	void _convert_tree(Ref<PropData> prop_data, Node *node, const Transform &transform);
+
+	bool generate_room_points_node(Node *node);
+	void generate_room_points(Room *room);
+	Node *substitute_prop_classes(Node *node);
+	Node *get_substitute_prop_class(Node *node);
 
 	static int add_processor(const Ref<PropDataEntry> &processor);
 	static Ref<PropDataEntry> get_processor(const int index);
