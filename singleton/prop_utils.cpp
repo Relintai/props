@@ -163,6 +163,7 @@ void PropUtils::generate_room_points(Room *room) {
 
 	PoolVector<Plane> planes;
 	Vector<Vector3> points;
+	PoolVector<Face3> faces;
 
 	for (int i = 0; i < mesh_arrays.size(); ++i) {
 		PoolVector<Vector3> verts = mesh_arrays[i];
@@ -170,16 +171,32 @@ void PropUtils::generate_room_points(Room *room) {
 		for (int j = 0; j < verts.size(); j += 3) {
 			Plane p(verts[j], verts[j + 1], verts[j + 2]);
 
-			//if (!is_plane_unique(planes, p)) {
-			//	continue;
-			//}
+			faces.push_back(Face3(verts[j], verts[j + 1], verts[j + 2]));
+
+			//points.push_back(verts[j]);
+			//points.push_back(verts[j + 1]);
+			//points.push_back(verts[j + 2]);
+
+			if (!is_plane_unique(planes, p)) {
+				continue;
+			}
 
 			planes.push_back(p);
 
-			points.push_back(verts[j]);
-			points.push_back(verts[j + 1]);
-			points.push_back(verts[j + 2]);
+			//points.push_back(verts[j]);
+			//points.push_back(verts[j + 1]);
+			//points.push_back(verts[j + 2]);
 		}
+	}
+
+	PoolVector<Face3> wrapped = Geometry::wrap_geometry(faces);
+
+	for (int i = 0; i < wrapped.size(); ++i) {
+		Face3 f = wrapped[i];
+
+		points.push_back(f.vertex[0]);
+		points.push_back(f.vertex[1]);
+		points.push_back(f.vertex[2]);
 	}
 
 	Geometry::MeshData md = Geometry::build_convex_mesh(planes);
@@ -206,6 +223,55 @@ void PropUtils::generate_room_points(Room *room) {
 	for (int i = 0; i < md.vertices.size(); ++i) {
 		vs.set(i, md.vertices[i]);
 	}
+
+	/*
+	//It will probably have a few unnecessary vertices still
+	//let's try to get rid of those aswell
+	PoolVector<int> remove_indices;
+	int vssize = vs.size();
+	for (int i = 0; i < vssize - 2; ++i) {
+		Plane p(vs[i], vs[i + 1], vs[i + 2]);
+
+		for (int j = 0; j < vssize; ++j) {
+			if (i == j) {
+				//skip this and the next 2
+				j += 3;
+
+				if (j >= vssize) {
+					break;
+				}
+			}
+
+			if (p.has_point(vs[j], 0.1)) {
+				bool found = false;
+				for (int k = 0; k < remove_indices.size(); ++k) {
+					if (remove_indices[k] == j) {
+						found = true;
+						break;
+					}
+				}
+
+				if (!found) {
+					remove_indices.push_back(j);
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < remove_indices.size(); ++i) {
+		int rindex = remove_indices[i];
+
+		vs.remove(rindex);
+
+		for (int j = i + 1; j < remove_indices.size(); ++j) {
+			int rij = remove_indices[j];
+
+			if (rij > rindex) {
+				remove_indices.set(j, rij - 1);
+			}
+		}
+	}
+*/
 
 	room->set_points(vs);
 }
