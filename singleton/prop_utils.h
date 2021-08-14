@@ -54,8 +54,9 @@ public:
 
 	bool generate_room_points_node(Node *node);
 	void generate_room_points(Room *room);
-	Node *substitute_prop_classes(Node *node);
-	Node *get_substitute_prop_class(Node *node);
+	void get_mesh_arrays(Node *node, Vector<PoolVector<Vector3>> *arrs);
+	bool is_plane_unique(const PoolVector<Plane> &planes, const Plane &p);
+
 
 	static int add_processor(const Ref<PropDataEntry> &processor);
 	static Ref<PropDataEntry> get_processor(const int index);

@@ -31,6 +31,14 @@ SOFTWARE.
 #include "scene/3d/room.h"
 #include "scene/3d/room_manager.h"
 
+#include "core/math/quick_hull.h"
+#include "scene/3d/mesh_instance.h"
+#include "scene/3d/portal.h"
+
+#if MESH_DATA_RESOURCE_PRESENT
+#include "../../mesh_data_resource/nodes/mesh_data_instance.h"
+#endif
+
 #if VERSION_MAJOR > 3
 #include "core/config/engine.h"
 #else
@@ -131,7 +139,7 @@ bool PropUtils::generate_room_points_node(Node *node) {
 
 	Room *r = Object::cast_to<Room>(node);
 
-	if (r)  {
+	if (r) {
 		generate_room_points(r);
 
 		return true;
@@ -149,67 +157,237 @@ bool PropUtils::generate_room_points_node(Node *node) {
 void PropUtils::generate_room_points(Room *room) {
 	ERR_FAIL_COND(!ObjectDB::instance_validate(room));
 
-	Node *rn = room->duplicate();
+	Vector<PoolVector<Vector3>> mesh_arrays;
 
-	rn = substitute_prop_classes(rn);
+	get_mesh_arrays(room, &mesh_arrays);
 
-	Room *r = Object::cast_to<Room>(rn);
-	r->set_name("room");
+	PoolVector<Plane> planes;
+	Vector<Vector3> points;
 
-	RoomManager *rm = memnew(RoomManager);
-	rm->set_merge_meshes(false);
-	rm->add_child(r);
-	rm->set_roomlist_path(NodePath("./room"));
+	for (int i = 0; i < mesh_arrays.size(); ++i) {
+		PoolVector<Vector3> verts = mesh_arrays[i];
 
-	//don't set owner, so it won't show up in the editor
-	room->add_child(rm);
+		for (int j = 0; j < verts.size(); j += 3) {
+			Plane p(verts[j], verts[j + 1], verts[j + 2]);
 
-	r->generate_points();
+			//if (!is_plane_unique(planes, p)) {
+			//	continue;
+			//}
 
-	print_error(String::num(r->get_points().size()));
+			planes.push_back(p);
 
-	room->remove_child(rm);
-
-	room->set_points(r->get_points());
-
-	memdelete(rm);
-}
-
-Node *PropUtils::substitute_prop_classes(Node *node) {
-	ERR_FAIL_COND_V(!ObjectDB::instance_validate(node), nullptr);
-
-	//start with children
-	for (int i = 0; i < node->get_child_count(); ++i) {
-		substitute_prop_classes(node->get_child(i));
+			points.push_back(verts[j]);
+			points.push_back(verts[j + 1]);
+			points.push_back(verts[j + 2]);
+		}
 	}
 
-	Node *n = get_substitute_prop_class(node);
+	Geometry::MeshData md = Geometry::build_convex_mesh(planes);
+	md.optimize_vertices();
 
-	if (n) {
-		for (int i = 0; i < node->get_child_count();) {
-			Node *c = node->get_child(i);
+	QuickHull q;
 
-			node->remove_child(c);
+	// calculate an epsilon based on the simplify value, and use this to build the hull
+	real_t s = 0.5;
 
-			n->add_child(c);
+	// value between  0.3 (accurate) and 10.0 (very rough)
+	// * UNIT_EPSILON
+	s *= s;
+	s *= 40.0;
+	s += 0.3; // minimum
+	s *= UNIT_EPSILON;
+
+	q.build(points, md, s);
+
+	md.optimize_vertices();
+
+	PoolVector<Vector3> vs;
+	vs.resize(md.vertices.size());
+	for (int i = 0; i < md.vertices.size(); ++i) {
+		vs.set(i, md.vertices[i]);
+	}
+
+	room->set_points(vs);
+}
+
+//based on Room::SimplifyInfo::add_plane_if_unique
+bool PropUtils::is_plane_unique(const PoolVector<Plane> &planes, const Plane &p) {
+	for (int n = 0; n < planes.size(); n++) {
+		const Plane &o = planes[n];
+
+		// this is a fudge factor for how close planes can be to be considered the same ...
+		// to prevent ridiculous amounts of planes
+		const real_t d = 0.08f; //_plane_simplify_dist; // 0.08f
+
+		if (Math::abs(p.d - o.d) > d) {
+			continue;
 		}
 
-		memdelete(node);
+		real_t dot = p.normal.dot(o.normal);
+		if (dot < 0.98f) //_plane_simplify_dot) // 0.98f
+		{
+			continue;
+		}
 
-		return n;
+		// match!
+		return false;
 	}
 
-	return node;
+	return true;
 }
 
-Node *PropUtils::get_substitute_prop_class(Node *node) {
-	if (node->has_method("get_substitute_for_room")) {
-		Node *n = node->call("get_substitute_for_room");
+void PropUtils::get_mesh_arrays(Node *node, Vector<PoolVector<Vector3>> *arrs) {
+	ERR_FAIL_COND(!ObjectDB::instance_validate(node));
 
-		return n;
+	for (int i = 0; i < node->get_child_count(); ++i) {
+		get_mesh_arrays(node->get_child(i), arrs);
 	}
 
-	return nullptr;
+	{
+		Portal *pn = Object::cast_to<Portal>(node);
+
+		if (pn) {
+			if (!pn->get_portal_active()) {
+				return;
+			}
+
+			if (!pn->is_visible_in_tree()) {
+				return;
+			}
+
+			PoolVector<Vector2> points = pn->get_points();
+			PoolVector<Vector3> v3p;
+			v3p.resize(points.size());
+
+			for (int i = 0; i < points.size(); ++i) {
+				v3p.set(i, Vector3(points[i].x, points[i].y, 0));
+			}
+
+			Transform t = pn->get_global_transform();
+
+			int fvertcount = (points.size() - 2) * 3;
+
+			PoolVector<Vector3> tverts;
+			tverts.resize(fvertcount);
+
+			for (int i = 0; i < points.size() - 2; ++i) {
+				int sindex = i * 3;
+
+				tverts.set(sindex, t.xform(v3p[i]));
+				tverts.set(sindex + 1, t.xform(v3p[i + 1]));
+				tverts.set(sindex + 2, t.xform(v3p[i + 2]));
+			}
+
+			//portal planes need to take precedence
+			arrs->insert(0, tverts);
+
+			return;
+		}
+	}
+
+#if MESH_DATA_RESOURCE_PRESENT
+	{
+		MeshDataInstance *mdi = Object::cast_to<MeshDataInstance>(node);
+
+		if (mdi) {
+			if (!mdi->is_visible_in_tree()) {
+				return;
+			}
+
+			Ref<MeshDataResource> mdr = mdi->get_mesh_data();
+
+			if (!mdr.is_valid()) {
+				return;
+			}
+
+			Array arr = mdr->get_array();
+
+			if (arr.size() != Mesh::ARRAY_MAX) {
+				return;
+			}
+
+			Transform t = mdi->get_global_transform();
+
+			PoolVector<Vector3> verts = arr[Mesh::ARRAY_VERTEX];
+			PoolVector<Vector3> tverts;
+			tverts.resize(verts.size());
+
+			for (int i = 0; i < verts.size(); ++i) {
+				tverts.set(i, t.xform(verts[i]));
+			}
+
+			PoolVector<int> indices = arr[Mesh::ARRAY_INDEX];
+
+			if (indices.size() == 0) {
+				arrs->push_back(tverts);
+				return;
+			}
+
+			PoolVector<Vector3> fverts;
+			fverts.resize(indices.size());
+
+			for (int i = 0; i < indices.size(); ++i) {
+				fverts.set(i, tverts[indices[i]]);
+			}
+
+			arrs->push_back(fverts);
+
+			return;
+		}
+	}
+#endif
+
+	{
+		MeshInstance *min = Object::cast_to<MeshInstance>(node);
+
+		if (min) {
+			if (!min->is_visible_in_tree()) {
+				return;
+			}
+
+			Ref<ArrayMesh> am = min->get_mesh();
+
+			if (!am.is_valid()) {
+				return;
+			}
+
+			Transform t = min->get_global_transform();
+
+			for (int si = 0; si < am->get_surface_count(); ++si) {
+				Array arr = am->surface_get_arrays(si);
+
+				if (arr.size() != Mesh::ARRAY_MAX) {
+					continue;
+				}
+
+				PoolVector<Vector3> verts = arr[Mesh::ARRAY_VERTEX];
+				PoolVector<Vector3> tverts;
+				tverts.resize(verts.size());
+
+				for (int i = 0; i < verts.size(); ++i) {
+					tverts.set(i, t.xform(verts[i]));
+				}
+
+				PoolVector<int> indices = arr[Mesh::ARRAY_INDEX];
+
+				if (indices.size() == 0) {
+					arrs->push_back(tverts);
+					continue;
+				}
+
+				PoolVector<Vector3> fverts;
+				fverts.resize(indices.size());
+
+				for (int i = 0; i < indices.size(); ++i) {
+					fverts.set(i, tverts[indices[i]]);
+				}
+
+				arrs->push_back(fverts);
+			}
+
+			return;
+		}
+	}
 }
 
 int PropUtils::add_processor(const Ref<PropDataEntry> &processor) {
