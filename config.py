@@ -14,6 +14,7 @@ def get_doc_classes():
         "PropDataLight",
         "PropDataProp",
         "PropDataScene",
+        "PropDataPortal",
         "PropData",
 
         "PropDataProcessor",

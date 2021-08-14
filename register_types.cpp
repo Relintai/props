@@ -33,6 +33,7 @@ SOFTWARE.
 #include "props/prop_data.h"
 #include "props/prop_data_entry.h"
 #include "props/prop_data_light.h"
+#include "props/prop_data_portal.h"
 #include "props/prop_data_prop.h"
 #include "props/prop_data_scene.h"
 
@@ -77,6 +78,7 @@ void register_props_types() {
 	ClassDB::register_class<PropDataScene>();
 	ClassDB::register_class<PropDataLight>();
 	ClassDB::register_class<PropDataProp>();
+	ClassDB::register_class<PropDataPortal>();
 
 	ClassDB::register_class<GroundClutter>();
 	ClassDB::register_class<GroundClutterFoliage>();
@@ -118,6 +120,9 @@ void register_props_types() {
 
 	Ref<PropDataScene> scene_processor = Ref<PropDataScene>(memnew(PropDataScene));
 	PropUtils::add_processor(scene_processor);
+
+	Ref<PropDataPortal> portal_processor = Ref<PropDataPortal>(memnew(PropDataPortal));
+	PropUtils::add_processor(portal_processor);
 
 #ifdef TOOLS_ENABLED
 	EditorPlugins::add_by_type<PropEditorPlugin>();
