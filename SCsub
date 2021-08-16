@@ -29,6 +29,9 @@ sources = [
 
     "lights/prop_light.cpp",
 
+    "tiled_wall/tiled_wall.cpp",
+    "tiled_wall/tiled_wall_data.cpp",
+
     "props/prop_data.cpp",
     "props/prop_data_entry.cpp",
     "props/prop_data_scene.cpp",

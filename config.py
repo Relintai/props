@@ -16,6 +16,9 @@ def get_doc_classes():
         "PropDataScene",
         "PropDataPortal",
         "PropData",
+        
+        "TiledWall",
+        "TiledWallData",
 
         "PropDataProcessor",
 

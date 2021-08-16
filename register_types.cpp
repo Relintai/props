@@ -30,6 +30,9 @@ SOFTWARE.
 #include "core/engine.h"
 #endif
 
+#include "tiled_wall/tiled_wall.h"
+#include "tiled_wall/tiled_wall_data.h"
+
 #include "props/prop_data.h"
 #include "props/prop_data_entry.h"
 #include "props/prop_data_light.h"
@@ -71,6 +74,9 @@ static PropUtils *prop_utils = NULL;
 static PropCache *prop_texture_cache = NULL;
 
 void register_props_types() {
+	ClassDB::register_class<TiledWall>();
+	ClassDB::register_class<TiledWallData>();
+
 	ClassDB::register_class<PropLight>();
 
 	ClassDB::register_class<PropData>();
