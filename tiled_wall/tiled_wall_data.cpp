@@ -51,46 +51,46 @@ void TiledWallData::set_snap_axis(const Vector3 &value) {
 	_snap_axis = value;
 }
 
-Ref<Texture> TiledWallData::get_prop(const int index) const {
-	ERR_FAIL_INDEX_V(index, _props.size(), Ref<Texture>());
+Ref<Texture> TiledWallData::get_texture(const int index) const {
+	ERR_FAIL_INDEX_V(index, _textures.size(), Ref<Texture>());
 
-	return _props.get(index);
+	return _textures.get(index);
 }
-void TiledWallData::set_prop(const int index, const Ref<Texture> prop) {
-	ERR_FAIL_INDEX(index, _props.size());
+void TiledWallData::set_texture(const int index, const Ref<Texture> prop) {
+	ERR_FAIL_INDEX(index, _textures.size());
 
-	_props.set(index, prop);
+	_textures.set(index, prop);
 }
-void TiledWallData::add_prop(const Ref<Texture> prop) {
-	_props.push_back(prop);
+void TiledWallData::add_texture(const Ref<Texture> prop) {
+	_textures.push_back(prop);
 }
-void TiledWallData::remove_prop(const int index) {
-	ERR_FAIL_INDEX(index, _props.size());
+void TiledWallData::remove_texture(const int index) {
+	ERR_FAIL_INDEX(index, _textures.size());
 
-	_props.remove(index);
-}
-
-int TiledWallData::get_prop_count() const {
-	return _props.size();
+	_textures.remove(index);
 }
 
-Vector<Variant> TiledWallData::get_props() {
+int TiledWallData::get_texture_count() const {
+	return _textures.size();
+}
+
+Vector<Variant> TiledWallData::get_textures() {
 	Vector<Variant> r;
-	for (int i = 0; i < _props.size(); i++) {
+	for (int i = 0; i < _textures.size(); i++) {
 #if VERSION_MAJOR < 4
-		r.push_back(_props[i].get_ref_ptr());
+		r.push_back(_textures[i].get_ref_ptr());
 #else
-		r.push_back(_props[i]);
+		r.push_back(_textures[i]);
 #endif
 	}
 	return r;
 }
-void TiledWallData::set_props(const Vector<Variant> &props) {
-	_props.clear();
+void TiledWallData::set_textures(const Vector<Variant> &props) {
+	_textures.clear();
 	for (int i = 0; i < props.size(); i++) {
-		Ref<Texture> prop = Ref<Texture>(props[i]);
+		Ref<Texture> tex = Ref<Texture>(props[i]);
 
-		_props.push_back(prop);
+		_textures.push_back(tex);
 	}
 }
 
@@ -98,9 +98,9 @@ void TiledWallData::set_props(const Vector<Variant> &props) {
 void TiledWallData::add_textures_into(Ref<TexturePacker> texture_packer) {
 	ERR_FAIL_COND(!texture_packer.is_valid());
 
-	for (int i = 0; i < _props.size(); ++i) {
+	for (int i = 0; i < _textures.size(); ++i) {
 		
-		Ref<Texture> entry = _props.get(i);
+		Ref<Texture> entry = _textures.get(i);
 
 		if (entry.is_valid()) {
 			texture_packer->add_texture(entry);
@@ -128,10 +128,10 @@ void TiledWallData::copy_from(const Ref<TiledWallData> &prop_data) {
 	_snap_to_mesh = prop_data->_snap_to_mesh;
 	_snap_axis = prop_data->_snap_axis;
 
-	_props.clear();
+	_textures.clear();
 
-	for (int i = 0; i < prop_data->_props.size(); ++i) {
-		_props.push_back(prop_data->_props[i]);
+	for (int i = 0; i < prop_data->_textures.size(); ++i) {
+		_textures.push_back(prop_data->_textures[i]);
 	}
 
 	emit_changed();
@@ -144,7 +144,7 @@ TiledWallData::TiledWallData() {
 	_snap_axis = Vector3(0, -1, 0);
 }
 TiledWallData::~TiledWallData() {
-	_props.clear();
+	_textures.clear();
 }
 
 void TiledWallData::_bind_methods() {
@@ -156,16 +156,16 @@ void TiledWallData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_snap_axis", "value"), &TiledWallData::set_snap_axis);
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "snap_axis"), "set_snap_axis", "get_snap_axis");
 
-	ClassDB::bind_method(D_METHOD("get_prop", "index"), &TiledWallData::get_prop);
-	ClassDB::bind_method(D_METHOD("set_prop", "index", "spell"), &TiledWallData::set_prop);
-	ClassDB::bind_method(D_METHOD("add_prop", "prop"), &TiledWallData::add_prop);
-	ClassDB::bind_method(D_METHOD("remove_prop", "index"), &TiledWallData::remove_prop);
+	ClassDB::bind_method(D_METHOD("get_texture", "index"), &TiledWallData::get_texture);
+	ClassDB::bind_method(D_METHOD("set_texture", "index", "texture"), &TiledWallData::set_texture);
+	ClassDB::bind_method(D_METHOD("add_texture", "texture"), &TiledWallData::add_texture);
+	ClassDB::bind_method(D_METHOD("remove_texture", "index"), &TiledWallData::remove_texture);
 
-	ClassDB::bind_method(D_METHOD("get_prop_count"), &TiledWallData::get_prop_count);
+	ClassDB::bind_method(D_METHOD("get_texture_count"), &TiledWallData::get_texture_count);
 
-	ClassDB::bind_method(D_METHOD("get_props"), &TiledWallData::get_props);
-	ClassDB::bind_method(D_METHOD("set_props", "props"), &TiledWallData::set_props);
-	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "props", PROPERTY_HINT_NONE, "17/17:Texture", PROPERTY_USAGE_DEFAULT, "Texture"), "set_props", "get_props");
+	ClassDB::bind_method(D_METHOD("get_textures"), &TiledWallData::get_textures);
+	ClassDB::bind_method(D_METHOD("set_textures", "textures"), &TiledWallData::set_textures);
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "textures", PROPERTY_HINT_NONE, "17/17:Texture", PROPERTY_USAGE_DEFAULT, "Texture"), "set_textures", "get_textures");
 
 #if TEXTURE_PACKER_PRESENT
 	ClassDB::bind_method(D_METHOD("add_textures_into", "texture_packer"), &TiledWallData::add_textures_into);

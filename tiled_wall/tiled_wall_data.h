@@ -59,15 +59,15 @@ public:
 	Vector3 get_snap_axis() const;
 	void set_snap_axis(const Vector3 &value);
 
-	Ref<Texture> get_prop(const int index) const;
-	void set_prop(const int index, const Ref<Texture> prop);
-	void add_prop(const Ref<Texture> prop);
-	void remove_prop(const int index);
+	Ref<Texture> get_texture(const int index) const;
+	void set_texture(const int index, const Ref<Texture> prop);
+	void add_texture(const Ref<Texture> prop);
+	void remove_texture(const int index);
 
-	int get_prop_count() const;
+	int get_texture_count() const;
 
-	Vector<Variant> get_props();
-	void set_props(const Vector<Variant> &props);
+	Vector<Variant> get_textures();
+	void set_textures(const Vector<Variant> &textures);
 
 #if TEXTURE_PACKER_PRESENT
 	void add_textures_into(Ref<TexturePacker> texture_packer);
@@ -92,7 +92,7 @@ private:
 	bool _snap_to_mesh;
 	Vector3 _snap_axis;
 
-	Vector<Ref<Texture>> _props;
+	Vector<Ref<Texture>> _textures;
 
 	bool _is_room;
 	PoolVector3Array _room_bounds;
