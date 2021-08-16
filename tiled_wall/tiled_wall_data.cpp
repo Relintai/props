@@ -56,12 +56,12 @@ Ref<Texture> TiledWallData::get_texture(const int index) const {
 
 	return _textures.get(index);
 }
-void TiledWallData::set_texture(const int index, const Ref<Texture> texture) {
+void TiledWallData::set_texture(const int index, const Ref<Texture> &texture) {
 	ERR_FAIL_INDEX(index, _textures.size());
 
 	_textures.set(index, texture);
 }
-void TiledWallData::add_texture(const Ref<Texture> texture) {
+void TiledWallData::add_texture(const Ref<Texture> &texture) {
 	_textures.push_back(texture);
 }
 void TiledWallData::remove_texture(const int index) {
@@ -100,12 +100,12 @@ Ref<Texture> TiledWallData::get_flavour_texture(const int index) const {
 
 	return _flavour_textures.get(index);
 }
-void TiledWallData::set_flavour_texture(const int index, const Ref<Texture> texture) {
+void TiledWallData::set_flavour_texture(const int index, const Ref<Texture> &texture) {
 	ERR_FAIL_INDEX(index, _flavour_textures.size());
 
 	_flavour_textures.set(index, texture);
 }
-void TiledWallData::add_flavour_texture(const Ref<Texture> texture) {
+void TiledWallData::add_flavour_texture(const Ref<Texture> &texture) {
 	_flavour_textures.push_back(texture);
 }
 void TiledWallData::remove_flavour_texture(const int index) {

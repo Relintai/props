@@ -61,8 +61,8 @@ public:
 
 	//textures
 	Ref<Texture> get_texture(const int index) const;
-	void set_texture(const int index, const Ref<Texture> texture);
-	void add_texture(const Ref<Texture> texture);
+	void set_texture(const int index, const Ref<Texture> &texture);
+	void add_texture(const Ref<Texture> &texture);
 	void remove_texture(const int index);
 
 	int get_texture_count() const;
@@ -72,8 +72,8 @@ public:
 
 	//flavour_textures
 	Ref<Texture> get_flavour_texture(const int index) const;
-	void set_flavour_texture(const int index, const Ref<Texture> texture);
-	void add_flavour_texture(const Ref<Texture> texture);
+	void set_flavour_texture(const int index, const Ref<Texture> &texture);
+	void add_flavour_texture(const Ref<Texture> &texture);
 	void remove_flavour_texture(const int index);
 
 	int get_flavour_texture_count() const;
