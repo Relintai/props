@@ -59,15 +59,27 @@ public:
 	Vector3 get_snap_axis() const;
 	void set_snap_axis(const Vector3 &value);
 
+	//textures
 	Ref<Texture> get_texture(const int index) const;
-	void set_texture(const int index, const Ref<Texture> prop);
-	void add_texture(const Ref<Texture> prop);
+	void set_texture(const int index, const Ref<Texture> texture);
+	void add_texture(const Ref<Texture> texture);
 	void remove_texture(const int index);
 
 	int get_texture_count() const;
 
 	Vector<Variant> get_textures();
 	void set_textures(const Vector<Variant> &textures);
+
+	//flavour_textures
+	Ref<Texture> get_flavour_texture(const int index) const;
+	void set_flavour_texture(const int index, const Ref<Texture> texture);
+	void add_flavour_texture(const Ref<Texture> texture);
+	void remove_flavour_texture(const int index);
+
+	int get_flavour_texture_count() const;
+
+	Vector<Variant> get_flavour_textures();
+	void set_flavour_textures(const Vector<Variant> &textures);
 
 #if TEXTURE_PACKER_PRESENT
 	void add_textures_into(Ref<TexturePacker> texture_packer);
@@ -93,6 +105,7 @@ private:
 	Vector3 _snap_axis;
 
 	Vector<Ref<Texture>> _textures;
+	Vector<Ref<Texture>> _flavour_textures;
 
 	bool _is_room;
 	PoolVector3Array _room_bounds;
