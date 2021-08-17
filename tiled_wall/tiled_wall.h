@@ -38,7 +38,9 @@ SOFTWARE.
 
 #include "core/math/vector3.h"
 
-class PropInstance;
+class TiledWallData;
+class PropMaterialCache;
+class PropMesher;
 
 class TiledWall : public GeometryInstance {
 	GDCLASS(TiledWall, GeometryInstance);
@@ -47,32 +49,24 @@ public:
 	int get_width() const;
 	void set_width(const int value);
 
-	int get_heigt() const;
-	void set_heigt(const int value);
+	int get_heigth() const;
+	void set_heigth(const int value);
 
-	//array textures
-	//array flavour textures
-	//this class->add merger
-	//merge tex then:
-	//mesher->draw_tiled_wall(width, height, transform, array texture_rects, array flavour texture_rects, int tilemode)
-	//for propinstancemerger-> same, in diff thread
-	//job->add_wall()->add in the propentry + a transform -> can be easily meshed
+	Ref<TiledWallData> get_data();
+	void set_data(const Ref<TiledWallData> &data);
 
-	//get_faces -> keep mesh in mesher -> query
+	bool get_collision() const;
+	void set_collision(const int value);
 
-
-	Ref<Texture> get_texture();
-	void set_texture(const Ref<Texture> &texture);
-
-	Ref<Material> get_material();
-	void set_material(const Ref<Material> &mat);
+	//todo collision layers
 
 	AABB get_aabb() const;
 	PoolVector<Face3> get_faces(uint32_t p_usage_flags) const;
 
 	void refresh();
-	void setup_material_texture();
-	void free_meshes();
+	void generate_mesh();
+	void clear_mesh();
+	void free_mesh();
 
 	TiledWall();
 	~TiledWall();
@@ -84,9 +78,12 @@ protected:
 private:
 	int _width;
 	int _height;
-	
-	Ref<Texture> _texture;
-	Ref<Material> _material;
+	bool _collision;
+
+	Ref<TiledWallData> _data;
+	Ref<PropMaterialCache> _cache;
+	Ref<PropMesher> _mesher;
+	AABB _aabb;
 
 	RID _mesh_rid;
 };

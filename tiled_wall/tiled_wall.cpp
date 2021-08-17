@@ -19,40 +19,53 @@
 #include "../../texture_packer/texture_resource/packer_image_resource.h"
 #endif
 
-#include "scene/3d/mesh_instance.h"
+#include "../material_cache/prop_material_cache.h"
+#include "../prop_mesher.h"
+#include "../singleton/prop_cache.h"
+
+#include "core/core_string_names.h"
+#include "tiled_wall_data.h"
 
 int TiledWall::get_width() const {
 	return _width;
 }
 void TiledWall::set_width(const int value) {
 	_width = value;
+
+	generate_mesh();
 }
 
-int TiledWall::get_heigt() const {
+int TiledWall::get_heigth() const {
 	return _height;
 }
-void TiledWall::set_heigt(const int value) {
+void TiledWall::set_heigth(const int value) {
 	_height = value;
+
+	generate_mesh();
 }
 
-Ref<Texture> TiledWall::get_texture() {
-	return _texture;
+Ref<TiledWallData> TiledWall::get_data() {
+	return _data;
 }
-void TiledWall::set_texture(const Ref<Texture> &texture) {
-	_texture = texture;
+void TiledWall::set_data(const Ref<TiledWallData> &data) {
+	if (_data.is_valid()) {
+		_data->disconnect(CoreStringNames::get_singleton()->changed, this, "refresh");
+	}
 
-	setup_material_texture();
-	refresh();
+	_data = data;
+
+	if (_data.is_valid()) {
+		_data->connect(CoreStringNames::get_singleton()->changed, this, "refresh");
+	}
+
+	call_deferred("refresh");
 }
 
-Ref<Material> TiledWall::get_material() {
-	return _material;
+bool TiledWall::get_collision() const {
+	return _collision;
 }
-void TiledWall::set_material(const Ref<Material> &mat) {
-	_material = mat;
-
-	setup_material_texture();
-	refresh();
+void TiledWall::set_collision(const int value) {
+	_collision = value;
 }
 
 AABB TiledWall::get_aabb() const {
@@ -61,7 +74,8 @@ AABB TiledWall::get_aabb() const {
 
 PoolVector<Face3> TiledWall::get_faces(uint32_t p_usage_flags) const {
 	PoolVector<Face3> faces;
-/*
+
+	/*
 	if (_mesh.is_valid()) {
 		Array arrs = _mesh->get_array_const();
 
@@ -97,20 +111,56 @@ void TiledWall::refresh() {
 	if (!is_inside_tree()) {
 		return;
 	}
-/*
+
+	clear_mesh();
+
+	if (!_data.is_valid()) {
+		return;
+	}
+
 	if (_mesh_rid == RID()) {
 		_mesh_rid = VisualServer::get_singleton()->mesh_create();
 
 		VS::get_singleton()->instance_set_base(get_instance(), _mesh_rid);
 	}
 
-	VisualServer::get_singleton()->mesh_clear(_mesh_rid);
+	Ref<PropMaterialCache> old_cache;
 
-	if (!_mesh.is_valid()) {
+	old_cache = _cache;
+
+	_cache = PropCache::get_singleton()->tiled_wall_material_cache_get(_data);
+
+	if (old_cache.is_valid() && old_cache != _cache) {
+		PropCache::get_singleton()->tiled_wall_material_cache_unref(old_cache);
+	}
+
+	if (!_cache->get_initialized()) {
+		_cache->mutex_lock();
+
+		//An anouther thread could have initialized it before wo got the mutex!
+		if (!_cache->get_initialized()) {
+			_data->setup_cache(_cache);
+
+			_cache->refresh_rects();
+		}
+
+		_cache->mutex_unlock();
+	}
+
+	generate_mesh();
+}
+
+void TiledWall::generate_mesh() {
+	if (!_data.is_valid()) {
 		return;
 	}
 
-	Array arr = _mesh->get_array();
+	//data->mesh()
+
+	//_mesher->
+
+	/*
+	Array arr = _mesher->get_array();
 
 	if (arr.size() != Mesh::ARRAY_MAX) {
 		return;
@@ -126,61 +176,26 @@ void TiledWall::refresh() {
 
 	if (_material.is_valid()) {
 		VisualServer::get_singleton()->mesh_surface_set_material(_mesh_rid, 0, _material->get_rid());
-	}
-	*/
+	}*/
+
+	//setup new aabb
 }
 
-void TiledWall::setup_material_texture() {
-	if (!is_inside_tree()) {
-		return;
-	}
+void TiledWall::clear_mesh() {
+	_mesher->reset();
+	_aabb = AABB();
 
-	if (!_texture.is_valid()) {
-		if (_material.is_valid()) {
-			Ref<SpatialMaterial> sm = _material;
-
-			if (!sm.is_valid()) {
-				return;
-			}
-
-			sm->set_texture(SpatialMaterial::TEXTURE_ALBEDO, _texture);
-		}
-
-		return;
-	} else {
-		Ref<SpatialMaterial> sm = _material;
-
-		if (!sm.is_valid()) {
-			return;
-		}
-
-#if TEXTURE_PACKER_PRESENT
-		Ref<PackerImageResource> r = _texture;
-
-		if (r.is_valid()) {
-			Ref<Image> i = r->get_data();
-
-			Ref<ImageTexture> tex;
-			tex.instance();
-#if VERSION_MAJOR < 4
-			tex->create_from_image(i, 0);
+	if (_mesh_rid != RID()) {
+		if (VS::get_singleton()->mesh_get_surface_count(_mesh_rid) > 0)
+#if !GODOT4
+			VS::get_singleton()->mesh_remove_surface(_mesh_rid, 0);
 #else
-			tex->create_from_image(i);
+			VS::get_singleton()->mesh_clear(_mesh_rid);
 #endif
-
-			if (sm.is_valid()) {
-				sm->set_texture(SpatialMaterial::TEXTURE_ALBEDO, tex);
-			}
-
-			return;
-		}
-#endif
-
-		sm->set_texture(SpatialMaterial::TEXTURE_ALBEDO, _texture);
 	}
 }
 
-void TiledWall::free_meshes() {
+void TiledWall::free_mesh() {
 	if (_mesh_rid != RID()) {
 		VS::get_singleton()->free(_mesh_rid);
 		_mesh_rid = RID();
@@ -194,32 +209,26 @@ TiledWall::TiledWall() {
 	//temporary
 	set_portal_mode(PORTAL_MODE_GLOBAL);
 
-	//set_notify_transform(true);
+	_mesher.instance();
 }
 TiledWall::~TiledWall() {
-	_texture.unref();
+	_data.unref();
+	_cache.unref();
+	_mesher.unref();
 }
 
 void TiledWall::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_ENTER_TREE: {
-			setup_material_texture();
 			refresh();
 
 			break;
 		}
 		case NOTIFICATION_EXIT_TREE: {
-			free_meshes();
+			free_mesh();
+
 			break;
 		}
-			/*
-		case NOTIFICATION_TRANSFORM_CHANGED: {
-			VisualServer *vs = VisualServer::get_singleton();
-
-			vs->instance_set_transform(get_instance(), get_global_transform());
-
-			break;
-		}*/
 	}
 }
 
@@ -228,17 +237,20 @@ void TiledWall::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_width", "value"), &TiledWall::set_width);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "width"), "set_width", "get_width");
 
-	ClassDB::bind_method(D_METHOD("get_heigt"), &TiledWall::get_heigt);
-	ClassDB::bind_method(D_METHOD("set_heigt", "value"), &TiledWall::set_heigt);
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "heigt"), "set_heigt", "get_heigt");
+	ClassDB::bind_method(D_METHOD("get_heigth"), &TiledWall::get_heigth);
+	ClassDB::bind_method(D_METHOD("set_heigth", "value"), &TiledWall::set_heigth);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "heigth"), "set_heigth", "get_heigth");
 
-	ClassDB::bind_method(D_METHOD("get_texture"), &TiledWall::get_texture);
-	ClassDB::bind_method(D_METHOD("set_texture", "value"), &TiledWall::set_texture);
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "texture", PROPERTY_HINT_RESOURCE_TYPE, "Texture"), "set_texture", "get_texture");
+	ClassDB::bind_method(D_METHOD("get_data"), &TiledWall::get_data);
+	ClassDB::bind_method(D_METHOD("set_data", "value"), &TiledWall::set_data);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "data", PROPERTY_HINT_RESOURCE_TYPE, "TiledWallData"), "set_data", "get_data");
 
-	ClassDB::bind_method(D_METHOD("get_material"), &TiledWall::get_material);
-	ClassDB::bind_method(D_METHOD("set_material", "value"), &TiledWall::set_material);
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_material", "get_material");
+	ClassDB::bind_method(D_METHOD("set_collision"), &TiledWall::set_collision);
+	ClassDB::bind_method(D_METHOD("set_collision", "value"), &TiledWall::set_collision);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "collision"), "set_collision", "set_collision");
 
 	ClassDB::bind_method(D_METHOD("refresh"), &TiledWall::refresh);
+	ClassDB::bind_method(D_METHOD("generate_mesh"), &TiledWall::generate_mesh);
+	ClassDB::bind_method(D_METHOD("clear_mesh"), &TiledWall::clear_mesh);
+	ClassDB::bind_method(D_METHOD("free_mesh"), &TiledWall::free_mesh);
 }
