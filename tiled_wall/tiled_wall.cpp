@@ -186,7 +186,7 @@ void TiledWall::clear_mesh() {
 
 	if (_mesh_rid != RID()) {
 		if (VS::get_singleton()->mesh_get_surface_count(_mesh_rid) > 0)
-#if !GODOT4
+#if VERSION_MAJOR < 4
 			VS::get_singleton()->mesh_remove_surface(_mesh_rid, 0);
 #else
 			VS::get_singleton()->mesh_clear(_mesh_rid);
