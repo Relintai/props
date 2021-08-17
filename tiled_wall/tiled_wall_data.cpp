@@ -149,6 +149,10 @@ void TiledWallData::add_textures_into(Ref<TexturePacker> texture_packer) {
 #endif
 
 void TiledWallData::copy_from(const Ref<TiledWallData> &tiled_wall_data) {
+	ERR_FAIL_COND(!tiled_wall_data.is_valid());
+
+	_tiling_type = tiled_wall_data->_tiling_type;
+
 	_textures.clear();
 
 	for (int i = 0; i < tiled_wall_data->_textures.size(); ++i) {
