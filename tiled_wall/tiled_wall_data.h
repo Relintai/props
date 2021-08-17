@@ -50,6 +50,19 @@ class TiledWallData : public Resource {
 	GDCLASS(TiledWallData, Resource);
 
 public:
+	enum TiledWallTilingType {
+		TILED_WALL_TILING_TYPE_NONE = 0,
+		TILED_WALL_TILING_TYPE_HORIZONTAL,
+		TILED_WALL_TILING_TYPE_VERTICAL,
+		TILED_WALL_TILING_TYPE_BOTH
+	};
+
+	static const String BINDING_STRING_TILED_WALL_TILING_TYPE;
+
+public:
+	TiledWallTilingType get_tiling_type() const;
+	void set_tiling_type(const TiledWallTilingType value);
+
 	//textures
 	Ref<Texture> get_texture(const int index) const;
 	void set_texture(const int index, const Ref<Texture> &texture);
@@ -76,7 +89,7 @@ public:
 	void add_textures_into(Ref<TexturePacker> texture_packer);
 #endif
 
-	void copy_from(const Ref<TiledWallData> &prop_data);
+	void copy_from(const Ref<TiledWallData> &tiled_wall_data);
 
 	TiledWallData();
 	~TiledWallData();
@@ -85,15 +98,12 @@ protected:
 	static void _bind_methods();
 
 private:
-	int _id;
-	bool _snap_to_mesh;
-	Vector3 _snap_axis;
+	TiledWallTilingType _tiling_type;
 
 	Vector<Ref<Texture>> _textures;
 	Vector<Ref<Texture>> _flavour_textures;
-
-	bool _is_room;
-	PoolVector3Array _room_bounds;
 };
+
+VARIANT_ENUM_CAST(TiledWallData::TiledWallTilingType);
 
 #endif

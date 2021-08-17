@@ -30,6 +30,15 @@ SOFTWARE.
 #define Shape Shape3D
 #endif
 
+const String TiledWallData::BINDING_STRING_TILED_WALL_TILING_TYPE = "None,Horizontal,Vertical,Both";
+
+TiledWallData::TiledWallTilingType TiledWallData::get_tiling_type() const {
+	return _tiling_type;
+}
+void TiledWallData::set_tiling_type(const TiledWallData::TiledWallTilingType value) {
+	_tiling_type = value;
+}
+
 Ref<Texture> TiledWallData::get_texture(const int index) const {
 	ERR_FAIL_INDEX_V(index, _textures.size(), Ref<Texture>());
 
@@ -139,31 +148,24 @@ void TiledWallData::add_textures_into(Ref<TexturePacker> texture_packer) {
 }
 #endif
 
-void TiledWallData::copy_from(const Ref<TiledWallData> &prop_data) {
-	_id = prop_data->_id;
-	_snap_to_mesh = prop_data->_snap_to_mesh;
-	_snap_axis = prop_data->_snap_axis;
-
+void TiledWallData::copy_from(const Ref<TiledWallData> &tiled_wall_data) {
 	_textures.clear();
 
-	for (int i = 0; i < prop_data->_textures.size(); ++i) {
-		_textures.push_back(prop_data->_textures[i]);
+	for (int i = 0; i < tiled_wall_data->_textures.size(); ++i) {
+		_textures.push_back(tiled_wall_data->_textures[i]);
 	}
 
 	_flavour_textures.clear();
 
-	for (int i = 0; i < prop_data->_flavour_textures.size(); ++i) {
-		_flavour_textures.push_back(prop_data->_flavour_textures[i]);
+	for (int i = 0; i < tiled_wall_data->_flavour_textures.size(); ++i) {
+		_flavour_textures.push_back(tiled_wall_data->_flavour_textures[i]);
 	}
 
 	emit_changed();
 }
 
 TiledWallData::TiledWallData() {
-	_id = 0;
-	_snap_to_mesh = false;
-	_is_room = false;
-	_snap_axis = Vector3(0, -1, 0);
+	_tiling_type = TILED_WALL_TILING_TYPE_NONE;
 }
 TiledWallData::~TiledWallData() {
 	_textures.clear();
@@ -171,6 +173,10 @@ TiledWallData::~TiledWallData() {
 }
 
 void TiledWallData::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("get_tiling_type"), &TiledWallData::get_tiling_type);
+	ClassDB::bind_method(D_METHOD("set_tiling_type", "texture"), &TiledWallData::set_tiling_type);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "tiling_type", PROPERTY_HINT_ENUM, "17/17:Texture"), "set_tiling_type", "get_tiling_type");
+
 	//textures
 	ClassDB::bind_method(D_METHOD("get_texture", "index"), &TiledWallData::get_texture);
 	ClassDB::bind_method(D_METHOD("set_texture", "index", "texture"), &TiledWallData::set_texture);
@@ -193,11 +199,16 @@ void TiledWallData::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("get_flavour_textures"), &TiledWallData::get_flavour_textures);
 	ClassDB::bind_method(D_METHOD("set_flavour_textures", "textures"), &TiledWallData::set_flavour_textures);
-	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "textures", PROPERTY_HINT_NONE, "17/17:Texture", PROPERTY_USAGE_DEFAULT, "Texture"), "set_flavour_textures", "get_flavour_textures");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "flavour_textures", PROPERTY_HINT_NONE, "17/17:Texture", PROPERTY_USAGE_DEFAULT, "Texture"), "set_flavour_textures", "get_flavour_textures");
 
 #if TEXTURE_PACKER_PRESENT
 	ClassDB::bind_method(D_METHOD("add_textures_into", "texture_packer"), &TiledWallData::add_textures_into);
 #endif
 
 	ClassDB::bind_method(D_METHOD("copy_from", "prop_data"), &TiledWallData::copy_from);
+
+	BIND_ENUM_CONSTANT(TILED_WALL_TILING_TYPE_NONE);
+	BIND_ENUM_CONSTANT(TILED_WALL_TILING_TYPE_HORIZONTAL);
+	BIND_ENUM_CONSTANT(TILED_WALL_TILING_TYPE_VERTICAL);
+	BIND_ENUM_CONSTANT(TILED_WALL_TILING_TYPE_BOTH);
 }
