@@ -86,6 +86,8 @@ private:
 	AABB _aabb;
 
 	RID _mesh_rid;
+
+	Array _mesh_array;
 };
 
 #endif

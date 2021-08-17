@@ -75,35 +75,30 @@ AABB TiledWall::get_aabb() const {
 PoolVector<Face3> TiledWall::get_faces(uint32_t p_usage_flags) const {
 	PoolVector<Face3> faces;
 
-	/*
-	if (_mesh.is_valid()) {
-		Array arrs = _mesh->get_array_const();
-
-		if (arrs.size() != Mesh::ARRAY_MAX) {
-			return faces;
-		}
-
-		PoolVector<Vector3> vertices = arrs[Mesh::ARRAY_VERTEX];
-		PoolVector<int> indices = arrs[Mesh::ARRAY_INDEX];
-
-		int ts = indices.size() / 3;
-		faces.resize(ts);
-
-		PoolVector<Face3>::Write w = faces.write();
-		PoolVector<Vector3>::Read rv = vertices.read();
-		PoolVector<int>::Read ri = indices.read();
-
-		for (int i = 0; i < ts; i++) {
-			int im3 = (i * 3);
-
-			for (int j = 0; j < 3; j++) {
-				w[i].vertex[j] = rv[indices[im3 + j]];
-			}
-		}
-
-		w.release();
+	if (_mesh_array.size() != Mesh::ARRAY_MAX) {
+		return faces;
 	}
-*/
+
+	PoolVector<Vector3> vertices = _mesh_array[Mesh::ARRAY_VERTEX];
+	PoolVector<int> indices = _mesh_array[Mesh::ARRAY_INDEX];
+
+	int ts = indices.size() / 3;
+	faces.resize(ts);
+
+	PoolVector<Face3>::Write w = faces.write();
+	PoolVector<Vector3>::Read rv = vertices.read();
+	PoolVector<int>::Read ri = indices.read();
+
+	for (int i = 0; i < ts; i++) {
+		int im3 = (i * 3);
+
+		for (int j = 0; j < 3; j++) {
+			w[i].vertex[j] = rv[indices[im3 + j]];
+		}
+	}
+
+	w.release();
+
 	return faces;
 }
 
@@ -155,35 +150,39 @@ void TiledWall::generate_mesh() {
 		return;
 	}
 
-	//data->mesh()
-
-	//_mesher->
-
-	/*
-	Array arr = _mesher->get_array();
-
-	if (arr.size() != Mesh::ARRAY_MAX) {
+	if (!_cache.is_valid()) {
 		return;
 	}
 
-	PoolVector<Vector3> vertices = arr[Mesh::ARRAY_VERTEX];
+	//_mesher->tiled wall mesh_wimple(w, h, TWD, cache)
+
+	_mesh_array = _mesher->build_mesh();
+
+	if (_mesh_array.size() != Mesh::ARRAY_MAX) {
+		return;
+	}
+
+	PoolVector<Vector3> vertices = _mesh_array[Mesh::ARRAY_VERTEX];
 
 	if (vertices.size() == 0) {
 		return;
 	}
 
-	VisualServer::get_singleton()->mesh_add_surface_from_arrays(_mesh_rid, VisualServer::PRIMITIVE_TRIANGLES, arr);
+	VisualServer::get_singleton()->mesh_add_surface_from_arrays(_mesh_rid, VisualServer::PRIMITIVE_TRIANGLES, _mesh_array);
 
-	if (_material.is_valid()) {
-		VisualServer::get_singleton()->mesh_surface_set_material(_mesh_rid, 0, _material->get_rid());
-	}*/
+	Ref<Material> material = _cache->material_lod_get(0);
 
-	//setup new aabb
+	if (material.is_valid()) {
+		VisualServer::get_singleton()->mesh_surface_set_material(_mesh_rid, 0, material->get_rid());
+	}
+
+	_aabb.size = Vector3(_width, _height, 0);
 }
 
 void TiledWall::clear_mesh() {
 	_mesher->reset();
 	_aabb = AABB();
+	_mesh_array.clear();
 
 	if (_mesh_rid != RID()) {
 		if (VS::get_singleton()->mesh_get_surface_count(_mesh_rid) > 0)
