@@ -41,6 +41,7 @@ SOFTWARE.
 #include "../../thread_pool/thread_pool.h"
 #endif
 
+#include "../tiled_wall/tiled_wall_data.h"
 #include "../material_cache/prop_material_cache.h"
 
 #include "core/hashfuncs.h"
@@ -436,6 +437,15 @@ void PropCache::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("materials_get"), &PropCache::materials_get);
 	ClassDB::bind_method(D_METHOD("materials_set"), &PropCache::materials_set);
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "materials", PROPERTY_HINT_NONE, "17/17:Material", PROPERTY_USAGE_DEFAULT, "Material"), "materials_set", "materials_get");
+
+	ClassDB::bind_method(D_METHOD("material_cache_get", "prop"), &PropCache::material_cache_get);
+	ClassDB::bind_method(D_METHOD("material_cache_unref", "prop"), &PropCache::material_cache_unref);
+
+	ClassDB::bind_method(D_METHOD("tiled_wall_material_cache_get", "twd"), &PropCache::tiled_wall_material_cache_get);
+	ClassDB::bind_method(D_METHOD("tiled_wall_material_cache_unref", "twd"), &PropCache::tiled_wall_material_cache_unref);
+
+	ClassDB::bind_method(D_METHOD("material_cache_custom_key_get", "key"), &PropCache::material_cache_custom_key_get);
+	ClassDB::bind_method(D_METHOD("material_cache_custom_key_unref", "key"), &PropCache::material_cache_custom_key_unref);
 
 	ClassDB::bind_method(D_METHOD("load_resource", "path", "type_hint"), &PropCache::load_resource, "");
 }
