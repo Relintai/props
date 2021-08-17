@@ -87,31 +87,6 @@ void TiledWallData::remove_texture(const int index) {
 	_textures.remove(index);
 }
 
-Rect2 TiledWallData::get_texture_rect(const int index) const {
-	if (_texture_rects.size() <= index) {
-		return Rect2(0, 0, 1, 1);
-	}
-
-	return _texture_rects[index];
-}
-void TiledWallData::set_texture_rect(const int index, const Rect2 &rect) {
-	if (_texture_rects.size() <= index) {
-		int tr_start_index = _texture_rects.size() - 1;
-
-		if (tr_start_index < 0) {
-			tr_start_index = 0;
-		}
-
-		_texture_rects.resize(index + 1);
-
-		for (int i = tr_start_index; i < _texture_rects.size(); ++i) {
-			_texture_rects.set(i, Rect2(0, 0, 1, 1));
-		}
-	}
-
-	_texture_rects.set(index, rect);
-}
-
 int TiledWallData::get_texture_count() const {
 	return _textures.size();
 }
@@ -158,31 +133,6 @@ void TiledWallData::remove_flavour_texture(const int index) {
 
 int TiledWallData::get_flavour_texture_count() const {
 	return _flavour_textures.size();
-}
-
-Rect2 TiledWallData::get_flavour_texture_rect(const int index) const {
-	if (_flavour_texture_rects.size() <= index) {
-		return Rect2(0, 0, 1, 1);
-	}
-
-	return _flavour_texture_rects[index];
-}
-void TiledWallData::set_flavour_texture_rect(const int index, const Rect2 &rect) {
-	if (_flavour_texture_rects.size() <= index) {
-		int tr_start_index = _flavour_texture_rects.size() - 1;
-
-		if (tr_start_index < 0) {
-			tr_start_index = 0;
-		}
-
-		_flavour_texture_rects.resize(index + 1);
-
-		for (int i = tr_start_index; i < _flavour_texture_rects.size(); ++i) {
-			_flavour_texture_rects.set(i, Rect2(0, 0, 1, 1));
-		}
-	}
-
-	_flavour_texture_rects.set(index, rect);
 }
 
 Vector<Variant> TiledWallData::get_flavour_textures() {
@@ -299,37 +249,6 @@ void TiledWallData::_setup_cache(Ref<PropMaterialCache> cache) {
 	}
 }
 
-void TiledWallData::setup_rects(Ref<PropMaterialCache> cache) {
-	call("_setup_rects", cache);
-}
-void TiledWallData::_setup_rects(Ref<PropMaterialCache> cache) {
-	_texture_rects.clear();
-	_texture_rects.resize(_textures.size());
-
-	for (int i = 0; i < _textures.size(); ++i) {
-		const Ref<Texture> &t = _textures[i];
-
-		if (t.is_valid()) {
-			Rect2 r = cache->texture_get_uv_rect(t);
-
-			_texture_rects.set(i, r);
-		}
-	}
-
-	_flavour_texture_rects.clear();
-	_texture_rects.resize(_flavour_textures.size());
-
-	for (int i = 0; i < _flavour_textures.size(); ++i) {
-		const Ref<Texture> &t = _flavour_textures[i];
-
-		if (t.is_valid()) {
-			Rect2 r = cache->texture_get_uv_rect(t);
-
-			_texture_rects.set(i, r);
-		}
-	}
-}
-
 void TiledWallData::copy_from(const Ref<TiledWallData> &tiled_wall_data) {
 	ERR_FAIL_COND(!tiled_wall_data.is_valid());
 
@@ -370,9 +289,6 @@ void TiledWallData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("add_texture", "texture"), &TiledWallData::add_texture);
 	ClassDB::bind_method(D_METHOD("remove_texture", "index"), &TiledWallData::remove_texture);
 
-	ClassDB::bind_method(D_METHOD("get_texture_rect", "index"), &TiledWallData::get_texture_rect);
-	ClassDB::bind_method(D_METHOD("set_texture_rect", "index", "rect"), &TiledWallData::set_texture_rect);
-
 	ClassDB::bind_method(D_METHOD("get_texture_count"), &TiledWallData::get_texture_count);
 
 	ClassDB::bind_method(D_METHOD("get_textures"), &TiledWallData::get_textures);
@@ -384,9 +300,6 @@ void TiledWallData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_flavour_texture", "index", "texture"), &TiledWallData::set_flavour_texture);
 	ClassDB::bind_method(D_METHOD("add_tflavour_exture", "texture"), &TiledWallData::add_flavour_texture);
 	ClassDB::bind_method(D_METHOD("remove_flavour_texture", "index"), &TiledWallData::remove_flavour_texture);
-
-	ClassDB::bind_method(D_METHOD("get_flavour_texture_rect", "index"), &TiledWallData::get_flavour_texture_rect);
-	ClassDB::bind_method(D_METHOD("set_flavour_texture_rect", "index", "rect"), &TiledWallData::set_flavour_texture_rect);
 
 	ClassDB::bind_method(D_METHOD("get_flavour_texture_count"), &TiledWallData::get_flavour_texture_count);
 
@@ -413,11 +326,6 @@ void TiledWallData::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("setup_cache", "cache"), &TiledWallData::setup_cache);
 	ClassDB::bind_method(D_METHOD("_setup_cache", "cache"), &TiledWallData::_setup_cache);
-
-	BIND_VMETHOD(MethodInfo("_setup_rects", PropertyInfo(Variant::OBJECT, "cache", PROPERTY_HINT_RESOURCE_TYPE, "PropMaterialCache")));
-
-	ClassDB::bind_method(D_METHOD("setup_rects", "cache"), &TiledWallData::setup_rects);
-	ClassDB::bind_method(D_METHOD("_setup_rects", "cache"), &TiledWallData::_setup_rects);
 
 	ClassDB::bind_method(D_METHOD("copy_from", "prop_data"), &TiledWallData::copy_from);
 
