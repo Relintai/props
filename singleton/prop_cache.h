@@ -26,19 +26,19 @@ SOFTWARE.
 #include "core/version.h"
 
 #if VERSION_MAJOR > 3
-#include "core/object/object.h"
+#include "core/core_bind.h"
 #include "core/math/color.h"
+#include "core/object/object.h"
 #include "core/object/reference.h"
 #include "core/templates/hash_map.h"
 #include "core/templates/vector.h"
-#include "core/core_bind.h"
 #else
-#include "core/hash_map.h"
+#include "core/bind/core_bind.h"
 #include "core/color.h"
+#include "core/hash_map.h"
 #include "core/object.h"
 #include "core/reference.h"
 #include "core/vector.h"
-#include "core/bind/core_bind.h"
 #endif
 
 #include "scene/resources/material.h"
@@ -48,6 +48,7 @@ SOFTWARE.
 #include "../props/prop_data.h"
 
 class PropMaterialCache;
+class TiledWallData;
 
 class PropCache : public Object {
 	GDCLASS(PropCache, Object);
@@ -93,6 +94,9 @@ public:
 	Ref<PropMaterialCache> material_cache_get(const Ref<PropData> &prop);
 	void material_cache_unref(const Ref<PropData> &prop);
 
+	Ref<PropMaterialCache> tiled_wall_material_cache_get(const Ref<TiledWallData> &twd);
+	void tiled_wall_material_cache_unref(const Ref<TiledWallData> &twd);
+
 	Ref<PropMaterialCache> material_cache_custom_key_get(const uint64_t key);
 	void material_cache_custom_key_unref(const uint64_t key);
 
@@ -111,9 +115,11 @@ protected:
 	StringName _default_prop_material_cache_class;
 
 	Map<uint64_t, Ref<PropMaterialCache>> _material_cache;
+	Map<uint64_t, Ref<PropMaterialCache>> _tiled_wall_material_cache;
 	Map<uint64_t, Ref<PropMaterialCache>> _custom_keyed_material_cache;
 
 	Mutex _material_cache_mutex;
+	Mutex _tiled_wall_material_cache_mutex;
 	Mutex _custom_keyed_material_cache_mutex;
 
 #ifdef TEXTURE_PACKER_PRESENT

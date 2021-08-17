@@ -244,6 +244,62 @@ void PropCache::material_cache_unref(const Ref<PropData> &prop) {
 	_material_cache_mutex.unlock();
 }
 
+Ref<PropMaterialCache> PropCache::tiled_wall_material_cache_get(const Ref<TiledWallData> &twd) {
+	ERR_FAIL_COND_V(!twd.is_valid(), Ref<PropMaterialCache>());
+
+	//get pointer's value as uint64
+	uint64_t k = make_uint64_t<const TiledWallData *>(*twd);
+
+	_tiled_wall_material_cache_mutex.lock();
+
+	if (_tiled_wall_material_cache.has(k)) {
+		Ref<PropMaterialCache> m = _tiled_wall_material_cache[k];
+
+		m->inc_ref_count();
+
+		_tiled_wall_material_cache_mutex.unlock();
+
+		return m;
+	}
+
+	PropMaterialCache *p = Object::cast_to<PropMaterialCache>(ClassDB::instance(_default_prop_material_cache_class));
+
+	if (!p) {
+		ERR_PRINT("Can't instance the given PropMaterialCache! class_name: " + String(_default_prop_material_cache_class));
+	}
+
+	Ref<PropMaterialCache> m(p);
+
+	_tiled_wall_material_cache[k] = m;
+
+	_tiled_wall_material_cache_mutex.unlock();
+
+	return m;
+}
+void PropCache::tiled_wall_material_cache_unref(const Ref<TiledWallData> &twd) {
+	//get pointer's value as uint64
+	uint64_t k = make_uint64_t<const TiledWallData *>(*twd);
+
+	_tiled_wall_material_cache_mutex.lock();
+
+	if (!_tiled_wall_material_cache.has(k)) {
+		_tiled_wall_material_cache_mutex.unlock();
+
+		ERR_PRINT("PropCache::material_cache_unref: can't find cache!");
+
+		return;
+	}
+
+	Ref<PropMaterialCache> m = _tiled_wall_material_cache[k];
+
+	m->dec_ref_count();
+	if (m->get_ref_count() <= 0) {
+		_tiled_wall_material_cache.erase(k);
+	}
+
+	_tiled_wall_material_cache_mutex.unlock();
+}
+
 Ref<PropMaterialCache> PropCache::material_cache_custom_key_get(const uint64_t key) {
 	_custom_keyed_material_cache_mutex.lock();
 
