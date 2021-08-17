@@ -41,6 +41,7 @@ SOFTWARE.
 #include "core/version.h"
 
 #include "scene/resources/texture.h"
+#include "scene/resources/material.h"
 
 #if TEXTURE_PACKER_PRESENT
 #include "../../texture_packer/texture_packer.h"
@@ -85,6 +86,16 @@ public:
 	Vector<Variant> get_flavour_textures();
 	void set_flavour_textures(const Vector<Variant> &textures);
 
+	//materials
+	void material_add(const Ref<Material> &value);
+	void material_set(const int index, const Ref<Material> &value);
+	void material_remove(const int index);
+	int material_get_num() const;
+	void materials_clear();
+
+	Vector<Variant> materials_get();
+	void materials_set(const Vector<Variant> &materials);
+
 #if TEXTURE_PACKER_PRESENT
 	void add_textures_into(Ref<TexturePacker> texture_packer);
 #endif
@@ -102,6 +113,7 @@ private:
 
 	Vector<Ref<Texture>> _textures;
 	Vector<Ref<Texture>> _flavour_textures;
+	Vector<Ref<Material>> _materials;
 };
 
 VARIANT_ENUM_CAST(TiledWallData::TiledWallTilingType);

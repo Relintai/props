@@ -30,6 +30,33 @@ SOFTWARE.
 #define Shape Shape3D
 #endif
 
+#if VERSION_MAJOR <= 3
+
+#define VARIANT_ARRAY_GET(arr)             \
+	Vector<Variant> r;                     \
+	for (int i = 0; i < arr.size(); i++) { \
+		r.push_back(arr[i]);               \
+	}                                      \
+	return r;
+
+#else
+
+#define VARIANT_ARRAY_GET(arr)             \
+	Vector<Variant> r;                     \
+	for (int i = 0; i < arr.size(); i++) { \
+		r.push_back(arr[i].get_ref_ptr()); \
+	}                                      \
+	return r;
+
+#endif
+
+#define VARIANT_ARRAY_SET(arr, arr_into, type) \
+	arr_into.clear();                          \
+	for (int i = 0; i < arr.size(); i++) {     \
+		Ref<type> e = Ref<type>(arr[i]);       \
+		arr_into.push_back(e);                 \
+	}
+
 const String TiledWallData::BINDING_STRING_TILED_WALL_TILING_TYPE = "None,Horizontal,Vertical,Both";
 
 TiledWallData::TiledWallTilingType TiledWallData::get_tiling_type() const {
@@ -126,6 +153,45 @@ void TiledWallData::set_flavour_textures(const Vector<Variant> &textures) {
 	}
 }
 
+//materials
+void TiledWallData::material_add(const Ref<Material> &value) {
+	ERR_FAIL_COND(!value.is_valid());
+
+	_materials.push_back(value);
+}
+
+void TiledWallData::material_set(const int index, const Ref<Material> &value) {
+	ERR_FAIL_INDEX(index, _materials.size());
+
+	_materials.set(index, value);
+}
+
+void TiledWallData::material_remove(const int index) {
+	_materials.remove(index);
+}
+
+int TiledWallData::material_get_num() const {
+	return _materials.size();
+}
+
+void TiledWallData::materials_clear() {
+	_materials.clear();
+}
+
+Vector<Variant> TiledWallData::materials_get() {
+	VARIANT_ARRAY_GET(_materials);
+}
+
+void TiledWallData::materials_set(const Vector<Variant> &materials) {
+	_materials.clear();
+
+	for (int i = 0; i < materials.size(); i++) {
+		Ref<Material> material = Ref<Material>(materials[i]);
+
+		_materials.push_back(material);
+	}
+}
+
 #if TEXTURE_PACKER_PRESENT
 void TiledWallData::add_textures_into(Ref<TexturePacker> texture_packer) {
 	ERR_FAIL_COND(!texture_packer.is_valid());
@@ -174,6 +240,7 @@ TiledWallData::TiledWallData() {
 TiledWallData::~TiledWallData() {
 	_textures.clear();
 	_flavour_textures.clear();
+	_materials.clear();
 }
 
 void TiledWallData::_bind_methods() {
@@ -204,6 +271,17 @@ void TiledWallData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_flavour_textures"), &TiledWallData::get_flavour_textures);
 	ClassDB::bind_method(D_METHOD("set_flavour_textures", "textures"), &TiledWallData::set_flavour_textures);
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "flavour_textures", PROPERTY_HINT_NONE, "17/17:Texture", PROPERTY_USAGE_DEFAULT, "Texture"), "set_flavour_textures", "get_flavour_textures");
+
+	//materials
+	ClassDB::bind_method(D_METHOD("material_add", "value"), &TiledWallData::material_add);
+	ClassDB::bind_method(D_METHOD("material_set", "index", "value"), &TiledWallData::material_set);
+	ClassDB::bind_method(D_METHOD("material_remove", "index"), &TiledWallData::material_remove);
+	ClassDB::bind_method(D_METHOD("material_get_num"), &TiledWallData::material_get_num);
+	ClassDB::bind_method(D_METHOD("materials_clear"), &TiledWallData::materials_clear);
+
+	ClassDB::bind_method(D_METHOD("materials_get"), &TiledWallData::materials_get);
+	ClassDB::bind_method(D_METHOD("materials_set"), &TiledWallData::materials_set);
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "materials", PROPERTY_HINT_NONE, "17/17:Material", PROPERTY_USAGE_DEFAULT, "Material"), "materials_set", "materials_get");
 
 #if TEXTURE_PACKER_PRESENT
 	ClassDB::bind_method(D_METHOD("add_textures_into", "texture_packer"), &TiledWallData::add_textures_into);
