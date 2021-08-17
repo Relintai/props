@@ -40,12 +40,14 @@ SOFTWARE.
 
 #include "core/version.h"
 
-#include "scene/resources/texture.h"
 #include "scene/resources/material.h"
+#include "scene/resources/texture.h"
 
 #if TEXTURE_PACKER_PRESENT
 #include "../../texture_packer/texture_packer.h"
 #endif
+
+class PropMaterialCache;
 
 class TiledWallData : public Resource {
 	GDCLASS(TiledWallData, Resource);
@@ -99,6 +101,12 @@ public:
 #if TEXTURE_PACKER_PRESENT
 	void add_textures_into(Ref<TexturePacker> texture_packer);
 #endif
+
+	void setup_cache(Ref<PropMaterialCache> cache);
+	void _setup_cache(Ref<PropMaterialCache> cache);
+	
+	void setup_rects(Ref<PropMaterialCache> cache);
+	void _setup_rects(Ref<PropMaterialCache> cache);
 
 	void copy_from(const Ref<TiledWallData> &tiled_wall_data);
 

@@ -57,6 +57,8 @@ SOFTWARE.
 		arr_into.push_back(e);                 \
 	}
 
+#include "../material_cache/prop_material_cache.h"
+
 const String TiledWallData::BINDING_STRING_TILED_WALL_TILING_TYPE = "None,Horizontal,Vertical,Both";
 
 TiledWallData::TiledWallTilingType TiledWallData::get_tiling_type() const {
@@ -214,6 +216,43 @@ void TiledWallData::add_textures_into(Ref<TexturePacker> texture_packer) {
 }
 #endif
 
+void TiledWallData::setup_cache(Ref<PropMaterialCache> cache) {
+	call("_setup_cache", cache);
+}
+void TiledWallData::_setup_cache(Ref<PropMaterialCache> cache) {
+	if (cache->material_get_num() == 0) {
+		for (int i = 0; i < _materials.size(); ++i) {
+			const Ref<Material> &m = _materials[i];
+
+			if (m.is_valid()) {
+				cache->material_add(m);
+			}
+		}
+	}
+
+	for (int i = 0; i < _textures.size(); ++i) {
+		const Ref<Texture> &t = _textures[i];
+
+		if (t.is_valid()) {
+			cache->texture_add(t);
+		}
+	}
+
+	for (int i = 0; i < _flavour_textures.size(); ++i) {
+		const Ref<Texture> &t = _flavour_textures[i];
+
+		if (t.is_valid()) {
+			cache->texture_add(t);
+		}
+	}
+}
+
+void TiledWallData::setup_rects(Ref<PropMaterialCache> cache) {
+	call("_setup_rects", cache);
+}
+void TiledWallData::_setup_rects(Ref<PropMaterialCache> cache) {
+}
+
 void TiledWallData::copy_from(const Ref<TiledWallData> &tiled_wall_data) {
 	ERR_FAIL_COND(!tiled_wall_data.is_valid());
 
@@ -286,6 +325,16 @@ void TiledWallData::_bind_methods() {
 #if TEXTURE_PACKER_PRESENT
 	ClassDB::bind_method(D_METHOD("add_textures_into", "texture_packer"), &TiledWallData::add_textures_into);
 #endif
+
+	BIND_VMETHOD(MethodInfo("_setup_cache", PropertyInfo(Variant::OBJECT, "cache", PROPERTY_HINT_RESOURCE_TYPE, "PropMaterialCache")));
+
+	ClassDB::bind_method(D_METHOD("setup_cache", "cache"), &TiledWallData::setup_cache);
+	ClassDB::bind_method(D_METHOD("_setup_cache", "cache"), &TiledWallData::_setup_cache);
+
+	BIND_VMETHOD(MethodInfo("_setup_rects", PropertyInfo(Variant::OBJECT, "cache", PROPERTY_HINT_RESOURCE_TYPE, "PropMaterialCache")));
+
+	ClassDB::bind_method(D_METHOD("setup_rects", "cache"), &TiledWallData::setup_rects);
+	ClassDB::bind_method(D_METHOD("_setup_rects", "cache"), &TiledWallData::_setup_rects);
 
 	ClassDB::bind_method(D_METHOD("copy_from", "prop_data"), &TiledWallData::copy_from);
 
