@@ -30,27 +30,6 @@ SOFTWARE.
 #define Shape Shape3D
 #endif
 
-int TiledWallData::get_id() const {
-	return _id;
-}
-void TiledWallData::set_id(const int value) {
-	_id = value;
-}
-
-bool TiledWallData::get_snap_to_mesh() const {
-	return _snap_to_mesh;
-}
-void TiledWallData::set_snap_to_mesh(const bool value) {
-	_snap_to_mesh = value;
-}
-
-Vector3 TiledWallData::get_snap_axis() const {
-	return _snap_axis;
-}
-void TiledWallData::set_snap_axis(const Vector3 &value) {
-	_snap_axis = value;
-}
-
 Ref<Texture> TiledWallData::get_texture(const int index) const {
 	ERR_FAIL_INDEX_V(index, _textures.size(), Ref<Texture>());
 
@@ -160,20 +139,6 @@ void TiledWallData::add_textures_into(Ref<TexturePacker> texture_packer) {
 }
 #endif
 
-bool TiledWallData::get_is_room() const {
-	return _is_room;
-}
-void TiledWallData::set_is_room(const bool value) {
-	_is_room = value;
-}
-
-PoolVector3Array TiledWallData::get_room_bounds() {
-	return _room_bounds;
-}
-void TiledWallData::set_room_bounds(const PoolVector3Array &bounds) {
-	_room_bounds = bounds;
-}
-
 void TiledWallData::copy_from(const Ref<TiledWallData> &prop_data) {
 	_id = prop_data->_id;
 	_snap_to_mesh = prop_data->_snap_to_mesh;
@@ -206,14 +171,6 @@ TiledWallData::~TiledWallData() {
 }
 
 void TiledWallData::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("get_snap_to_mesh"), &TiledWallData::get_snap_to_mesh);
-	ClassDB::bind_method(D_METHOD("set_snap_to_mesh", "value"), &TiledWallData::set_snap_to_mesh);
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "snap_to_mesh"), "set_snap_to_mesh", "get_snap_to_mesh");
-
-	ClassDB::bind_method(D_METHOD("get_snap_axis"), &TiledWallData::get_snap_axis);
-	ClassDB::bind_method(D_METHOD("set_snap_axis", "value"), &TiledWallData::set_snap_axis);
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "snap_axis"), "set_snap_axis", "get_snap_axis");
-
 	//textures
 	ClassDB::bind_method(D_METHOD("get_texture", "index"), &TiledWallData::get_texture);
 	ClassDB::bind_method(D_METHOD("set_texture", "index", "texture"), &TiledWallData::set_texture);
@@ -241,14 +198,6 @@ void TiledWallData::_bind_methods() {
 #if TEXTURE_PACKER_PRESENT
 	ClassDB::bind_method(D_METHOD("add_textures_into", "texture_packer"), &TiledWallData::add_textures_into);
 #endif
-
-	ClassDB::bind_method(D_METHOD("get_is_room"), &TiledWallData::get_is_room);
-	ClassDB::bind_method(D_METHOD("set_is_room", "value"), &TiledWallData::set_is_room);
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "is_room"), "set_is_room", "get_is_room");
-
-	ClassDB::bind_method(D_METHOD("get_room_bounds"), &TiledWallData::get_room_bounds);
-	ClassDB::bind_method(D_METHOD("set_room_bounds", "value"), &TiledWallData::set_room_bounds);
-	ADD_PROPERTY(PropertyInfo(Variant::POOL_VECTOR3_ARRAY, "room_bounds"), "set_room_bounds", "get_room_bounds");
 
 	ClassDB::bind_method(D_METHOD("copy_from", "prop_data"), &TiledWallData::copy_from);
 }

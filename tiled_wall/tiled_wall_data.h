@@ -50,15 +50,6 @@ class TiledWallData : public Resource {
 	GDCLASS(TiledWallData, Resource);
 
 public:
-	int get_id() const;
-	void set_id(const int value);
-
-	bool get_snap_to_mesh() const;
-	void set_snap_to_mesh(const bool value);
-
-	Vector3 get_snap_axis() const;
-	void set_snap_axis(const Vector3 &value);
-
 	//textures
 	Ref<Texture> get_texture(const int index) const;
 	void set_texture(const int index, const Ref<Texture> &texture);
@@ -84,12 +75,6 @@ public:
 #if TEXTURE_PACKER_PRESENT
 	void add_textures_into(Ref<TexturePacker> texture_packer);
 #endif
-
-	bool get_is_room() const;
-	void set_is_room(const bool value);
-
-	PoolVector3Array get_room_bounds();
-	void set_room_bounds(const PoolVector3Array &bounds);
 
 	void copy_from(const Ref<TiledWallData> &prop_data);
 
