@@ -267,6 +267,8 @@ void TiledWallData::add_textures_into(Ref<TexturePacker> texture_packer) {
 #endif
 
 void TiledWallData::setup_cache(Ref<PropMaterialCache> cache) {
+	//Note: the caller should lock and unlock the cache!
+
 	call("_setup_cache", cache);
 }
 void TiledWallData::_setup_cache(Ref<PropMaterialCache> cache) {
