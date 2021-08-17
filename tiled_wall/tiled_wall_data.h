@@ -72,6 +72,9 @@ public:
 	void add_texture(const Ref<Texture> &texture);
 	void remove_texture(const int index);
 
+	Rect2 get_texture_rect(const int index) const;
+	void set_texture_rect(const int index, const Rect2 &rect);
+
 	int get_texture_count() const;
 
 	Vector<Variant> get_textures();
@@ -82,6 +85,9 @@ public:
 	void set_flavour_texture(const int index, const Ref<Texture> &texture);
 	void add_flavour_texture(const Ref<Texture> &texture);
 	void remove_flavour_texture(const int index);
+
+	Rect2 get_flavour_texture_rect(const int index) const;
+	void set_flavour_texture_rect(const int index, const Rect2 &rect);
 
 	int get_flavour_texture_count() const;
 
@@ -104,7 +110,7 @@ public:
 
 	void setup_cache(Ref<PropMaterialCache> cache);
 	void _setup_cache(Ref<PropMaterialCache> cache);
-	
+
 	void setup_rects(Ref<PropMaterialCache> cache);
 	void _setup_rects(Ref<PropMaterialCache> cache);
 
@@ -120,7 +126,11 @@ private:
 	TiledWallTilingType _tiling_type;
 
 	Vector<Ref<Texture>> _textures;
+	Vector<Rect2> _texture_rects;
+
 	Vector<Ref<Texture>> _flavour_textures;
+	Vector<Rect2> _flavour_texture_rects;
+
 	Vector<Ref<Material>> _materials;
 };
 
