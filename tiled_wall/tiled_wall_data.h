@@ -116,6 +116,12 @@ public:
 
 	void copy_from(const Ref<TiledWallData> &tiled_wall_data);
 
+	//Ref<Shape> get_collider_shape();
+
+	//generate mesh -> add mesh into
+	//genmerate_mesh() -> generate_mesh() PropMesher
+	//PropMesher->tiled wall mesh_wimple(w, h, TWD)
+
 	TiledWallData();
 	~TiledWallData();
 
