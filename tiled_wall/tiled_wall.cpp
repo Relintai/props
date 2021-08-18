@@ -136,6 +136,8 @@ void TiledWall::refresh() {
 
 		//An anouther thread could have initialized it before wo got the mutex!
 		if (!_cache->get_initialized()) {
+			_cache->initial_setup_default();
+			
 			_data->setup_cache(_cache);
 
 			_cache->refresh_rects();
