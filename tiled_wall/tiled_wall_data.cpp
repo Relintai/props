@@ -167,6 +167,13 @@ void TiledWallData::set_flavour_textures(const Vector<Variant> &textures) {
 	emit_changed();
 }
 
+float TiledWallData::get_flavour_chance() const {
+	return _flavour_chance;
+}
+void TiledWallData::set_flavour_chance(const float value) {
+	_flavour_chance = value;
+}
+
 //materials
 void TiledWallData::material_add(const Ref<Material> &value) {
 	ERR_FAIL_COND(!value.is_valid());
@@ -291,6 +298,7 @@ void TiledWallData::copy_from(const Ref<TiledWallData> &tiled_wall_data) {
 
 TiledWallData::TiledWallData() {
 	_tiling_type = TILED_WALL_TILING_TYPE_NONE;
+	_flavour_chance = 0.15;
 }
 TiledWallData::~TiledWallData() {
 	_textures.clear();
@@ -326,6 +334,10 @@ void TiledWallData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_flavour_textures"), &TiledWallData::get_flavour_textures);
 	ClassDB::bind_method(D_METHOD("set_flavour_textures", "textures"), &TiledWallData::set_flavour_textures);
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "flavour_textures", PROPERTY_HINT_NONE, "17/17:Texture", PROPERTY_USAGE_DEFAULT, "Texture"), "set_flavour_textures", "get_flavour_textures");
+
+	ClassDB::bind_method(D_METHOD("get_flavour_chance"), &TiledWallData::get_flavour_chance);
+	ClassDB::bind_method(D_METHOD("set_flavour_chance", "texture"), &TiledWallData::set_flavour_chance);
+	ADD_PROPERTY(PropertyInfo(Variant::REAL, "flavour_chance"), "set_flavour_chance", "get_flavour_chance");
 
 	//materials
 	ClassDB::bind_method(D_METHOD("material_add", "value"), &TiledWallData::material_add);

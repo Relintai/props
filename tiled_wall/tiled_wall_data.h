@@ -89,6 +89,9 @@ public:
 	Vector<Variant> get_flavour_textures();
 	void set_flavour_textures(const Vector<Variant> &textures);
 
+	float get_flavour_chance() const;
+	void set_flavour_chance(const float value);
+
 	//materials
 	void material_add(const Ref<Material> &value);
 	void material_set(const int index, const Ref<Material> &value);
@@ -121,6 +124,8 @@ private:
 
 	Vector<Ref<Texture>> _textures;
 	Vector<Ref<Texture>> _flavour_textures;
+	float _flavour_chance;
+
 	Vector<Ref<Material>> _materials;
 };
 
