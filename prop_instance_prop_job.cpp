@@ -154,6 +154,63 @@ void PropInstancePropJob::clear_lights() {
 	_prop_mesher->clear_lights();
 }
 
+
+void PropInstancePropJob::_physics_process(float delta) {
+	if (_phase == 0)
+		phase_physics_process();
+}
+
+void PropInstancePropJob::_execute_phase() {
+	if (!_material_cache.is_valid()) {
+		ERR_PRINT("!PropInstancePropJob::_execute_phase(): !_material_cache.is_valid()");
+		//reset_meshes();
+		set_complete(true); //So threadpool knows it's done
+		finished();
+	}
+
+#ifdef MESH_DATA_RESOURCE_PRESENT
+	if (_prop_mesh_datas.size() == 0) {
+		//reset_meshes();
+		set_complete(true);
+		finished();
+		return;
+	}
+#endif
+
+	if (_phase == 1) {
+		phase_prop();
+	} else if (_phase == 2) {
+		phase_steps();
+	} else if (_phase > 2) {
+		set_complete(true); //So threadpool knows it's done
+		finished();
+		ERR_FAIL_MSG("PropInstancePropJob: _phase is too high!");
+	}
+}
+
+void PropInstancePropJob::_reset() {
+	PropInstanceJob::_reset();
+
+	_build_done = false;
+	_phase = 0;
+
+	_current_mesh = 0;
+	_current_job_step = 0;
+
+	reset_stages();
+
+	if (_prop_mesher.is_valid()) {
+		_prop_mesher->reset();
+	}
+
+	_prop_tiled_wall_datas.clear();
+
+	_prop_mesh_datas.clear();
+	clear_collision_shapes();
+
+	set_build_phase_type(BUILD_PHASE_TYPE_PHYSICS_PROCESS);
+}
+
 void PropInstancePropJob::phase_physics_process() {
 	//TODO this should only update the differences
 	for (int i = 0; i < _prop_instace->collider_get_num(); ++i) {
@@ -268,61 +325,6 @@ void PropInstancePropJob::phase_prop() {
 	next_phase();
 }
 
-void PropInstancePropJob::_physics_process(float delta) {
-	if (_phase == 0)
-		phase_physics_process();
-}
-
-void PropInstancePropJob::_execute_phase() {
-	if (!_material_cache.is_valid()) {
-		ERR_PRINT("!PropInstancePropJob::_execute_phase(): !_material_cache.is_valid()");
-		//reset_meshes();
-		set_complete(true); //So threadpool knows it's done
-		finished();
-	}
-
-#ifdef MESH_DATA_RESOURCE_PRESENT
-	if (_prop_mesh_datas.size() == 0) {
-		//reset_meshes();
-		set_complete(true);
-		finished();
-		return;
-	}
-#endif
-
-	if (_phase == 1) {
-		phase_prop();
-	} else if (_phase == 2) {
-		phase_steps();
-	} else if (_phase > 2) {
-		set_complete(true); //So threadpool knows it's done
-		finished();
-		ERR_FAIL_MSG("PropInstancePropJob: _phase is too high!");
-	}
-}
-
-void PropInstancePropJob::_reset() {
-	PropInstanceJob::_reset();
-
-	_build_done = false;
-	_phase = 0;
-
-	_current_mesh = 0;
-	_current_job_step = 0;
-
-	reset_stages();
-
-	if (_prop_mesher.is_valid()) {
-		_prop_mesher->reset();
-	}
-
-	_prop_tiled_wall_datas.clear();
-
-	_prop_mesh_datas.clear();
-	clear_collision_shapes();
-
-	set_build_phase_type(BUILD_PHASE_TYPE_PHYSICS_PROCESS);
-}
 
 void PropInstancePropJob::phase_steps() {
 	ERR_FAIL_COND(!_prop_mesher.is_valid());

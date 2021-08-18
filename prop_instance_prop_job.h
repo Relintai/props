@@ -72,13 +72,12 @@ public:
 	void add_light(const Ref<PropLight> &light);
 	void clear_lights();
 
-	void phase_physics_process();
-	void phase_prop();
-
 	void _physics_process(float delta);
 	void _execute_phase();
 	void _reset();
 
+	void phase_physics_process();
+	void phase_prop();
 	void phase_steps();
 
 	void step_type_normal();
