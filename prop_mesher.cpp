@@ -547,6 +547,8 @@ void PropMesher::add_tiled_wall_simple(const int width, const int height, const 
 }
 
 void PropMesher::add_tiled_wall_mesh_rect_simple(const int x, const int y, const Transform &transform, const Rect2 &texture_rect) {
+	int vc = get_vertex_count();
+
 	//x + 1, y
 	add_normal(transform.xform(Vector3(0, 0, -1)));
 	add_uv(transform_uv(Vector2(1, 1), texture_rect));
@@ -567,7 +569,6 @@ void PropMesher::add_tiled_wall_mesh_rect_simple(const int x, const int y, const
 	add_uv(transform_uv(Vector2(1, 0), texture_rect));
 	add_vertex(transform.xform(Vector3(x + 1, y + 1, 0)));
 
-	int vc = get_vertex_count();
 	add_indices(vc + 2);
 	add_indices(vc + 1);
 	add_indices(vc + 0);
