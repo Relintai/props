@@ -39,6 +39,7 @@ SOFTWARE.
 #include "props/prop_data_portal.h"
 #include "props/prop_data_prop.h"
 #include "props/prop_data_scene.h"
+#include "props/prop_data_tiled_wall.h"
 
 #include "clutter/ground_clutter.h"
 #include "clutter/ground_clutter_foliage.h"
@@ -85,6 +86,7 @@ void register_props_types() {
 	ClassDB::register_class<PropDataLight>();
 	ClassDB::register_class<PropDataProp>();
 	ClassDB::register_class<PropDataPortal>();
+	ClassDB::register_class<PropDataTiledWall>();
 
 	ClassDB::register_class<GroundClutter>();
 	ClassDB::register_class<GroundClutterFoliage>();
@@ -129,6 +131,9 @@ void register_props_types() {
 
 	Ref<PropDataPortal> portal_processor = Ref<PropDataPortal>(memnew(PropDataPortal));
 	PropUtils::add_processor(portal_processor);
+
+	Ref<PropDataTiledWall> tiled_wall_processor = Ref<PropDataTiledWall>(memnew(PropDataTiledWall));
+	PropUtils::add_processor(tiled_wall_processor);
 
 #ifdef TOOLS_ENABLED
 	EditorPlugins::add_by_type<PropEditorPlugin>();

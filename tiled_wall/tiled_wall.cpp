@@ -137,7 +137,7 @@ void TiledWall::refresh() {
 		//An anouther thread could have initialized it before wo got the mutex!
 		if (!_cache->get_initialized()) {
 			_cache->initial_setup_default();
-			
+
 			_data->setup_cache(_cache);
 
 			_cache->refresh_rects();
@@ -209,6 +209,7 @@ void TiledWall::free_mesh() {
 TiledWall::TiledWall() {
 	_width = 1;
 	_height = 1;
+	_collision = true;
 
 	//temporary
 	set_portal_mode(PORTAL_MODE_GLOBAL);
