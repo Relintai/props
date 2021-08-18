@@ -32,6 +32,7 @@ int TiledWall::get_width() const {
 void TiledWall::set_width(const int value) {
 	_width = value;
 
+	clear_mesh();
 	generate_mesh();
 }
 
@@ -41,6 +42,7 @@ int TiledWall::get_heigth() const {
 void TiledWall::set_heigth(const int value) {
 	_height = value;
 
+	clear_mesh();
 	generate_mesh();
 }
 
