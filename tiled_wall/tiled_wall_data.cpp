@@ -281,7 +281,7 @@ TiledWallData::~TiledWallData() {
 void TiledWallData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_tiling_type"), &TiledWallData::get_tiling_type);
 	ClassDB::bind_method(D_METHOD("set_tiling_type", "texture"), &TiledWallData::set_tiling_type);
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "tiling_type", PROPERTY_HINT_ENUM, "17/17:Texture"), "set_tiling_type", "get_tiling_type");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "tiling_type", PROPERTY_HINT_ENUM, TiledWallData::BINDING_STRING_TILED_WALL_TILING_TYPE), "set_tiling_type", "get_tiling_type");
 
 	//textures
 	ClassDB::bind_method(D_METHOD("get_texture", "index"), &TiledWallData::get_texture);
