@@ -155,6 +155,7 @@ void TiledWall::generate_mesh() {
 	}
 
 	//_mesher->tiled wall mesh_wimple(w, h, TWD, cache)
+	_mesher->add_tiled_wall_simple(_width, _height, Transform(), _data, _cache);
 
 	_mesh_array = _mesher->build_mesh();
 

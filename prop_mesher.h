@@ -62,6 +62,8 @@ using PoolVector = Vector<N>;
 
 class OpenSimplexNoise;
 class PropLight;
+class PropMaterialCache;
+class TiledWallData;
 
 class PropMesher : public Reference {
 	GDCLASS(PropMesher, Reference);
@@ -142,6 +144,10 @@ public:
 	void set_build_flags(const int flags);
 
 	void reset();
+
+	void add_tiled_wall_simple(const int width, const int height, const Transform &transform, const Ref<TiledWallData> &tiled_wall_data, const Ref<PropMaterialCache> &cache);
+	void add_tiled_wall_mesh_rect_simple(const int x, const int y, const Transform &transform, const Rect2 &texture_rect);
+	Vector2 transform_uv(const Vector2 &uv, const Rect2 &rect) const;
 
 #ifdef MESH_DATA_RESOURCE_PRESENT
 	void add_mesh_data_resource(Ref<MeshDataResource> mesh, const Vector3 position = Vector3(0, 0, 0), const Vector3 rotation = Vector3(0, 0, 0), const Vector3 scale = Vector3(1.0, 1.0, 1.0), const Rect2 uv_rect = Rect2(0, 0, 1, 1));

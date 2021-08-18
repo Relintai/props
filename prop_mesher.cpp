@@ -25,6 +25,9 @@ SOFTWARE.
 #include "lights/prop_light.h"
 #include "modules/opensimplex/open_simplex_noise.h"
 
+#include "material_cache/prop_material_cache.h"
+#include "tiled_wall/tiled_wall_data.h"
+
 const String PropMesher::BINDING_STRING_BUILD_FLAGS = "Use Lighting,Use AO,Use RAO,Bake Lights";
 
 bool PropMesher::Vertex::operator==(const Vertex &p_vertex) const {
@@ -461,6 +464,111 @@ void PropMesher::reset() {
 	_last_bones.clear();
 	_last_weights.clear();
 	_last_tangent = Plane();
+}
+
+void PropMesher::add_tiled_wall_simple(const int width, const int height, const Transform &transform, const Ref<TiledWallData> &tiled_wall_data, const Ref<PropMaterialCache> &cache) {
+	ERR_FAIL_COND(!tiled_wall_data.is_valid());
+	ERR_FAIL_COND(!cache.is_valid());
+	ERR_FAIL_COND(width < 0);
+	ERR_FAIL_COND(height < 0);
+
+	if (tiled_wall_data->get_texture_count() == 0) {
+		return;
+	}
+
+	//collect rects
+	Vector<Rect2> normal_rects;
+	Vector<Rect2> flavour_rects;
+
+	//fallback
+	if (normal_rects.size() == 0) {
+		normal_rects.push_back(Rect2(0, 0, 1, 1));
+	}
+
+	TiledWallData::TiledWallTilingType tiling_type = tiled_wall_data->get_tiling_type();
+
+	//todo implement flavour!
+
+	if (tiling_type == TiledWallData::TILED_WALL_TILING_TYPE_NONE) {
+		Rect2 r = normal_rects[0];
+
+		for (int x = 0; x < width; ++x) {
+			for (int y = 0; y < height; ++y) {
+				add_tiled_wall_mesh_rect_simple(x, y, transform, r);
+			}
+		}
+	} else if (tiling_type == TiledWallData::TILED_WALL_TILING_TYPE_HORIZONTAL) {
+		Rect2 r;
+
+		for (int x = 0; x < width; ++x) {
+			r = normal_rects[x % normal_rects.size()];
+
+			for (int y = 0; y < height; ++y) {
+				add_tiled_wall_mesh_rect_simple(x, y, transform, r);
+			}
+		}
+	} else if (tiling_type == TiledWallData::TILED_WALL_TILING_TYPE_VERTICAL) {
+		Rect2 r;
+
+		for (int x = 0; x < width; ++x) {
+			for (int y = 0; y < height; ++y) {
+				r = normal_rects[y % normal_rects.size()];
+
+				add_tiled_wall_mesh_rect_simple(x, y, transform, r);
+			}
+		}
+	} else if (tiling_type == TiledWallData::TILED_WALL_TILING_TYPE_BOTH) {
+		Rect2 r;
+
+		for (int x = 0; x < width; ++x) {
+			for (int y = 0; y < height; ++y) {
+				r = normal_rects[(x + y) % normal_rects.size()];
+
+				add_tiled_wall_mesh_rect_simple(x, y, transform, r);
+			}
+		}
+	}
+}
+
+void PropMesher::add_tiled_wall_mesh_rect_simple(const int x, const int y, const Transform &transform, const Rect2 &texture_rect) {
+	//x + 1, y
+	add_normal(transform.xform(Vector3(0, 0, 1)));
+	add_uv(transform_uv(Vector2(1, 1), texture_rect));
+	add_vertex(transform.xform(Vector3(x + 1, y, 0)));
+
+	//x, y
+	add_normal(transform.xform(Vector3(0, 0, 1)));
+	add_uv(transform_uv(Vector2(0, 1), texture_rect));
+	add_vertex(transform.xform(Vector3(x, y, 0)));
+
+	//x, y + 1
+	add_normal(transform.xform(Vector3(0, 0, 1)));
+	add_uv(transform_uv(Vector2(0, 0), texture_rect));
+	add_vertex(transform.xform(Vector3(x, y + 1, 0)));
+
+	//x + 1, y + 1
+	add_normal(transform.xform(Vector3(0, 0, 1)));
+	add_uv(transform_uv(Vector2(1, 0), texture_rect));
+	add_vertex(transform.xform(Vector3(x + 1, y + 1, 0)));
+
+	int vc = get_vertex_count();
+	add_indices(vc + 2);
+	add_indices(vc + 1);
+	add_indices(vc + 0);
+	add_indices(vc + 3);
+	add_indices(vc + 2);
+	add_indices(vc + 0);
+}
+
+_FORCE_INLINE_ Vector2 PropMesher::transform_uv(const Vector2 &uv, const Rect2 &rect) const {
+	Vector2 ruv = uv;
+
+	ruv.x *= rect.size.x;
+	ruv.y *= rect.size.y;
+	ruv.x += rect.position.x;
+	ruv.y += rect.position.y;
+
+	return ruv;
 }
 
 #ifdef MESH_DATA_RESOURCE_PRESENT
@@ -1171,6 +1279,10 @@ void PropMesher::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_build_flags"), &PropMesher::get_build_flags);
 	ClassDB::bind_method(D_METHOD("set_build_flags", "value"), &PropMesher::set_build_flags);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "build_flags", PROPERTY_HINT_FLAGS, PropMesher::BINDING_STRING_BUILD_FLAGS), "set_build_flags", "get_build_flags");
+
+	ClassDB::bind_method(D_METHOD("add_tiled_wall_simple", "width", "height", "transform", "tiled_wall_data", "cache"), &PropMesher::add_tiled_wall_simple);
+	ClassDB::bind_method(D_METHOD("add_tiled_wall_mesh_rect_simple", "x", "y", "transform", "texture_rect"), &PropMesher::add_tiled_wall_mesh_rect_simple);
+	ClassDB::bind_method(D_METHOD("transform_uv", "uv", "rect"), &PropMesher::transform_uv);
 
 #ifdef MESH_DATA_RESOURCE_PRESENT
 	ClassDB::bind_method(D_METHOD("add_mesh_data_resource", "mesh", "position", "rotation", "scale", "uv_rect"), &PropMesher::add_mesh_data_resource, DEFVAL(Rect2(0, 0, 1, 1)), DEFVAL(Vector3(1.0, 1.0, 1.0)), DEFVAL(Vector3()), DEFVAL(Vector3()));
