@@ -245,7 +245,9 @@ void TiledWallData::_setup_cache(Ref<PropMaterialCache> cache) {
 			const Ref<Material> &m = _materials[i];
 
 			if (m.is_valid()) {
-				cache->material_add(m);
+				Ref<Material> nm = m->duplicate();
+
+				cache->material_add(nm);
 			}
 		}
 	}
