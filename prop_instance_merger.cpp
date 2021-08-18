@@ -61,6 +61,10 @@ typedef class RenderingServer VS;
 #include "../thread_pool/thread_pool.h"
 #endif
 
+#include "./props/prop_data_tiled_wall.h"
+
+#include "tiled_wall/tiled_wall_data.h"
+
 const float PropInstanceMerger::LOD_CHECK_INTERVAL = 2;
 
 bool PropInstanceMerger::get_building() {
@@ -522,6 +526,7 @@ void PropInstanceMerger::_build() {
 
 	Ref<PropMaterialCache> cache = PropCache::get_singleton()->material_cache_get(_prop_data);
 
+	//note: this should be moved to the job
 	if (!cache->get_initialized()) {
 		cache->mutex_lock();
 
@@ -586,6 +591,15 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 				continue;
 
 			prop_preprocess(t, p);
+
+			continue;
+		}
+
+		Ref<PropDataTiledWall> tiled_wall_data = e;
+
+		if (tiled_wall_data.is_valid()) {
+
+			_job->add_tiled_wall(tiled_wall_data, t);
 
 			continue;
 		}

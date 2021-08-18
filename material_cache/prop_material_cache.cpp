@@ -24,7 +24,9 @@ SOFTWARE.
 
 #include "../../props/props/prop_data.h"
 #include "../../props/props/prop_data_prop.h"
+#include "../../props/props/prop_data_tiled_wall.h"
 #include "../singleton/prop_cache.h"
+#include "../tiled_wall/tiled_wall_data.h"
 
 #if MESH_DATA_RESOURCE_PRESENT
 #define PROPS_PRESENT 1
@@ -196,8 +198,23 @@ void PropMaterialCache::prop_add_textures(const Ref<PropData> &prop) {
 				continue;
 
 			texture_add(tex);
+
+			continue;
 		}
 #endif
+
+		Ref<PropDataTiledWall> pdtw = prop->get_prop(i);
+
+		if (pdtw.is_valid()) {
+			Ref<TiledWallData> twd = pdtw->get_data();
+
+			if (!twd.is_valid())
+				continue;
+
+			twd->setup_cache(Ref<PropMaterialCache>(this));
+
+			continue;
+		}
 
 		Ref<PropDataProp> pdp = prop->get_prop(i);
 
@@ -225,6 +242,33 @@ void PropMaterialCache::prop_remove_textures(const Ref<PropData> &prop) {
 		}
 #endif
 
+		Ref<PropDataTiledWall> pdtw = prop->get_prop(i);
+
+		if (pdtw.is_valid()) {
+			Ref<TiledWallData> twd = pdtw->get_data();
+
+			if (!twd.is_valid())
+				continue;
+
+			for (int j = 0; j < twd->get_texture_count(); ++j) {
+				const Ref<Texture> &tex = twd->get_texture(j);
+
+				if (tex.is_valid()) {
+					texture_remove(tex);
+				}
+			}
+
+			for (int j = 0; j < twd->get_flavour_texture_count(); ++j) {
+				const Ref<Texture> &tex = twd->get_flavour_texture(j);
+
+				if (tex.is_valid()) {
+					texture_remove(tex);
+				}
+			}
+
+			continue;
+		}
+
 		Ref<PropDataProp> pdp = prop->get_prop(i);
 
 		if (pdp.is_valid()) {
@@ -238,7 +282,7 @@ void PropMaterialCache::refresh_rects() {
 }
 
 void PropMaterialCache::initial_setup_default() {
-	PropCache* pc = PropCache::get_singleton();
+	PropCache *pc = PropCache::get_singleton();
 
 	pc->ensure_materials_loaded();
 

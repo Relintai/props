@@ -59,6 +59,9 @@ SOFTWARE.
 #undef PROPS_PRESENT
 #endif
 
+#include "tiled_wall/tiled_wall_data.h"
+#include "props/prop_data_tiled_wall.h"
+
 Ref<PropMaterialCache> PropInstancePropJob::get_material_cache() {
 	return _material_cache;
 }
@@ -131,6 +134,18 @@ void PropInstancePropJob::clear_meshes() {
 	_prop_mesh_datas.clear();
 }
 #endif
+
+void PropInstancePropJob::add_tiled_wall(const Ref<PropDataTiledWall> &data, const Transform &base_transform) {
+	PTWEntry e;
+	e.data = data;
+	e.base_transform = base_transform;
+
+	_prop_tiled_wall_datas.push_back(e);
+}
+
+void PropInstancePropJob::clear_tiled_walls() {
+	_prop_tiled_wall_datas.clear();
+}
 
 void PropInstancePropJob::add_light(const Ref<PropLight> &light) {
 	_prop_mesher->add_light(light);
@@ -209,13 +224,21 @@ void PropInstancePropJob::phase_prop() {
 			Ref<MeshDataResource> mesh = pmd->get_mesh();
 			Ref<Texture> tex = pmd->get_texture();
 			Transform t = pmd->get_transform();
-			t *= e.base_transform;
 
 			Rect2 uvr = _material_cache->texture_get_uv_rect(tex);
 
 			_prop_mesher->add_mesh_data_resource_transform(mesh, t, uvr);
 		}
 #endif
+
+		for (int i = 0; i < _prop_tiled_wall_datas.size(); ++i) {
+			PTWEntry &e = _prop_tiled_wall_datas.write[i];
+
+			Ref<PropDataTiledWall> pdtw = e.data;
+			Transform t = pdtw->get_transform();
+
+			_prop_mesher->add_tiled_wall_simple(pdtw->get_width(), pdtw->get_heigth(), t, pdtw->get_data(), _material_cache);
+		}
 
 		if (_prop_mesher->get_vertex_count() == 0) {
 			//reset_meshes();
@@ -292,6 +315,8 @@ void PropInstancePropJob::_reset() {
 	if (_prop_mesher.is_valid()) {
 		_prop_mesher->reset();
 	}
+
+	_prop_tiled_wall_datas.clear();
 
 	_prop_mesh_datas.clear();
 	clear_collision_shapes();

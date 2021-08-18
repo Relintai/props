@@ -23,6 +23,10 @@
 #include "./props/prop_data_light.h"
 #include "./props/prop_data_prop.h"
 #include "./props/prop_data_scene.h"
+#include "./props/prop_data_tiled_wall.h"
+
+#include "tiled_wall/tiled_wall.h"
+#include "tiled_wall/tiled_wall_data.h"
 
 Ref<PropData> PropInstance::get_prop_data() {
 	return _prop_data;
@@ -127,6 +131,23 @@ void PropInstance::_prop_preprocess(Transform transform, const Ref<PropData> &pr
 			continue;
 		}
 
+		Ref<PropDataTiledWall> tiled_wall_data = e;
+
+		if (tiled_wall_data.is_valid()) {
+			TiledWall *twn = memnew(TiledWall);
+
+			twn->set_width(tiled_wall_data->get_width());
+			twn->set_heigth(tiled_wall_data->get_heigth());
+			twn->set_data(tiled_wall_data->get_data());
+			twn->set_collision(tiled_wall_data->get_collision());
+
+			twn->set_transform(t);
+
+			add_child(twn);
+
+			continue;
+		}
+
 		Ref<PropDataScene> scene_data = e;
 
 		if (scene_data.is_valid()) {
@@ -185,7 +206,6 @@ void PropInstance::_prop_preprocess(Transform transform, const Ref<PropData> &pr
 					if (spmat.is_valid()) {
 						spmat->set_texture(SpatialMaterial::TEXTURE_ALBEDO, texture);
 					} else {
-
 						Ref<ShaderMaterial> shmat = mat;
 
 						if (shmat.is_valid()) {

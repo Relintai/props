@@ -32,6 +32,7 @@ class PropMesherJobStep;
 class PropMaterialCache;
 class Shape;
 class PropLight;
+class PropDataTiledWall;
 
 #if MESH_DATA_RESOURCE_PRESENT
 class PropDataMeshData;
@@ -64,6 +65,9 @@ public:
 	void add_mesh(const Ref<PropDataMeshData> &mesh_data, const Transform &base_transform);
 	void clear_meshes();
 #endif
+
+	void add_tiled_wall(const Ref<PropDataTiledWall> &data, const Transform &base_transform);
+	void clear_tiled_walls();
 
 	void add_light(const Ref<PropLight> &light);
 	void clear_lights();
@@ -103,6 +107,11 @@ protected:
 	};
 #endif
 
+	struct PTWEntry {
+		Ref<PropDataTiledWall> data;
+		Transform base_transform;
+	};
+
 	struct CollisionShapeEntry {
 		Ref<Shape> shape;
 		Transform transform;
@@ -122,6 +131,8 @@ protected:
 #endif
 
 	Vector<CollisionShapeEntry> _collision_shapes;
+
+	Vector<PTWEntry> _prop_tiled_wall_datas;
 
 	Array temp_mesh_arr;
 };
