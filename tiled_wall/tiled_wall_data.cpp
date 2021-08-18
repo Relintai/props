@@ -66,6 +66,8 @@ TiledWallData::TiledWallTilingType TiledWallData::get_tiling_type() const {
 }
 void TiledWallData::set_tiling_type(const TiledWallData::TiledWallTilingType value) {
 	_tiling_type = value;
+
+	emit_changed();
 }
 
 Ref<Texture> TiledWallData::get_texture(const int index) const {
@@ -77,6 +79,8 @@ void TiledWallData::set_texture(const int index, const Ref<Texture> &texture) {
 	ERR_FAIL_INDEX(index, _textures.size());
 
 	_textures.set(index, texture);
+
+	emit_changed();
 }
 void TiledWallData::add_texture(const Ref<Texture> &texture) {
 	_textures.push_back(texture);
@@ -85,6 +89,8 @@ void TiledWallData::remove_texture(const int index) {
 	ERR_FAIL_INDEX(index, _textures.size());
 
 	_textures.remove(index);
+
+	emit_changed();
 }
 
 int TiledWallData::get_texture_count() const {
@@ -121,6 +127,8 @@ void TiledWallData::set_flavour_texture(const int index, const Ref<Texture> &tex
 	ERR_FAIL_INDEX(index, _flavour_textures.size());
 
 	_flavour_textures.set(index, texture);
+
+	emit_changed();
 }
 void TiledWallData::add_flavour_texture(const Ref<Texture> &texture) {
 	_flavour_textures.push_back(texture);
@@ -129,6 +137,8 @@ void TiledWallData::remove_flavour_texture(const int index) {
 	ERR_FAIL_INDEX(index, _flavour_textures.size());
 
 	_flavour_textures.remove(index);
+
+	emit_changed();
 }
 
 int TiledWallData::get_flavour_texture_count() const {
@@ -153,6 +163,8 @@ void TiledWallData::set_flavour_textures(const Vector<Variant> &textures) {
 
 		_flavour_textures.push_back(tex);
 	}
+
+	emit_changed();
 }
 
 //materials
@@ -166,10 +178,14 @@ void TiledWallData::material_set(const int index, const Ref<Material> &value) {
 	ERR_FAIL_INDEX(index, _materials.size());
 
 	_materials.set(index, value);
+
+	emit_changed();
 }
 
 void TiledWallData::material_remove(const int index) {
 	_materials.remove(index);
+
+	emit_changed();
 }
 
 int TiledWallData::material_get_num() const {
@@ -192,6 +208,8 @@ void TiledWallData::materials_set(const Vector<Variant> &materials) {
 
 		_materials.push_back(material);
 	}
+
+	emit_changed();
 }
 
 #if TEXTURE_PACKER_PRESENT
