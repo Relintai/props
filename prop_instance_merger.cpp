@@ -495,6 +495,11 @@ void PropInstanceMerger::_build() {
 		return;
 	}
 
+	if (!is_inside_tree() || !get_world().is_valid()) {
+		queue_build();
+		return;
+	}
+
 	set_building(true);
 	_build_queued = false;
 
