@@ -466,7 +466,7 @@ void PropMesher::reset() {
 	_last_tangent = Plane();
 }
 
-void PropMesher::add_tiled_wall_simple(const int width, const int height, const Transform &transform, const Ref<TiledWallData> &tiled_wall_data, const Ref<PropMaterialCache> &cache) {
+void PropMesher::add_tiled_wall_simple(const int width, const int height, const Transform &transform, const Ref<TiledWallData> &tiled_wall_data, Ref<PropMaterialCache> cache) {
 	ERR_FAIL_COND(!tiled_wall_data.is_valid());
 	ERR_FAIL_COND(!cache.is_valid());
 	ERR_FAIL_COND(width < 0);
@@ -479,6 +479,22 @@ void PropMesher::add_tiled_wall_simple(const int width, const int height, const 
 	//collect rects
 	Vector<Rect2> normal_rects;
 	Vector<Rect2> flavour_rects;
+
+	for (int i = 0; i < tiled_wall_data->get_texture_count(); ++i) {
+		const Ref<Texture> &t = tiled_wall_data->get_texture(i);
+
+		if (t.is_valid()) {
+			normal_rects.push_back(cache->texture_get_uv_rect(t));
+		}
+	}
+
+	for (int i = 0; i < tiled_wall_data->get_flavour_texture_count(); ++i) {
+		const Ref<Texture> &t = tiled_wall_data->get_flavour_texture(i);
+
+		if (t.is_valid()) {
+			flavour_rects.push_back(cache->texture_get_uv_rect(t));
+		}
+	}
 
 	//fallback
 	if (normal_rects.size() == 0) {
