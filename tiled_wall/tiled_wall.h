@@ -68,6 +68,9 @@ public:
 	void clear_mesh();
 	void free_mesh();
 
+	void create_colliders();
+	void free_colliders();
+
 	TiledWall();
 	~TiledWall();
 
@@ -86,6 +89,8 @@ private:
 	AABB _aabb;
 
 	RID _mesh_rid;
+	RID _physics_shape_rid;
+	RID _physics_body_rid;
 
 	Array _mesh_array;
 };

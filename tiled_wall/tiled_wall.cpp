@@ -68,6 +68,17 @@ bool TiledWall::get_collision() const {
 }
 void TiledWall::set_collision(const int value) {
 	_collision = value;
+
+/*
+	if (!is_inside_tree()) {
+		return;
+	}
+
+	if (_collision) {
+		create_colliders();
+	} else {
+		free_colliders();
+	}*/
 }
 
 AABB TiledWall::get_aabb() const {
@@ -110,7 +121,15 @@ void TiledWall::refresh() {
 	}
 
 	clear_mesh();
+/*
+	if (_physics_shape_rid != RID()) {
+		PhysicsServer::get_singleton()->shape_set_data(_physics_shape_rid, Vector3(_width / 2.0, _height / 2.0, 0.01));
 
+		Transform t = get_global_transform();
+		t.translate(Vector3(_width / 2.0, _height / 2.0, 0));
+		PhysicsServer::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer::BODY_STATE_TRANSFORM, t);
+	}
+*/
 	if (!_data.is_valid()) {
 		return;
 	}
@@ -157,7 +176,15 @@ void TiledWall::generate_mesh() {
 	if (!_cache.is_valid()) {
 		return;
 	}
+/*
+	if (_physics_shape_rid != RID()) {
+		PhysicsServer::get_singleton()->shape_set_data(_physics_shape_rid, Vector3(_width / 2.0, _height / 2.0, 0.01));
 
+		Transform t = get_global_transform();
+		t.translate(Vector3(_width / 2.0, _height / 2.0, 0));
+		PhysicsServer::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer::BODY_STATE_TRANSFORM, t);
+	}
+*/
 	//_mesher->tiled wall mesh_wimple(w, h, TWD, cache)
 	_mesher->add_tiled_wall_simple(_width, _height, Transform(), _data, _cache);
 
@@ -206,6 +233,48 @@ void TiledWall::free_mesh() {
 	}
 }
 
+void TiledWall::create_colliders() {
+	if (!is_inside_tree()) {
+		return;
+	}
+
+	free_colliders();
+
+	ERR_FAIL_COND(!get_world().is_valid() && get_world()->get_space() == RID());
+
+	_physics_shape_rid = PhysicsServer::get_singleton()->shape_create(PhysicsServer::SHAPE_BOX);
+	_physics_body_rid = PhysicsServer::get_singleton()->body_create(PhysicsServer::BODY_MODE_STATIC);
+
+	PhysicsServer::get_singleton()->shape_set_data(_physics_shape_rid, Vector3(_width / 2.0, _height / 2.0, 0.01));
+
+	//todo layer mask
+	PhysicsServer::get_singleton()->body_set_collision_layer(_physics_body_rid, 1);
+	PhysicsServer::get_singleton()->body_set_collision_mask(_physics_body_rid, 1);
+
+	PhysicsServer::get_singleton()->body_add_shape(_physics_body_rid, _physics_shape_rid);
+
+	Transform t = get_global_transform();
+	t.translate(Vector3(_width / 2.0, _height / 2.0, 0));
+
+	PhysicsServer::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer::BODY_STATE_TRANSFORM, t);
+
+	PhysicsServer::get_singleton()->body_set_space(_physics_body_rid, get_world()->get_space());
+}
+
+void TiledWall::free_colliders() {
+	if (_physics_body_rid != RID()) {
+		PhysicsServer::get_singleton()->free(_physics_body_rid);
+
+		_physics_body_rid = RID();
+	}
+
+	if (_physics_shape_rid != RID()) {
+		PhysicsServer::get_singleton()->free(_physics_shape_rid);
+
+		_physics_shape_rid = RID();
+	}
+}
+
 TiledWall::TiledWall() {
 	_width = 1;
 	_height = 1;
@@ -225,6 +294,10 @@ TiledWall::~TiledWall() {
 void TiledWall::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_ENTER_TREE: {
+			//if (_collision) {
+			//	call_deferred("create_colliders");
+			//}
+
 			refresh();
 
 			break;
@@ -232,8 +305,23 @@ void TiledWall::_notification(int p_what) {
 		case NOTIFICATION_EXIT_TREE: {
 			free_mesh();
 
+			//if (_collision) {
+			//	free_colliders();
+			//}
+
 			break;
 		}
+	//	case NOTIFICATION_TRANSFORM_CHANGED: {
+			/*
+			if (_physics_body_rid != RID()) {
+				Transform t = get_global_transform();
+				t.translate(Vector3(_width / 2.0, _height / 2.0, 0));
+
+				PhysicsServer::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer::BODY_STATE_TRANSFORM, t);
+			}
+*/
+		//	break;
+	//	}
 	}
 }
 
@@ -258,4 +346,7 @@ void TiledWall::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("generate_mesh"), &TiledWall::generate_mesh);
 	ClassDB::bind_method(D_METHOD("clear_mesh"), &TiledWall::clear_mesh);
 	ClassDB::bind_method(D_METHOD("free_mesh"), &TiledWall::free_mesh);
+
+	ClassDB::bind_method(D_METHOD("create_colliders"), &TiledWall::create_colliders);
+	ClassDB::bind_method(D_METHOD("free_colliders"), &TiledWall::free_colliders);
 }
