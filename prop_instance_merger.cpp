@@ -65,6 +65,8 @@ typedef class RenderingServer VS;
 
 #include "tiled_wall/tiled_wall_data.h"
 
+#include "scene/resources/box_shape.h"
+
 const float PropInstanceMerger::LOD_CHECK_INTERVAL = 2;
 
 bool PropInstanceMerger::get_building() {
@@ -583,6 +585,22 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 		if (tiled_wall_data.is_valid()) {
 
 			_job->add_tiled_wall(tiled_wall_data, t);
+
+			if (tiled_wall_data->get_collision()) {
+				Ref<BoxShape> tws;
+				tws.instance();
+
+				float hew = tiled_wall_data->get_width() / 2.0;
+				float heh = tiled_wall_data->get_heigth() / 2.0;
+
+				tws->set_extents(Vector3(hew, heh, 0.01));
+
+				Transform tt = t;
+				//tt.origin += Vector3(hew, heh, 0);
+				tt.translate(hew, heh, 0);
+
+				_job->add_collision_shape(tws, tt);
+			}
 
 			continue;
 		}
