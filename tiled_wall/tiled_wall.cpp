@@ -245,9 +245,9 @@ void TiledWall::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_data", "value"), &TiledWall::set_data);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "data", PROPERTY_HINT_RESOURCE_TYPE, "TiledWallData"), "set_data", "get_data");
 
-	ClassDB::bind_method(D_METHOD("set_collision"), &TiledWall::set_collision);
+	ClassDB::bind_method(D_METHOD("get_collision"), &TiledWall::get_collision);
 	ClassDB::bind_method(D_METHOD("set_collision", "value"), &TiledWall::set_collision);
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "collision"), "set_collision", "set_collision");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "collision"), "set_collision", "get_collision");
 
 	ClassDB::bind_method(D_METHOD("refresh"), &TiledWall::refresh);
 	ClassDB::bind_method(D_METHOD("generate_mesh"), &TiledWall::generate_mesh);
