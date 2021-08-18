@@ -76,6 +76,7 @@ public:
 	void _execute_phase();
 	void _reset();
 
+	void phase_setup_cache();
 	void phase_physics_process();
 	void phase_prop();
 	void phase_steps();

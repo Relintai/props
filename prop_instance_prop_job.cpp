@@ -59,8 +59,8 @@ SOFTWARE.
 #undef PROPS_PRESENT
 #endif
 
-#include "tiled_wall/tiled_wall_data.h"
 #include "props/prop_data_tiled_wall.h"
+#include "tiled_wall/tiled_wall_data.h"
 
 Ref<PropMaterialCache> PropInstancePropJob::get_material_cache() {
 	return _material_cache;
@@ -154,7 +154,6 @@ void PropInstancePropJob::clear_lights() {
 	_prop_mesher->clear_lights();
 }
 
-
 void PropInstancePropJob::_physics_process(float delta) {
 	if (_phase == 0)
 		phase_physics_process();
@@ -178,10 +177,12 @@ void PropInstancePropJob::_execute_phase() {
 #endif
 
 	if (_phase == 1) {
-		phase_prop();
+		phase_setup_cache();
 	} else if (_phase == 2) {
+		phase_prop();
+	} else if (_phase == 3) {
 		phase_steps();
-	} else if (_phase > 2) {
+	} else if (_phase > 3) {
 		set_complete(true); //So threadpool knows it's done
 		finished();
 		ERR_FAIL_MSG("PropInstancePropJob: _phase is too high!");
@@ -258,6 +259,33 @@ void PropInstancePropJob::phase_physics_process() {
 	next_phase();
 }
 
+void PropInstancePropJob::phase_setup_cache() {
+	if (should_do()) {
+		if (!_material_cache->get_initialized()) {
+			_material_cache->mutex_lock();
+
+			//check again, this thread might have gotten here after an another one already did the initialization!
+			if (!_material_cache->get_initialized()) {
+				//this will set up materials, and settings
+				_material_cache->initial_setup_default();
+
+				_material_cache->prop_add_textures(_prop_instace->get_prop_data());
+
+				_material_cache->refresh_rects();
+			}
+
+			_material_cache->mutex_unlock();
+		}
+
+		if (should_return()) {
+			return;
+		}
+	}
+
+	reset_stages();
+	next_phase();
+}
+
 void PropInstancePropJob::phase_prop() {
 	if (!_prop_mesher.is_valid()) {
 		set_complete(true); //So threadpool knows it's done
@@ -324,7 +352,6 @@ void PropInstancePropJob::phase_prop() {
 	reset_stages();
 	next_phase();
 }
-
 
 void PropInstancePropJob::phase_steps() {
 	ERR_FAIL_COND(!_prop_mesher.is_valid());

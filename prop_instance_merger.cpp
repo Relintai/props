@@ -526,23 +526,6 @@ void PropInstanceMerger::_build() {
 
 	Ref<PropMaterialCache> cache = PropCache::get_singleton()->material_cache_get(_prop_data);
 
-	//note: this should be moved to the job
-	if (!cache->get_initialized()) {
-		cache->mutex_lock();
-
-		//check again, this thread might have gotten here after an another one already did the initialization!
-		if (!cache->get_initialized()) {
-			//this will set up materials, and settings
-			cache->initial_setup_default();
-
-			cache->prop_add_textures(_prop_data);
-
-			cache->refresh_rects();
-		}
-
-		cache->mutex_unlock();
-	}
-
 	_job->set_material_cache(cache);
 
 	prop_preprocess(Transform(), _prop_data);
