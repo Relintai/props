@@ -614,22 +614,22 @@ void PropMesher::add_tiled_wall_mesh_rect_simple(const int x, const int y, const
 	int vc = get_vertex_count();
 
 	//x + 1, y
-	add_normal(transform.xform(Vector3(0, 0, -1)));
+	add_normal(transform.basis.xform(Vector3(0, 0, -1)));
 	add_uv(transform_uv(Vector2(1, 1), texture_rect));
 	add_vertex(transform.xform(Vector3(x + 1, y, 0)));
 
 	//x, y
-	add_normal(transform.xform(Vector3(0, 0, -1)));
+	add_normal(transform.basis.xform(Vector3(0, 0, -1)));
 	add_uv(transform_uv(Vector2(0, 1), texture_rect));
 	add_vertex(transform.xform(Vector3(x, y, 0)));
 
 	//x, y + 1
-	add_normal(transform.xform(Vector3(0, 0, -1)));
+	add_normal(transform.basis.xform(Vector3(0, 0, -1)));
 	add_uv(transform_uv(Vector2(0, 0), texture_rect));
 	add_vertex(transform.xform(Vector3(x, y + 1, 0)));
 
 	//x + 1, y + 1
-	add_normal(transform.xform(Vector3(0, 0, -1)));
+	add_normal(transform.basis.xform(Vector3(0, 0, -1)));
 	add_uv(transform_uv(Vector2(1, 0), texture_rect));
 	add_vertex(transform.xform(Vector3(x + 1, y + 1, 0)));
 
