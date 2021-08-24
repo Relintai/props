@@ -122,6 +122,8 @@ protected:
 	Mutex _tiled_wall_material_cache_mutex;
 	Mutex _custom_keyed_material_cache_mutex;
 
+	Mutex _material_mutex;
+
 #ifdef TEXTURE_PACKER_PRESENT
 	int _texture_flags;
 	int _max_atlas_size;

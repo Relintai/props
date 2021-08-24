@@ -41,8 +41,8 @@ SOFTWARE.
 #include "../../thread_pool/thread_pool.h"
 #endif
 
-#include "../tiled_wall/tiled_wall_data.h"
 #include "../material_cache/prop_material_cache.h"
+#include "../tiled_wall/tiled_wall_data.h"
 
 #include "core/hashfuncs.h"
 
@@ -170,9 +170,13 @@ void PropCache::materials_load() {
 }
 
 void PropCache::ensure_materials_loaded() {
+	_material_mutex.lock();
+
 	if (_materials.size() != _material_paths.size()) {
 		materials_load();
 	}
+
+	_material_mutex.unlock();
 }
 
 Vector<Variant> PropCache::materials_get() {
