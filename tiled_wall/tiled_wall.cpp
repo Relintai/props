@@ -210,7 +210,6 @@ void TiledWall::generate_mesh() {
 		PhysicsServer::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer::BODY_STATE_TRANSFORM, t);
 	}
 */
-	//_mesher->tiled wall mesh_wimple(w, h, TWD, cache)
 	_mesher->add_tiled_wall_simple(_width, _height, Transform(), _data, _cache);
 
 	_mesh_array = _mesher->build_mesh();
@@ -253,6 +252,7 @@ void TiledWall::clear_mesh() {
 
 void TiledWall::free_mesh() {
 	if (_mesh_rid != RID()) {
+		VS::get_singleton()->instance_set_base(get_instance(), RID());
 		VS::get_singleton()->free(_mesh_rid);
 		_mesh_rid = RID();
 	}
@@ -268,31 +268,12 @@ void TiledWall::create_colliders() {
 	ERR_FAIL_COND(!get_world().is_valid() && get_world()->get_space() == RID());
 
 	_physics_shape_rid = PhysicsServer::get_singleton()->shape_create(PhysicsServer::SHAPE_BOX);
-	_physics_body_rid = PhysicsServer::get_singleton()->body_create(PhysicsServer::BODY_MODE_STATIC);
 
 	PhysicsServer::get_singleton()->shape_set_data(_physics_shape_rid, Vector3(_width / 2.0, _height / 2.0, 0.01));
-
-	//todo layer mask
-	PhysicsServer::get_singleton()->body_set_collision_layer(_physics_body_rid, _collision_layer);
-	PhysicsServer::get_singleton()->body_set_collision_mask(_physics_body_rid, _collision_mask);
-
 	PhysicsServer::get_singleton()->body_add_shape(_physics_body_rid, _physics_shape_rid);
-
-	Transform t = get_global_transform();
-	t.translate(Vector3(_width / 2.0, _height / 2.0, 0));
-
-	PhysicsServer::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer::BODY_STATE_TRANSFORM, t);
-
-	PhysicsServer::get_singleton()->body_set_space(_physics_body_rid, get_world()->get_space());
 }
 
 void TiledWall::free_colliders() {
-	if (_physics_body_rid != RID()) {
-		PhysicsServer::get_singleton()->free(_physics_body_rid);
-
-		_physics_body_rid = RID();
-	}
-
 	if (_physics_shape_rid != RID()) {
 		PhysicsServer::get_singleton()->free(_physics_shape_rid);
 
@@ -307,6 +288,8 @@ TiledWall::TiledWall() {
 	_collision_layer = 1;
 	_collision_mask = 1;
 
+	_physics_body_rid = PhysicsServer::get_singleton()->body_create(PhysicsServer::BODY_MODE_STATIC);
+
 	//temporary
 	set_portal_mode(PORTAL_MODE_GLOBAL);
 
@@ -316,39 +299,44 @@ TiledWall::~TiledWall() {
 	_data.unref();
 	_cache.unref();
 	_mesher.unref();
+
+	PhysicsServer::get_singleton()->free(_physics_body_rid);
+
+	_physics_body_rid = RID();
+
+	free_mesh();
+	free_colliders();
 }
 
 void TiledWall::_notification(int p_what) {
 	switch (p_what) {
-		case NOTIFICATION_ENTER_TREE: {
-			//if (_collision) {
-			//	call_deferred("create_colliders");
-			//}
+		case NOTIFICATION_ENTER_WORLD: {
+			Transform t = get_global_transform();
+			t.translate(Vector3(_width / 2.0, _height / 2.0, 0));
+
+			PhysicsServer::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer::BODY_STATE_TRANSFORM, t);
+
+			RID space = get_world()->get_space();
+			PhysicsServer::get_singleton()->body_set_space(_physics_body_rid, space);
 
 			refresh();
 
 			break;
 		}
-		case NOTIFICATION_EXIT_TREE: {
-			free_mesh();
-
-			//if (_collision) {
-			//	free_colliders();
-			//}
-
+		case NOTIFICATION_EXIT_WORLD: {
+			PhysicsServer::get_singleton()->body_set_space(_physics_body_rid, RID());
 			break;
 		}
-			//	case NOTIFICATION_TRANSFORM_CHANGED: {
-			/*
-			if (_physics_body_rid != RID()) {
+		case NOTIFICATION_TRANSFORM_CHANGED: {
+			if (_collision) {
 				Transform t = get_global_transform();
 				t.translate(Vector3(_width / 2.0, _height / 2.0, 0));
 
 				PhysicsServer::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer::BODY_STATE_TRANSFORM, t);
 			}
-*/
-			//	break;
-			//	}
+
+			break;
+		}
 	}
 }
 
