@@ -49,11 +49,11 @@ public:
 	Ref<Material> get_material();
 	void set_material(const Ref<Material> &material);
 
-	void set_collision_layer(uint32_t p_layer);
 	uint32_t get_collision_layer() const;
+	void set_collision_layer(uint32_t p_layer);
 
-	void set_collision_mask(uint32_t p_mask);
 	uint32_t get_collision_mask() const;
+	void set_collision_mask(uint32_t p_mask);
 
 	virtual void collision_layer_changed();
 	virtual void collision_mask_changed();

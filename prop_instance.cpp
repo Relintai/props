@@ -51,24 +51,24 @@ void PropInstance::set_material(const Ref<Material> &material) {
 	_material = material;
 }
 
+uint32_t PropInstance::get_collision_layer() const {
+	return _collision_layer;
+}
+
 void PropInstance::set_collision_layer(uint32_t p_layer) {
 	_collision_layer = p_layer;
 
 	collision_layer_changed();
 }
 
-uint32_t PropInstance::get_collision_layer() const {
-	return _collision_layer;
+uint32_t PropInstance::get_collision_mask() const {
+	return _collision_mask;
 }
 
 void PropInstance::set_collision_mask(uint32_t p_mask) {
 	_collision_mask = p_mask;
 
 	collision_mask_changed();
-}
-
-uint32_t PropInstance::get_collision_mask() const {
-	return _collision_mask;
 }
 
 void PropInstance::collision_layer_changed() {
