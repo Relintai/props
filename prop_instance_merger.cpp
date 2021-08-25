@@ -271,7 +271,7 @@ RID PropInstanceMerger::collider_shape_rid_get(const int index) {
 	return _colliders[index].shape_rid;
 }
 
-int PropInstanceMerger::collider_add(const Transform &local_transform, const Ref<Shape> &shape, const RID &shape_rid, const RID &body) {
+int PropInstanceMerger::collider_add(const Transform &local_transform, const Ref<Shape> &shape, const RID &shape_rid, const RID &body, const bool owns_shape) {
 	ERR_FAIL_COND_V(!shape.is_valid() && shape_rid == RID(), 0);
 
 	int index = _colliders.size();
@@ -281,6 +281,7 @@ int PropInstanceMerger::collider_add(const Transform &local_transform, const Ref
 	e.body = body;
 	e.shape = shape;
 	e.shape_rid = shape_rid;
+	e.owns_shape = owns_shape;
 
 	_colliders.push_back(e);
 
@@ -449,8 +450,9 @@ void PropInstanceMerger::draw_debug_mdr_colliders() {
 	for (int i = 0; i < collider_get_num(); ++i) {
 		Ref<Shape> shape = collider_shape_get(i);
 
-		if (!shape.is_valid())
+		if (!shape.is_valid()) {
 			continue;
+		}
 
 		Transform t = collider_local_transform_get(i);
 
@@ -481,9 +483,16 @@ void PropInstanceMerger::free_meshes() {
 
 void PropInstanceMerger::free_colliders() {
 	for (int i = 0; i < _colliders.size(); ++i) {
-		PhysicsServer::get_singleton()->free(_colliders[i].body);
+		ColliderBody &e = _colliders.write[i];
 
-		_colliders.write[i].body = RID();
+		PhysicsServer::get_singleton()->free(e.body);
+
+		e.body = RID();
+
+		if (e.owns_shape) {
+			e.shape.unref();
+			e.shape_rid = RID();
+		}
 	}
 }
 
@@ -570,6 +579,8 @@ void PropInstanceMerger::_build_finished() {
 	apply_lod_level();
 	check_auto_lod();
 
+	notification(NOTIFICATION_TRANSFORM_CHANGED);
+
 	if (_build_queued) {
 		call_deferred("build");
 	}
@@ -618,7 +629,7 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 				//tt.origin += Vector3(hew, heh, 0);
 				tt.translate(hew, heh, 0);
 
-				_job->add_collision_shape(tws, tt);
+				_job->add_collision_shape(tws, tt, true);
 			}
 
 			continue;
@@ -840,9 +851,10 @@ void PropInstanceMerger::_notification(int p_what) {
 		case NOTIFICATION_TRANSFORM_CHANGED: {
 			Transform new_transform = get_global_transform();
 
-			if (new_transform == _last_transform) {
-				break;
-			}
+			//Don't do this check, so this can be used to setmesh positions after a build
+			//if (new_transform == _last_transform) {
+			//	break;
+			//}
 
 			_last_transform = new_transform;
 
@@ -863,7 +875,9 @@ void PropInstanceMerger::_notification(int p_what) {
 			for (int i = 0; i < _colliders.size(); ++i) {
 				const ColliderBody &c = _colliders[i];
 
-				PhysicsServer::get_singleton()->body_set_shape_transform(c.body, 0, new_transform * c.transform);
+				if (c.body != RID()) {
+					PhysicsServer::get_singleton()->body_set_shape_transform(c.body, 0, new_transform * c.transform);
+				}
 			}
 
 			break;

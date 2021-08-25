@@ -51,7 +51,7 @@ public:
 	void add_jobs_step(const Ref<PropMesherJobStep> &step);
 	int get_jobs_step_count() const;
 
-	void add_collision_shape(const Ref<Shape> &shape, const Transform &transform);
+	void add_collision_shape(const Ref<Shape> &shape, const Transform &transform, const bool owns_shape = false);
 	void clear_collision_shapes();
 
 	PropInstanceMerger *get_prop_instace();
@@ -115,6 +115,11 @@ protected:
 	struct CollisionShapeEntry {
 		Ref<Shape> shape;
 		Transform transform;
+		bool owns_shape;
+
+		CollisionShapeEntry() {
+			owns_shape = false;
+		}
 	};
 
 	Ref<PropMaterialCache> _material_cache;

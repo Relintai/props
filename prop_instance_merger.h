@@ -92,7 +92,7 @@ public:
 	RID collider_body_get(const int index);
 	Ref<Shape> collider_shape_get(const int index);
 	RID collider_shape_rid_get(const int index);
-	int collider_add(const Transform &local_transform, const Ref<Shape> &shape, const RID &shape_rid, const RID &body);
+	int collider_add(const Transform &local_transform, const Ref<Shape> &shape, const RID &shape_rid, const RID &body, const bool owns_shape = false);
 	int collider_get_num() const;
 	void colliders_clear();
 
@@ -135,6 +135,11 @@ protected:
 		RID body;
 		Ref<Shape> shape;
 		RID shape_rid;
+		bool owns_shape;
+
+		ColliderBody() {
+			owns_shape = false;
+		}
 	};
 
 	struct MeshEntry {

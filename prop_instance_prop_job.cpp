@@ -91,11 +91,12 @@ int PropInstancePropJob::get_jobs_step_count() const {
 	return _job_steps.size();
 }
 
-void PropInstancePropJob::add_collision_shape(const Ref<Shape> &shape, const Transform &transform) {
+void PropInstancePropJob::add_collision_shape(const Ref<Shape> &shape, const Transform &transform, const bool owns_shape) {
 	CollisionShapeEntry e;
 
 	e.shape = shape;
 	e.transform = transform;
+	e.owns_shape = owns_shape;
 
 	_collision_shapes.push_back(e);
 }
@@ -214,10 +215,11 @@ void PropInstancePropJob::_reset() {
 
 void PropInstancePropJob::phase_physics_process() {
 	//TODO this should only update the differences
-	for (int i = 0; i < _prop_instace->collider_get_num(); ++i) {
-		PhysicsServer::get_singleton()->free(_prop_instace->collider_body_get(i));
-	}
+	//for (int i = 0; i < _prop_instace->collider_get_num(); ++i) {
+	//	PhysicsServer::get_singleton()->free(_prop_instace->collider_body_get(i));
+	//}
 
+	_prop_instace->free_colliders();
 	_prop_instace->colliders_clear();
 
 	for (int i = 0; i < _collision_shapes.size(); ++i) {
@@ -233,7 +235,6 @@ void PropInstancePropJob::phase_physics_process() {
 
 		//TODO store the layer mask somewhere
 		PhysicsServer::get_singleton()->body_set_collision_layer(body, 1);
-
 		PhysicsServer::get_singleton()->body_set_collision_mask(body, 1);
 
 		if (_prop_instace->is_inside_tree() && _prop_instace->is_inside_world()) {
@@ -244,9 +245,9 @@ void PropInstancePropJob::phase_physics_process() {
 			}
 		}
 
-		PhysicsServer::get_singleton()->body_set_state(body, PhysicsServer::BODY_STATE_TRANSFORM, e.transform);
+		//PhysicsServer::get_singleton()->body_set_state(body, PhysicsServer::BODY_STATE_TRANSFORM, e.transform);
 
-		_prop_instace->collider_add(e.transform, e.shape, e.shape->get_rid(), body);
+		_prop_instace->collider_add(e.transform, e.shape, e.shape->get_rid(), body, e.owns_shape);
 	}
 
 #if TOOLS_ENABLED
@@ -322,7 +323,8 @@ void PropInstancePropJob::phase_prop() {
 			PTWEntry &e = _prop_tiled_wall_datas.write[i];
 
 			Ref<PropDataTiledWall> pdtw = e.data;
-			Transform t = pdtw->get_transform();
+			//Transform t = pdtw->get_transform();
+			Transform t = e.base_transform;
 
 			_prop_mesher->add_tiled_wall_simple(pdtw->get_width(), pdtw->get_heigth(), t, pdtw->get_data(), _material_cache);
 		}
