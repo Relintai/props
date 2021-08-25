@@ -542,13 +542,13 @@ void PropInstanceMerger::_build() {
 
 	Ref<PropMaterialCache> cache = PropCache::get_singleton()->material_cache_get(_prop_data);
 
-	if (!cache->get_initialized()) {
+	if (cache->material_get_num() == 0) {
 		//lock it!
 		cache->mutex_lock();
 
 		//check again, this thread might have gotten here after an another one already did the initialization!
 		//this check might not be needed here
-		if (!cache->get_initialized()) {
+		if (cache->material_get_num() == 0) {
 			//this will set up materials, and settings
 			//needs to be called from the main thread!
 			cache->initial_setup_default();
