@@ -69,7 +69,7 @@ bool TiledWall::get_collision() const {
 void TiledWall::set_collision(const int value) {
 	_collision = value;
 
-/*
+	/*
 	if (!is_inside_tree()) {
 		return;
 	}
@@ -79,6 +79,30 @@ void TiledWall::set_collision(const int value) {
 	} else {
 		free_colliders();
 	}*/
+}
+
+uint32_t TiledWall::get_collision_layer() const {
+	return _collision_layer;
+}
+
+void TiledWall::set_collision_layer(uint32_t p_layer) {
+	_collision_layer = p_layer;
+
+	if (_physics_body_rid != RID()) {
+		PhysicsServer::get_singleton()->area_set_collision_layer(_physics_body_rid, p_layer);
+	}
+}
+
+uint32_t TiledWall::get_collision_mask() const {
+	return _collision_mask;
+}
+
+void TiledWall::set_collision_mask(uint32_t p_mask) {
+	_collision_mask = p_mask;
+
+	if (_physics_body_rid != RID()) {
+		PhysicsServer::get_singleton()->area_set_collision_mask(_physics_body_rid, p_mask);
+	}
 }
 
 AABB TiledWall::get_aabb() const {
@@ -121,7 +145,7 @@ void TiledWall::refresh() {
 	}
 
 	clear_mesh();
-/*
+	/*
 	if (_physics_shape_rid != RID()) {
 		PhysicsServer::get_singleton()->shape_set_data(_physics_shape_rid, Vector3(_width / 2.0, _height / 2.0, 0.01));
 
@@ -177,7 +201,7 @@ void TiledWall::generate_mesh() {
 	if (!_cache.is_valid()) {
 		return;
 	}
-/*
+	/*
 	if (_physics_shape_rid != RID()) {
 		PhysicsServer::get_singleton()->shape_set_data(_physics_shape_rid, Vector3(_width / 2.0, _height / 2.0, 0.01));
 
@@ -249,8 +273,8 @@ void TiledWall::create_colliders() {
 	PhysicsServer::get_singleton()->shape_set_data(_physics_shape_rid, Vector3(_width / 2.0, _height / 2.0, 0.01));
 
 	//todo layer mask
-	PhysicsServer::get_singleton()->body_set_collision_layer(_physics_body_rid, 1);
-	PhysicsServer::get_singleton()->body_set_collision_mask(_physics_body_rid, 1);
+	PhysicsServer::get_singleton()->body_set_collision_layer(_physics_body_rid, _collision_layer);
+	PhysicsServer::get_singleton()->body_set_collision_mask(_physics_body_rid, _collision_mask);
 
 	PhysicsServer::get_singleton()->body_add_shape(_physics_body_rid, _physics_shape_rid);
 
@@ -280,6 +304,8 @@ TiledWall::TiledWall() {
 	_width = 1;
 	_height = 1;
 	_collision = true;
+	_collision_layer = 1;
+	_collision_mask = 1;
 
 	//temporary
 	set_portal_mode(PORTAL_MODE_GLOBAL);
@@ -312,7 +338,7 @@ void TiledWall::_notification(int p_what) {
 
 			break;
 		}
-	//	case NOTIFICATION_TRANSFORM_CHANGED: {
+			//	case NOTIFICATION_TRANSFORM_CHANGED: {
 			/*
 			if (_physics_body_rid != RID()) {
 				Transform t = get_global_transform();
@@ -321,8 +347,8 @@ void TiledWall::_notification(int p_what) {
 				PhysicsServer::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer::BODY_STATE_TRANSFORM, t);
 			}
 */
-		//	break;
-	//	}
+			//	break;
+			//	}
 	}
 }
 
@@ -342,6 +368,16 @@ void TiledWall::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_collision"), &TiledWall::get_collision);
 	ClassDB::bind_method(D_METHOD("set_collision", "value"), &TiledWall::set_collision);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "collision"), "set_collision", "get_collision");
+
+	ClassDB::bind_method(D_METHOD("get_collision_layer"), &TiledWall::get_collision_layer);
+	ClassDB::bind_method(D_METHOD("set_collision_layer", "value"), &TiledWall::set_collision_layer);
+
+	ClassDB::bind_method(D_METHOD("get_collision_mask"), &TiledWall::get_collision_mask);
+	ClassDB::bind_method(D_METHOD("set_collision_mask", "value"), &TiledWall::set_collision_mask);
+
+	ADD_GROUP("Collision", "collision_");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "collision_layer", PROPERTY_HINT_LAYERS_3D_PHYSICS), "set_collision_layer", "get_collision_layer");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "collision_mask", PROPERTY_HINT_LAYERS_3D_PHYSICS), "set_collision_mask", "get_collision_mask");
 
 	ClassDB::bind_method(D_METHOD("refresh"), &TiledWall::refresh);
 	ClassDB::bind_method(D_METHOD("generate_mesh"), &TiledWall::generate_mesh);

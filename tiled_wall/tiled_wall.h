@@ -58,7 +58,11 @@ public:
 	bool get_collision() const;
 	void set_collision(const int value);
 
-	//todo collision layers
+	uint32_t get_collision_layer() const;
+	void set_collision_layer(uint32_t p_layer);
+
+	uint32_t get_collision_mask() const;
+	void set_collision_mask(uint32_t p_mask);
 
 	AABB get_aabb() const;
 	PoolVector<Face3> get_faces(uint32_t p_usage_flags) const;
@@ -82,6 +86,9 @@ private:
 	int _width;
 	int _height;
 	bool _collision;
+
+	uint32_t _collision_layer;
+	uint32_t _collision_mask;
 
 	Ref<TiledWallData> _data;
 	Ref<PropMaterialCache> _cache;
