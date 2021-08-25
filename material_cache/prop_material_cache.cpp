@@ -282,6 +282,8 @@ void PropMaterialCache::refresh_rects() {
 }
 
 void PropMaterialCache::initial_setup_default() {
+	//Note: call only on the main thread! Shader->duplicate() can crash if done from an another thread!
+
 	PropCache *pc = PropCache::get_singleton();
 
 	pc->ensure_materials_loaded();

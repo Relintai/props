@@ -533,6 +533,21 @@ void PropInstanceMerger::_build() {
 
 	Ref<PropMaterialCache> cache = PropCache::get_singleton()->material_cache_get(_prop_data);
 
+	if (!cache->get_initialized()) {
+		//lock it!
+		cache->mutex_lock();
+
+		//check again, this thread might have gotten here after an another one already did the initialization!
+		//this check might not be needed here
+		if (!cache->get_initialized()) {
+			//this will set up materials, and settings
+			//needs to be called from the main thread!
+			cache->initial_setup_default();
+		}
+
+		cache->mutex_unlock();
+	}
+
 	_job->set_material_cache(cache);
 
 	prop_preprocess(Transform(), _prop_data);
@@ -588,7 +603,6 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 		Ref<PropDataTiledWall> tiled_wall_data = e;
 
 		if (tiled_wall_data.is_valid()) {
-
 			_job->add_tiled_wall(tiled_wall_data, t);
 
 			if (tiled_wall_data->get_collision()) {

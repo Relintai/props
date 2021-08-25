@@ -170,13 +170,9 @@ void PropCache::materials_load() {
 }
 
 void PropCache::ensure_materials_loaded() {
-	_material_mutex.lock();
-
 	if (_materials.size() != _material_paths.size()) {
 		materials_load();
 	}
-
-	_material_mutex.unlock();
 }
 
 Vector<Variant> PropCache::materials_get() {

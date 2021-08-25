@@ -267,7 +267,9 @@ void PropInstancePropJob::phase_setup_cache() {
 			//check again, this thread might have gotten here after an another one already did the initialization!
 			if (!_material_cache->get_initialized()) {
 				//this will set up materials, and settings
-				_material_cache->initial_setup_default();
+				//Can only be called from the main thread!
+				//Merger calls this
+				//_material_cache->initial_setup_default();
 
 				_material_cache->prop_add_textures(_prop_instace->get_prop_data());
 
