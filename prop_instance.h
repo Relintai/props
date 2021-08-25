@@ -49,6 +49,15 @@ public:
 	Ref<Material> get_material();
 	void set_material(const Ref<Material> &material);
 
+	void set_collision_layer(uint32_t p_layer);
+	uint32_t get_collision_layer() const;
+
+	void set_collision_mask(uint32_t p_mask);
+	uint32_t get_collision_mask() const;
+
+	virtual void collision_layer_changed();
+	virtual void collision_mask_changed();
+
 	void init_materials();
 	virtual void _init_materials();
 
@@ -72,6 +81,9 @@ protected:
 protected:
 	Ref<PropData> _prop_data;
 	Ref<Material> _material;
+
+	uint32_t _collision_layer;
+	uint32_t _collision_mask;
 
 	bool _build_queued;
 	bool _building;

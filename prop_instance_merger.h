@@ -122,6 +122,9 @@ public:
 
 	void _prop_preprocess(Transform tarnsform, const Ref<PropData> &prop);
 
+	void collision_layer_changed();
+	void collision_mask_changed();
+
 	PropInstanceMerger();
 	~PropInstanceMerger();
 

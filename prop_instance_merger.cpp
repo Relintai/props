@@ -694,6 +694,25 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 	}
 }
 
+void PropInstanceMerger::collision_layer_changed() {
+	for (int i = 0; i < _colliders.size(); ++i) {
+		const ColliderBody &c = _colliders[i];
+
+		if (c.body != RID()) {
+			PhysicsServer::get_singleton()->body_set_collision_layer(c.body, _collision_layer);
+		}
+	}
+}
+void PropInstanceMerger::collision_mask_changed() {
+	for (int i = 0; i < _colliders.size(); ++i) {
+		const ColliderBody &c = _colliders[i];
+
+		if (c.body != RID()) {
+			PhysicsServer::get_singleton()->body_set_collision_mask(c.body, _collision_mask);
+		}
+	}
+}
+
 PropInstanceMerger::PropInstanceMerger() {
 	_build_queued = false;
 	_auto_lod = true;

@@ -51,6 +51,32 @@ void PropInstance::set_material(const Ref<Material> &material) {
 	_material = material;
 }
 
+void PropInstance::set_collision_layer(uint32_t p_layer) {
+	_collision_layer = p_layer;
+
+	collision_layer_changed();
+}
+
+uint32_t PropInstance::get_collision_layer() const {
+	return _collision_layer;
+}
+
+void PropInstance::set_collision_mask(uint32_t p_mask) {
+	_collision_mask = p_mask;
+
+	collision_mask_changed();
+}
+
+uint32_t PropInstance::get_collision_mask() const {
+	return _collision_mask;
+}
+
+void PropInstance::collision_layer_changed() {
+}
+
+void PropInstance::collision_mask_changed() {
+}
+
 void PropInstance::init_materials() {
 	call("_init_materials");
 }
@@ -228,6 +254,9 @@ void PropInstance::_prop_preprocess(Transform transform, const Ref<PropData> &pr
 PropInstance::PropInstance() {
 	_build_queued = false;
 	_building = false;
+
+	_collision_layer = 1;
+	_collision_mask = 1;
 }
 
 PropInstance::~PropInstance() {
@@ -254,6 +283,16 @@ void PropInstance::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_material"), &PropInstance::get_material);
 	ClassDB::bind_method(D_METHOD("set_material", "material"), &PropInstance::set_material);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_material", "get_material");
+
+	ClassDB::bind_method(D_METHOD("get_collision_layer"), &PropInstance::get_collision_layer);
+	ClassDB::bind_method(D_METHOD("set_collision_layer", "layer"), &PropInstance::set_collision_layer);
+
+	ClassDB::bind_method(D_METHOD("get_collision_mask"), &PropInstance::get_collision_mask);
+	ClassDB::bind_method(D_METHOD("set_collision_mask", "layer"), &PropInstance::set_collision_mask);
+
+	ADD_GROUP("Collision", "collision_");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "collision_layer", PROPERTY_HINT_LAYERS_3D_PHYSICS), "set_collision_layer", "get_collision_layer");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "collision_mask", PROPERTY_HINT_LAYERS_3D_PHYSICS), "set_collision_mask", "get_collision_mask");
 
 	BIND_VMETHOD(MethodInfo("_prop_preprocess",
 			PropertyInfo(Variant::TRANSFORM, "tarnsform"),

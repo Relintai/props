@@ -234,8 +234,8 @@ void PropInstancePropJob::phase_physics_process() {
 		PhysicsServer::get_singleton()->body_add_shape(body, e.shape->get_rid());
 
 		//TODO store the layer mask somewhere
-		PhysicsServer::get_singleton()->body_set_collision_layer(body, 1);
-		PhysicsServer::get_singleton()->body_set_collision_mask(body, 1);
+		PhysicsServer::get_singleton()->body_set_collision_layer(body, _prop_instace->get_collision_layer());
+		PhysicsServer::get_singleton()->body_set_collision_mask(body, _prop_instace->get_collision_mask());
 
 		if (_prop_instace->is_inside_tree() && _prop_instace->is_inside_world()) {
 			Ref<World> world = _prop_instace->GET_WORLD();
