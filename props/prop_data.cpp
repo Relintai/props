@@ -137,6 +137,9 @@ void PropData::copy_from(const Ref<PropData> &prop_data) {
 		_props.push_back(prop_data->_props[i]);
 	}
 
+	_is_room = prop_data->_is_room;
+	_room_bounds = prop_data->_room_bounds;
+
 	emit_changed();
 }
 
