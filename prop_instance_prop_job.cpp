@@ -169,7 +169,7 @@ void PropInstancePropJob::_execute_phase() {
 	}
 
 #ifdef MESH_DATA_RESOURCE_PRESENT
-	if (_prop_mesh_datas.size() == 0) {
+	if (_prop_mesh_datas.size() == 0 && _prop_tiled_wall_datas.size() == 0) {
 		//reset_meshes();
 		set_complete(true);
 		finished();
@@ -296,7 +296,7 @@ void PropInstancePropJob::phase_prop() {
 	}
 
 	if (should_do()) {
-		if (_prop_mesh_datas.size() == 0) {
+		if (_prop_mesh_datas.size() == 0 && _prop_tiled_wall_datas.size() == 0) {
 			//reset_meshes();
 			reset_stages();
 			set_complete(true); //So threadpool knows it's done
