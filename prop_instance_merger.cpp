@@ -539,6 +539,7 @@ void PropInstanceMerger::_build() {
 	}
 
 	_job->reset();
+	_job->set_complete(false);
 
 	Ref<PropMaterialCache> cache = PropCache::get_singleton()->material_cache_get(_prop_data);
 
