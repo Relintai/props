@@ -36,10 +36,13 @@ SOFTWARE.
 #include "props/prop_data.h"
 #include "props/prop_data_entry.h"
 #include "props/prop_data_light.h"
-#include "props/prop_data_portal.h"
 #include "props/prop_data_prop.h"
 #include "props/prop_data_scene.h"
 #include "props/prop_data_tiled_wall.h"
+
+#if VERSION_MINOR >= 4
+#include "props/prop_data_portal.h"
+#endif
 
 #include "clutter/ground_clutter.h"
 #include "clutter/ground_clutter_foliage.h"
@@ -85,8 +88,11 @@ void register_props_types() {
 	ClassDB::register_class<PropDataScene>();
 	ClassDB::register_class<PropDataLight>();
 	ClassDB::register_class<PropDataProp>();
-	ClassDB::register_class<PropDataPortal>();
 	ClassDB::register_class<PropDataTiledWall>();
+
+#if VERSION_MINOR >= 4
+	ClassDB::register_class<PropDataPortal>();
+#endif
 
 	ClassDB::register_class<GroundClutter>();
 	ClassDB::register_class<GroundClutterFoliage>();
@@ -129,8 +135,10 @@ void register_props_types() {
 	Ref<PropDataScene> scene_processor = Ref<PropDataScene>(memnew(PropDataScene));
 	PropUtils::add_processor(scene_processor);
 
+#if VERSION_MINOR >= 4
 	Ref<PropDataPortal> portal_processor = Ref<PropDataPortal>(memnew(PropDataPortal));
 	PropUtils::add_processor(portal_processor);
+#endif
 
 	Ref<PropDataTiledWall> tiled_wall_processor = Ref<PropDataTiledWall>(memnew(PropDataTiledWall));
 	PropUtils::add_processor(tiled_wall_processor);

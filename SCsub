@@ -4,6 +4,8 @@ Import('env')
 
 module_env = env.Clone()
 
+import version
+
 if os.path.isdir('../mesh_data_resource'):
     module_env.Append(CPPDEFINES=['MESH_DATA_RESOURCE_PRESENT'])
 
@@ -37,7 +39,6 @@ sources = [
     "props/prop_data_scene.cpp",
     "props/prop_data_light.cpp",
     "props/prop_data_prop.cpp",
-    "props/prop_data_portal.cpp",
     "props/prop_data_tiled_wall.cpp",
 
     "clutter/ground_clutter.cpp",
@@ -64,6 +65,9 @@ sources = [
 
     "material_cache/prop_material_cache.cpp"
 ]
+
+if version.minor >= 4:
+    sources.append("props/prop_data_portal.cpp")
 
 if has_texture_packer:
     sources.append("material_cache/prop_material_cache_pcm.cpp")

@@ -82,6 +82,7 @@ void PropEditorPlugin::convert_scene(Node *root, const String &path) {
 }
 
 void PropEditorPlugin::find_room_points(Variant param) {
+#if VERSION_MINOR >= 4
 	SceneTree *st = SceneTree::get_singleton();
 
 	if (st) {
@@ -91,6 +92,7 @@ void PropEditorPlugin::find_room_points(Variant param) {
 			PropUtils::get_singleton()->generate_room_points_node(scene);
 		}
 	}
+#endif
 }
 
 void PropEditorPlugin::_quick_convert_button_pressed() {
@@ -110,7 +112,9 @@ PropEditorPlugin::PropEditorPlugin(EditorNode *p_node) {
 #if VERSION_MAJOR < 4
 	editor->add_tool_menu_item("Convert active scene to PropData", this, "convert_active_scene_to_prop_data");
 	editor->add_tool_menu_item("Convert selected scene(s) to PropData", this, "convert_selected_scene_to_prop_data");
+#if VERSION_MINOR >= 4
 	editor->add_tool_menu_item("(Prop) Find room points.", this, "find_room_points");
+#endif
 #else
 #endif
 
