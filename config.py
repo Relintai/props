@@ -33,6 +33,18 @@ def get_doc_classes():
         "PropSceneInstance",
 
         "PropUtils",
+
+        "PropInstanceMerger",
+        "PropCache",
+        "PropInstanceJob",
+        "PropInstanceMerger",
+        "PropInstancePropJob",
+        "PropMaterialCache",
+        "PropMaterialCachePCM",
+        "PropMesher",
+        "PropMesherJobStep",
+        "PropTextureJob",
+        "PropLight",
     ]
 
 def get_doc_path():
