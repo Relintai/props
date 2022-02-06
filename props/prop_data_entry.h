@@ -27,11 +27,15 @@ SOFTWARE.
 
 #if VERSION_MAJOR > 3
 #include "core/io/resource.h"
+#include "core/math/transform_3d.h"
+
+#ifndef Transform 
+#define Transform Transform3D
+#endif
 #else
 #include "core/resource.h"
-#endif
-
 #include "core/math/transform.h"
+#endif
 
 class PropData;
 class PropMesher;
