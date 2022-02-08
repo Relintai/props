@@ -57,7 +57,7 @@ using PoolVector = Vector<N>;
 #endif
 
 #ifdef TERRAMAN_PRESENT
-#include "../terraman/data/terra_light.h"
+#include "../terraman/data/terrain_light.h"
 #endif
 
 class OpenSimplexNoise;
@@ -173,7 +173,7 @@ public:
 	void bake_colors_lights();
 
 #ifdef TERRAMAN_PRESENT
-	void bake_lights(MeshInstance *node, Vector<Ref<TerraLight>> &lights);
+	void bake_lights(MeshInstance *node, Vector<Ref<TerrainLight>> &lights);
 #endif
 
 	Array build_mesh();

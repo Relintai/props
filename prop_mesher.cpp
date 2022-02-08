@@ -1001,7 +1001,7 @@ void PropMesher::bake_colors_lights() {
 }
 
 #ifdef TERRAMAN_PRESENT
-void PropMesher::bake_lights(MeshInstance *node, Vector<Ref<TerraLight>> &lights) {
+void PropMesher::bake_lights(MeshInstance *node, Vector<Ref<TerrainLight>> &lights) {
 	ERR_FAIL_COND(node == NULL);
 
 	Color darkColor(0, 0, 0, 1);
@@ -1018,7 +1018,7 @@ void PropMesher::bake_lights(MeshInstance *node, Vector<Ref<TerraLight>> &lights
 
 		//calculate the lights value
 		for (int i = 0; i < lights.size(); ++i) {
-			Ref<TerraLight> light = lights.get(i);
+			Ref<TerrainLight> light = lights.get(i);
 
 			Vector3 lightDir = light->get_world_position() - vertex;
 
