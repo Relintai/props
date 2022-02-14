@@ -123,6 +123,10 @@ Ref<PropInstanceJob> PropInstanceMerger::get_job() {
 }
 void PropInstanceMerger::set_job(const Ref<PropInstanceJob> &job) {
 	_job = job;
+
+	if (is_inside_tree()) {
+		_job->prop_instance_enter_tree();
+	}
 }
 
 //Materials
@@ -540,6 +544,7 @@ void PropInstanceMerger::_build() {
 
 	_job->reset();
 	_job->set_complete(false);
+	_job->set_cancelled(false);
 
 	Ref<PropMaterialCache> cache = PropCache::get_singleton()->material_cache_get(_prop_data);
 
@@ -760,8 +765,11 @@ PropInstanceMerger::~PropInstanceMerger() {
 void PropInstanceMerger::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_ENTER_TREE: {
-			if (_prop_data.is_valid()) {
+			if (_job.is_valid()) {
 				_job->prop_instance_enter_tree();
+			}
+
+			if (_prop_data.is_valid()) {
 				call_deferred("build");
 			}
 
