@@ -125,6 +125,8 @@ public:
 	void collision_layer_changed();
 	void collision_mask_changed();
 
+	virtual void _create_job();
+
 	PropInstanceMerger();
 	~PropInstanceMerger();
 

@@ -719,23 +719,7 @@ void PropInstanceMerger::collision_mask_changed() {
 	}
 }
 
-PropInstanceMerger::PropInstanceMerger() {
-	_build_queued = false;
-	_auto_lod = true;
-	_auto_lod_on = false;
-	_lod_level = 0;
-
-	//randomize so even if there is a lot they won't check for this at the same frame
-	_lod_check_timer = Math::randf() * LOD_CHECK_INTERVAL;
-
-	set_building(false);
-
-	set_notify_transform(true);
-
-	_first_lod_distance_squared = 1000;
-	_lod_reduction_distance_squared = 600;
-
-	//todo this should probably be in a virtual method, like in Terraman or Voxelman
+void PropInstanceMerger::_create_job() {
 	_job = Ref<PropInstancePropJob>(memnew(PropInstancePropJob()));
 	_job->set_prop_instace(this);
 
@@ -754,6 +738,23 @@ PropInstanceMerger::PropInstanceMerger() {
 	_job->add_jobs_step(js);
 }
 
+PropInstanceMerger::PropInstanceMerger() {
+	_build_queued = false;
+	_auto_lod = true;
+	_auto_lod_on = false;
+	_lod_level = 0;
+
+	//randomize so even if there is a lot they won't check for this at the same frame
+	_lod_check_timer = Math::randf() * LOD_CHECK_INTERVAL;
+
+	set_building(false);
+
+	set_notify_transform(true);
+
+	_first_lod_distance_squared = 1000;
+	_lod_reduction_distance_squared = 600;
+}
+
 PropInstanceMerger::~PropInstanceMerger() {
 	_job.unref();
 
@@ -764,6 +765,9 @@ PropInstanceMerger::~PropInstanceMerger() {
 
 void PropInstanceMerger::_notification(int p_what) {
 	switch (p_what) {
+		case NOTIFICATION_POSTINITIALIZE: {
+			call("_create_job");
+		} break;
 		case NOTIFICATION_ENTER_TREE: {
 			if (_job.is_valid()) {
 				_job->prop_instance_enter_tree();
@@ -918,6 +922,9 @@ void PropInstanceMerger::_notification(int p_what) {
 }
 
 void PropInstanceMerger::_bind_methods() {
+	BIND_VMETHOD(MethodInfo("_create_job"));
+	ClassDB::bind_method(D_METHOD("_create_job"), &PropInstanceMerger::_create_job);
+
 	ClassDB::bind_method(D_METHOD("get_job"), &PropInstanceMerger::get_job);
 	ClassDB::bind_method(D_METHOD("set_job", "value"), &PropInstanceMerger::set_job);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "job", PROPERTY_HINT_RESOURCE_TYPE, "PropInstanceJob", 0), "set_job", "get_job");
