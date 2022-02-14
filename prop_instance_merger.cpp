@@ -124,7 +124,7 @@ Ref<PropInstanceJob> PropInstanceMerger::get_job() {
 void PropInstanceMerger::set_job(const Ref<PropInstanceJob> &job) {
 	_job = job;
 
-	if (is_inside_tree()) {
+	if (_job.is_valid() && is_inside_tree()) {
 		_job->prop_instance_enter_tree();
 	}
 }
