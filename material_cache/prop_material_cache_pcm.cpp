@@ -151,7 +151,7 @@ void PropMaterialCachePCM::_setup_material_albedo(Ref<Texture> texture) {
 
 		if (spmat.is_valid()) {
 			spmat->set_texture(SpatialMaterial::TEXTURE_ALBEDO, texture);
-			return;
+			continue;
 		}
 
 		Ref<ShaderMaterial> shmat = m;
