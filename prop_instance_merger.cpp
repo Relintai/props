@@ -761,6 +761,11 @@ PropInstanceMerger::~PropInstanceMerger() {
 	_prop_data.unref();
 
 	_materials.clear();
+
+	free_meshes();
+	free_colliders();
+	meshes_clear();
+	colliders_clear();
 }
 
 void PropInstanceMerger::_notification(int p_what) {
@@ -785,8 +790,13 @@ void PropInstanceMerger::_notification(int p_what) {
 				_job->set_cancelled(true);
 			}
 
-			free_meshes();
-			free_colliders();
+			if (!_building) {
+				free_meshes();
+				free_colliders();
+				meshes_clear();
+				colliders_clear();
+			}
+
 			break;
 		}
 		case NOTIFICATION_INTERNAL_PHYSICS_PROCESS: {
