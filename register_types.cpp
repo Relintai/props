@@ -24,11 +24,7 @@ SOFTWARE.
 
 #include "core/version.h"
 
-#if VERSION_MAJOR > 3
 #include "core/config/engine.h"
-#else
-#include "core/engine.h"
-#endif
 
 #include "tiled_wall/tiled_wall.h"
 #include "tiled_wall/tiled_wall_data.h"
@@ -77,83 +73,89 @@ SOFTWARE.
 static PropUtils *prop_utils = NULL;
 static PropCache *prop_texture_cache = NULL;
 
-void register_props_types() {
-	ClassDB::register_class<TiledWall>();
-	ClassDB::register_class<TiledWallData>();
+void initialize_props_module(ModuleInitializationLevel p_level) {
+	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
+		GDREGISTER_CLASS(TiledWall);
+		GDREGISTER_CLASS(TiledWallData);
 
-	ClassDB::register_class<PropLight>();
+		GDREGISTER_CLASS(PropLight);
 
-	ClassDB::register_class<PropData>();
-	ClassDB::register_class<PropDataEntry>();
-	ClassDB::register_class<PropDataScene>();
-	ClassDB::register_class<PropDataLight>();
-	ClassDB::register_class<PropDataProp>();
-	ClassDB::register_class<PropDataTiledWall>();
+		GDREGISTER_CLASS(PropData);
+		GDREGISTER_CLASS(PropDataEntry);
+		GDREGISTER_CLASS(PropDataScene);
+		GDREGISTER_CLASS(PropDataLight);
+		GDREGISTER_CLASS(PropDataProp);
+		GDREGISTER_CLASS(PropDataTiledWall);
 
 #if VERSION_MINOR >= 4
-	ClassDB::register_class<PropDataPortal>();
+		GDREGISTER_CLASS(PropDataPortal);
 #endif
 
-	ClassDB::register_class<GroundClutter>();
-	ClassDB::register_class<GroundClutterFoliage>();
+		GDREGISTER_CLASS(GroundClutter);
+		GDREGISTER_CLASS(GroundClutterFoliage);
 
-	ClassDB::register_class<PropMesher>();
-	ClassDB::register_class<PropMesherJobStep>();
+		GDREGISTER_CLASS(PropMesher);
+		GDREGISTER_CLASS(PropMesherJobStep);
 
-	ClassDB::register_class<PropInstance>();
-	ClassDB::register_class<PropInstanceMerger>();
+		GDREGISTER_CLASS(PropInstance);
+		GDREGISTER_CLASS(PropInstanceMerger);
 
-	ClassDB::register_class<PropESSEntity>();
+		GDREGISTER_CLASS(PropESSEntity);
 
-	ClassDB::register_class<PropInstanceJob>();
-	ClassDB::register_class<PropInstancePropJob>();
+		GDREGISTER_CLASS(PropInstanceJob);
+		GDREGISTER_CLASS(PropInstancePropJob);
 
-	ClassDB::register_class<PropTextureJob>();
+		GDREGISTER_CLASS(PropTextureJob);
 
-	ClassDB::register_class<PropSceneInstance>();
+		GDREGISTER_CLASS(PropSceneInstance);
 
-	ClassDB::register_class<PropMaterialCache>();
+		GDREGISTER_CLASS(PropMaterialCache);
 
 #ifdef TEXTURE_PACKER_PRESENT
-	ClassDB::register_class<PropMaterialCachePCM>();
+		GDREGISTER_CLASS(PropMaterialCachePCM);
 #endif
 
-	prop_utils = memnew(PropUtils);
-	ClassDB::register_class<PropUtils>();
-	Engine::get_singleton()->add_singleton(Engine::Singleton("PropUtils", PropUtils::get_singleton()));
+		prop_utils = memnew(PropUtils);
+		GDREGISTER_CLASS(PropUtils);
+		Engine::get_singleton()->add_singleton(Engine::Singleton("PropUtils", PropUtils::get_singleton()));
 
-	prop_texture_cache = memnew(PropCache);
-	ClassDB::register_class<PropCache>();
-	Engine::get_singleton()->add_singleton(Engine::Singleton("PropCache", PropCache::get_singleton()));
+		prop_texture_cache = memnew(PropCache);
+		GDREGISTER_CLASS(PropCache);
+		Engine::get_singleton()->add_singleton(Engine::Singleton("PropCache", PropCache::get_singleton()));
 
-	Ref<PropDataLight> light_processor = Ref<PropDataLight>(memnew(PropDataLight));
-	PropUtils::add_processor(light_processor);
+		Ref<PropDataLight> light_processor = Ref<PropDataLight>(memnew(PropDataLight));
+		PropUtils::add_processor(light_processor);
 
-	Ref<PropDataProp> prop_processor = Ref<PropDataProp>(memnew(PropDataProp));
-	PropUtils::add_processor(prop_processor);
+		Ref<PropDataProp> prop_processor = Ref<PropDataProp>(memnew(PropDataProp));
+		PropUtils::add_processor(prop_processor);
 
-	Ref<PropDataScene> scene_processor = Ref<PropDataScene>(memnew(PropDataScene));
-	PropUtils::add_processor(scene_processor);
+		Ref<PropDataScene> scene_processor = Ref<PropDataScene>(memnew(PropDataScene));
+		PropUtils::add_processor(scene_processor);
 
 #if VERSION_MINOR >= 4
-	Ref<PropDataPortal> portal_processor = Ref<PropDataPortal>(memnew(PropDataPortal));
-	PropUtils::add_processor(portal_processor);
+		Ref<PropDataPortal> portal_processor = Ref<PropDataPortal>(memnew(PropDataPortal));
+		PropUtils::add_processor(portal_processor);
 #endif
 
-	Ref<PropDataTiledWall> tiled_wall_processor = Ref<PropDataTiledWall>(memnew(PropDataTiledWall));
-	PropUtils::add_processor(tiled_wall_processor);
+		Ref<PropDataTiledWall> tiled_wall_processor = Ref<PropDataTiledWall>(memnew(PropDataTiledWall));
+		PropUtils::add_processor(tiled_wall_processor);
+	}
 
 #ifdef TOOLS_ENABLED
-	EditorPlugins::add_by_type<PropEditorPlugin>();
+	if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
+		EditorPlugins::add_by_type<PropEditorPlugin>();
+	}
 #endif
 }
 
-void unregister_props_types() {
-	if (prop_utils) {
-		memdelete(prop_utils);
-	}
+void uninitialize_props_module(ModuleInitializationLevel p_level) {
+	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
+		if (prop_utils) {
+			memdelete(prop_utils);
+		}
 
-	if (prop_texture_cache) {
-		memdelete(prop_texture_cache);
+		if (prop_texture_cache) {
+			memdelete(prop_texture_cache);
+		}
 	}
 }

@@ -23,7 +23,9 @@ SOFTWARE.
 #ifndef PROPS_REGISTER_TYPES_H
 #define PROPS_REGISTER_TYPES_H
 
-void register_props_types();
-void unregister_props_types();
+#include "modules/register_module_types.h"
+
+void initialize_props_module(ModuleInitializationLevel p_level);
+void uninitialize_props_module(ModuleInitializationLevel p_level);
 
 #endif
