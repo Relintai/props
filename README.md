@@ -4,8 +4,13 @@ This is a c++ engine module for the Godot Engine.
 
 It gives you props, and editor utilities to convert scenes to props.
 
-It supports both godot 3.2 and 4.0 (master [last tested commit](https://github.com/godotengine/godot/commit/b7e10141197fdd9b0dbc4cfa7890329510d36540)). Note that since 4.0 is still in very early stages I only 
-check whether it works from time to time.
+## Godot Version Support
+
+This branch tries to follow godot's master branch (as much as I have time).
+
+For different godot versions look at the other branches.
+
+Status for this branch: Update for 4.0 is work in progress.
 
 # Pre-built binaries
 
