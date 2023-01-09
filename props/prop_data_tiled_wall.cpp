@@ -67,7 +67,7 @@ void PropDataTiledWall::_processor_process(Ref<PropData> prop_data, Node *node, 
 	ERR_FAIL_COND(!t);
 
 	Ref<PropDataTiledWall> tw;
-	tw.instance();
+	tw.instantiate();
 
 	tw->set_width(t->get_width());
 	tw->set_heigth(t->get_heigth());

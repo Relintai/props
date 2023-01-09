@@ -58,7 +58,7 @@ void PropDataLight::_processor_process(Ref<PropData> prop_data, Node *node, cons
 	ERR_FAIL_COND(!i);
 
 	Ref<PropDataLight> l;
-	l.instance();
+	l.instantiate();
 	l->set_light_color(i->get_color());
 	l->set_light_size(i->get_param(Light::PARAM_RANGE));
 	l->set_transform(transform * i->get_transform());

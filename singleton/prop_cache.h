@@ -29,7 +29,7 @@ SOFTWARE.
 #include "core/core_bind.h"
 #include "core/math/color.h"
 #include "core/object/object.h"
-#include "core/object/reference.h"
+#include "core/object/ref_counted.h"
 #include "core/templates/hash_map.h"
 #include "core/templates/vector.h"
 #else

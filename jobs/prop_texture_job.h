@@ -32,7 +32,7 @@ SOFTWARE.
 #include "core/version.h"
 
 #if VERSION_MAJOR > 3
-#include "core/object/reference.h"
+#include "core/object/ref_counted.h"
 #define Texture Texture2D
 #else
 #include "core/reference.h"
@@ -46,8 +46,8 @@ class TexturePacker;
 class PropTextureJob : public ThreadPoolJob {
 	GDCLASS(PropTextureJob, ThreadPoolJob);
 #else
-class PropTextureJob : public Reference {
-	GDCLASS(PropTextureJob, Reference);
+class PropTextureJob : public RefCounted {
+	GDCLASS(PropTextureJob, RefCounted);
 #endif
 
 public:

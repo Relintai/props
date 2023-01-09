@@ -58,7 +58,7 @@ void PropDataScene::_processor_process(Ref<PropData> prop_data, Node *node, cons
 	ERR_FAIL_COND(!i);
 
 	Ref<PropDataScene> l;
-	l.instance();
+	l.instantiate();
 	l->set_scene(i->get_scene());
 	l->set_transform(transform * i->get_transform());
 	prop_data->add_prop(l);

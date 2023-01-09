@@ -34,7 +34,7 @@ SOFTWARE.
 #endif
 #else
 #include "core/resource.h"
-#include "core/math/transform.h"
+#include "core/math/transform_3d.h"
 #endif
 
 class PropData;

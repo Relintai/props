@@ -27,7 +27,7 @@ SOFTWARE.
 
 #if VERSION_MAJOR > 3
 #include "core/math/color.h"
-#include "core/object/reference.h"
+#include "core/object/ref_counted.h"
 #include "core/templates/vector.h"
 
 template <class N>
@@ -65,8 +65,8 @@ class PropLight;
 class PropMaterialCache;
 class TiledWallData;
 
-class PropMesher : public Reference {
-	GDCLASS(PropMesher, Reference);
+class PropMesher : public RefCounted {
+	GDCLASS(PropMesher, RefCounted);
 
 public:
 	static const String BINDING_STRING_BUILD_FLAGS;

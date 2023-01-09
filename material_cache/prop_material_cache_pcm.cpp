@@ -163,7 +163,7 @@ void PropMaterialCachePCM::_setup_material_albedo(Ref<Texture> texture) {
 }
 
 PropMaterialCachePCM::PropMaterialCachePCM() {
-	_packer.instance();
+	_packer.instantiate();
 
 #if GODOT4
 #warning implement

@@ -142,7 +142,7 @@ void PropCache::material_set(const int index, const Ref<Material> &value) {
 }
 
 void PropCache::material_remove(const int index) {
-	_materials.remove(index);
+	_materials.remove_at(index);
 }
 
 int PropCache::material_get_num() const {

@@ -294,7 +294,7 @@ TiledWall::TiledWall() {
 	set_portal_mode(PORTAL_MODE_GLOBAL);
 #endif
 
-	_mesher.instance();
+	_mesher.instantiate();
 }
 TiledWall::~TiledWall() {
 	_data.unref();

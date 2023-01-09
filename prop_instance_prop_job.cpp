@@ -533,13 +533,13 @@ void PropInstancePropJob::step_type_merge_verts() {
 
 void PropInstancePropJob::step_type_bake_texture() {
 	Ref<ShaderMaterial> mat = _material_cache->material_lod_get(0);
-	Ref<SpatialMaterial> spmat = _material_cache->material_lod_get(0);
+	Ref<StandardMaterial3D> spmat = _material_cache->material_lod_get(0);
 	Ref<Texture> tex;
 
 	if (mat.is_valid()) {
 		tex = mat->get_shader_param("texture_albedo");
 	} else if (spmat.is_valid()) {
-		tex = spmat->get_texture(SpatialMaterial::TEXTURE_ALBEDO);
+		tex = spmat->get_texture(StandardMaterial3D::TEXTURE_ALBEDO);
 	}
 
 	if (tex.is_valid()) {
@@ -725,7 +725,7 @@ PropInstancePropJob::PropInstancePropJob() {
 	_current_job_step = 0;
 
 	//todo allocate this in a virtual method
-	_prop_mesher.instance();
+	_prop_mesher.instantiate();
 	_prop_mesher->set_build_flags(PropMesher::BUILD_FLAG_USE_LIGHTING | PropMesher::BUILD_FLAG_USE_AO | PropMesher::BUILD_FLAG_USE_RAO | PropMesher::BUILD_FLAG_BAKE_LIGHTS);
 }
 

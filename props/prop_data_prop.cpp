@@ -66,7 +66,7 @@ void PropDataProp::_processor_process(Ref<PropData> prop_data, Node *node, const
 	ERR_FAIL_COND(!i);
 
 	Ref<PropDataProp> l;
-	l.instance();
+	l.instantiate();
 	l->set_prop(i->get_prop_data());
 	l->set_transform(transform * i->get_transform());
 	prop_data->add_prop(l);

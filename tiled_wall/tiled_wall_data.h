@@ -26,7 +26,7 @@ SOFTWARE.
 #include "core/version.h"
 
 #if VERSION_MAJOR > 3
-#include "core/object/reference.h"
+#include "core/object/ref_counted.h"
 #include "core/templates/vector.h"
 #else
 #include "core/reference.h"
@@ -34,7 +34,7 @@ SOFTWARE.
 #endif
 
 #include "core/math/rect2.h"
-#include "core/math/transform.h"
+#include "core/math/transform_3d.h"
 #include "core/math/vector2.h"
 #include "core/math/vector3.h"
 

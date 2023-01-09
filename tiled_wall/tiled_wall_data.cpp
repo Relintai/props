@@ -44,7 +44,7 @@ SOFTWARE.
 #define VARIANT_ARRAY_GET(arr)             \
 	Vector<Variant> r;                     \
 	for (int i = 0; i < arr.size(); i++) { \
-		r.push_back(arr[i].get_ref_ptr()); \
+		r.push_back(arr[i]); \
 	}                                      \
 	return r;
 
@@ -88,7 +88,7 @@ void TiledWallData::add_texture(const Ref<Texture> &texture) {
 void TiledWallData::remove_texture(const int index) {
 	ERR_FAIL_INDEX(index, _textures.size());
 
-	_textures.remove(index);
+	_textures.remove_at(index);
 
 	emit_changed();
 }
@@ -136,7 +136,7 @@ void TiledWallData::add_flavour_texture(const Ref<Texture> &texture) {
 void TiledWallData::remove_flavour_texture(const int index) {
 	ERR_FAIL_INDEX(index, _flavour_textures.size());
 
-	_flavour_textures.remove(index);
+	_flavour_textures.remove_at(index);
 
 	emit_changed();
 }
@@ -190,7 +190,7 @@ void TiledWallData::material_set(const int index, const Ref<Material> &value) {
 }
 
 void TiledWallData::material_remove(const int index) {
-	_materials.remove(index);
+	_materials.remove_at(index);
 
 	emit_changed();
 }
@@ -337,7 +337,7 @@ void TiledWallData::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("get_flavour_chance"), &TiledWallData::get_flavour_chance);
 	ClassDB::bind_method(D_METHOD("set_flavour_chance", "texture"), &TiledWallData::set_flavour_chance);
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "flavour_chance"), "set_flavour_chance", "get_flavour_chance");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "flavour_chance"), "set_flavour_chance", "get_flavour_chance");
 
 	//materials
 	ClassDB::bind_method(D_METHOD("material_add", "value"), &TiledWallData::material_add);
@@ -354,7 +354,7 @@ void TiledWallData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("add_textures_into", "texture_packer"), &TiledWallData::add_textures_into);
 #endif
 
-	BIND_VMETHOD(MethodInfo("_setup_cache", PropertyInfo(Variant::OBJECT, "cache", PROPERTY_HINT_RESOURCE_TYPE, "PropMaterialCache")));
+	//BIND_VMETHOD(MethodInfo("_setup_cache", PropertyInfo(Variant::OBJECT, "cache", PROPERTY_HINT_RESOURCE_TYPE, "PropMaterialCache")));
 
 	ClassDB::bind_method(D_METHOD("setup_cache", "cache"), &TiledWallData::setup_cache);
 	ClassDB::bind_method(D_METHOD("_setup_cache", "cache"), &TiledWallData::_setup_cache);

@@ -118,7 +118,7 @@ void PropMaterialCache::material_set(const int index, const Ref<Material> &value
 }
 
 void PropMaterialCache::material_remove(const int index) {
-	_materials.remove(index);
+	_materials.remove_at(index);
 }
 
 int PropMaterialCache::material_get_num() const {
@@ -149,7 +149,7 @@ void PropMaterialCache::texture_add(const Ref<Texture> &texture) {
 void PropMaterialCache::texture_remove(const Ref<Texture> &texture) {
 	for (int i = 0; i < _textures.size(); ++i) {
 		if (_textures[i] == texture) {
-			_textures.remove(i);
+			_textures.remove_at(i);
 			return;
 		}
 	}
@@ -157,7 +157,7 @@ void PropMaterialCache::texture_remove(const Ref<Texture> &texture) {
 void PropMaterialCache::texture_remove_index(const int index) {
 	ERR_FAIL_INDEX(index, _textures.size());
 
-	_textures.remove(index);
+	_textures.remove_at(index);
 }
 void PropMaterialCache::textures_clear() {
 	_textures.clear();
@@ -330,7 +330,7 @@ void PropMaterialCache::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("inc_ref_count"), &PropMaterialCache::inc_ref_count);
 	ClassDB::bind_method(D_METHOD("dec_ref_count"), &PropMaterialCache::dec_ref_count);
 
-	BIND_VMETHOD(MethodInfo("_setup_material_albedo", PropertyInfo(Variant::OBJECT, "texture", PROPERTY_HINT_RESOURCE_TYPE, "Texture")));
+	//BIND_VMETHOD(MethodInfo("_setup_material_albedo", PropertyInfo(Variant::OBJECT, "texture", PROPERTY_HINT_RESOURCE_TYPE, "Texture")));
 
 	ClassDB::bind_method(D_METHOD("material_get", "index"), &PropMaterialCache::material_get);
 	ClassDB::bind_method(D_METHOD("material_lod_get", "index"), &PropMaterialCache::material_lod_get);

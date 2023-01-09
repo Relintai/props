@@ -624,7 +624,7 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 
 			if (tiled_wall_data->get_collision()) {
 				Ref<BoxShape> tws;
-				tws.instance();
+				tws.instantiate();
 
 				float hew = tiled_wall_data->get_width() / 2.0;
 				float heh = tiled_wall_data->get_heigth() / 2.0;
@@ -668,7 +668,7 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 
 		if (light_data.is_valid()) {
 			Ref<PropLight> light;
-			light.instance();
+			light.instantiate();
 
 			Vector3 v = t.xform(Vector3());
 
@@ -725,15 +725,15 @@ void PropInstanceMerger::_create_job() {
 
 	Ref<PropMesherJobStep> js;
 
-	js.instance();
+	js.instantiate();
 	js->set_job_type(PropMesherJobStep::TYPE_NORMAL);
 	_job->add_jobs_step(js);
 
-	js.instance();
+	js.instantiate();
 	js->set_job_type(PropMesherJobStep::TYPE_MERGE_VERTS);
 	_job->add_jobs_step(js);
 
-	js.instance();
+	js.instantiate();
 	js->set_job_type(PropMesherJobStep::TYPE_BAKE_TEXTURE);
 	_job->add_jobs_step(js);
 }

@@ -26,7 +26,7 @@ SOFTWARE.
 #include "core/version.h"
 
 #if VERSION_MAJOR > 3
-#include "core/object/reference.h"
+#include "core/object/ref_counted.h"
 #include "core/templates/vector.h"
 #include "core/math/color.h"
 #else
@@ -35,8 +35,8 @@ SOFTWARE.
 #include "core/color.h"
 #endif
 
-class PropLight : public Reference {
-	GDCLASS(PropLight, Reference);
+class PropLight : public RefCounted {
+	GDCLASS(PropLight, RefCounted);
 
 public:
 	Vector3 get_position();

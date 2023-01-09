@@ -27,7 +27,7 @@ SOFTWARE.
 
 #if VERSION_MAJOR > 3
 #include "core/object/object.h"
-#include "core/object/reference.h"
+#include "core/object/ref_counted.h"
 #include "core/templates/vector.h"
 #include "scene/3d/node_3d.h"
 #else

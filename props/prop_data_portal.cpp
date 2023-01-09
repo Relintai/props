@@ -73,7 +73,7 @@ void PropDataPortal::_processor_process(Ref<PropData> prop_data, Node *node, con
 	ERR_FAIL_COND(!p);
 
 	Ref<PropDataPortal> l;
-	l.instance();
+	l.instantiate();
 	l->set_is_active(p->get_portal_active());
 	l->set_is_two_way(p->is_two_way());
 	l->set_use_default_margin(p->get_use_default_margin());

@@ -29,7 +29,7 @@ SOFTWARE.
 #if VERSION_MAJOR < 4
 #include "scene/3d/visual_instance.h"
 #else
-#include "scene/3d/node_3d.h"
+#include "scene/3d/visual_instance_3d.h"
 
 #define SpatialMaterial StandardMaterial3D
 #define Spatial Node3D
@@ -42,8 +42,8 @@ class TiledWallData;
 class PropMaterialCache;
 class PropMesher;
 
-class TiledWall : public GeometryInstance {
-	GDCLASS(TiledWall, GeometryInstance);
+class TiledWall : public GeometryInstance3D {
+	GDCLASS(TiledWall, GeometryInstance3D);
 
 public:
 	int get_width() const;

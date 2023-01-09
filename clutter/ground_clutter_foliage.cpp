@@ -33,7 +33,7 @@ Ref<Texture> GroundClutterFoliage::get_texture(const int index) {
 void GroundClutterFoliage::remove_texture(const int index) {
 	ERR_FAIL_INDEX(index, _textures.size());
 
-	_textures.remove(index);
+	_textures.remove_at(index);
 }
 void GroundClutterFoliage::add_texture(Ref<Texture> texture) {
 	_textures.push_back(texture);

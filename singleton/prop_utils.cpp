@@ -59,7 +59,7 @@ Ref<PropData> PropUtils::convert_tree(Node *root) {
 #endif
 
 	Ref<PropData> data;
-	data.instance();
+	data.instantiate();
 	Transform t;
 
 	_convert_tree(data, root, t);

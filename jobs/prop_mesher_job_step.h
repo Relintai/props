@@ -26,7 +26,7 @@ SOFTWARE.
 #include "core/version.h"
 
 #if VERSION_MAJOR > 3
-#include "core/io/reference.h"
+#include "core/object/ref_counted.h"
 #else
 #include "core/reference.h"
 #endif
@@ -35,8 +35,8 @@ SOFTWARE.
 #include "../../mesh_utils/fast_quadratic_mesh_simplifier.h"
 #endif
 
-class PropMesherJobStep : public Reference {
-	GDCLASS(PropMesherJobStep, Reference);
+class PropMesherJobStep : public RefCounted {
+	GDCLASS(PropMesherJobStep, RefCounted);
 
 public:
 	//todo add:
