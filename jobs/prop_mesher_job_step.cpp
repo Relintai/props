@@ -102,7 +102,7 @@ void PropMesherJobStep::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("get_simplification_step_ratio"), &PropMesherJobStep::get_simplification_step_ratio);
 	ClassDB::bind_method(D_METHOD("set_simplification_step_ratio", "value"), &PropMesherJobStep::set_simplification_step_ratio);
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "simplification_step_ratio"), "set_simplification_step_ratio", "get_simplification_step_ratio");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "simplification_step_ratio"), "set_simplification_step_ratio", "get_simplification_step_ratio");
 
 	ClassDB::bind_method(D_METHOD("get_simplification_steps"), &PropMesherJobStep::get_simplification_steps);
 	ClassDB::bind_method(D_METHOD("set_simplification_steps", "value"), &PropMesherJobStep::set_simplification_steps);
@@ -110,7 +110,7 @@ void PropMesherJobStep::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("get_simplification_agressiveness"), &PropMesherJobStep::get_simplification_agressiveness);
 	ClassDB::bind_method(D_METHOD("set_simplification_agressiveness", "value"), &PropMesherJobStep::set_simplification_agressiveness);
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "simplification_agressiveness"), "set_simplification_agressiveness", "get_simplification_agressiveness");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "simplification_agressiveness"), "set_simplification_agressiveness", "get_simplification_agressiveness");
 #endif
 
 	BIND_ENUM_CONSTANT(TYPE_NORMAL);

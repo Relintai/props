@@ -34,7 +34,9 @@ SOFTWARE.
 #include "scene/3d/room_manager.h"
 #endif
 
-#include "scene/3d/mesh_instance.h"
+#include "scene/3d/mesh_instance_3d.h"
+
+#include "scene/3d/node_3d.h"
 
 #if MESH_DATA_RESOURCE_PRESENT
 #include "../../mesh_data_resource/nodes/mesh_data_instance.h"
@@ -67,7 +69,7 @@ Ref<PropData> PropUtils::convert_tree(Node *root) {
 	return data;
 }
 
-void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transform &transform) {
+void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transform3D &transform) {
 #if VERSION_MAJOR < 4
 	ERR_FAIL_COND(!ObjectDB::instance_validate(node));
 #endif
@@ -88,7 +90,7 @@ void PropUtils::_convert_tree(Ref<PropData> prop_data, Node *node, const Transfo
 		}
 	}
 
-	Spatial *sp = Object::cast_to<Spatial>(node);
+	Node3D *sp = Object::cast_to<Node3D>(node);
 
 	if (!sp) {
 		//reset transform
@@ -485,7 +487,7 @@ void PropUtils::swap_processors(const int index1, const int index2) {
 void PropUtils::remove_processor(const int index) {
 	ERR_FAIL_INDEX(index, PropUtils::_processors.size());
 
-	PropUtils::_processors.remove(index);
+	PropUtils::_processors.remove_at(index);
 }
 int PropUtils::get_processor_count() {
 	return PropUtils::_processors.size();

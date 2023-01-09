@@ -50,13 +50,13 @@ Ref<TiledWallData> TiledWall::get_data() {
 }
 void TiledWall::set_data(const Ref<TiledWallData> &data) {
 	if (_data.is_valid()) {
-		_data->disconnect(CoreStringNames::get_singleton()->changed, this, "refresh");
+		_data->disconnect(CoreStringNames::get_singleton()->changed, Callable(this, "refresh"));
 	}
 
 	_data = data;
 
 	if (_data.is_valid()) {
-		_data->connect(CoreStringNames::get_singleton()->changed, this, "refresh");
+		_data->connect(CoreStringNames::get_singleton()->changed, Callable(this, "refresh"));
 	}
 
 	call_deferred("refresh");
@@ -88,7 +88,7 @@ void TiledWall::set_collision_layer(uint32_t p_layer) {
 	_collision_layer = p_layer;
 
 	if (_physics_body_rid != RID()) {
-		PhysicsServer::get_singleton()->area_set_collision_layer(_physics_body_rid, p_layer);
+		PhysicsServer3D::get_singleton()->area_set_collision_layer(_physics_body_rid, p_layer);
 	}
 }
 
@@ -100,7 +100,7 @@ void TiledWall::set_collision_mask(uint32_t p_mask) {
 	_collision_mask = p_mask;
 
 	if (_physics_body_rid != RID()) {
-		PhysicsServer::get_singleton()->area_set_collision_mask(_physics_body_rid, p_mask);
+		PhysicsServer3D::get_singleton()->area_set_collision_mask(_physics_body_rid, p_mask);
 	}
 }
 
@@ -108,22 +108,21 @@ AABB TiledWall::get_aabb() const {
 	return AABB();
 }
 
-PoolVector<Face3> TiledWall::get_faces(uint32_t p_usage_flags) const {
-	PoolVector<Face3> faces;
+Vector<Face3> TiledWall::get_faces(uint32_t p_usage_flags) const {
+	Vector<Face3> faces;
 
 	if (_mesh_array.size() != Mesh::ARRAY_MAX) {
 		return faces;
 	}
 
-	PoolVector<Vector3> vertices = _mesh_array[Mesh::ARRAY_VERTEX];
-	PoolVector<int> indices = _mesh_array[Mesh::ARRAY_INDEX];
+	Vector<Vector3> vertices = _mesh_array[Mesh::ARRAY_VERTEX];
+	Vector<int> indices = _mesh_array[Mesh::ARRAY_INDEX];
 
 	int ts = indices.size() / 3;
 	faces.resize(ts);
 
-	PoolVector<Face3>::Write w = faces.write();
-	PoolVector<Vector3>::Read rv = vertices.read();
-	PoolVector<int>::Read ri = indices.read();
+	Face3 *w = faces.ptrw();
+	const Vector3 *rv = vertices.ptr();
 
 	for (int i = 0; i < ts; i++) {
 		int im3 = (i * 3);
@@ -132,8 +131,6 @@ PoolVector<Face3> TiledWall::get_faces(uint32_t p_usage_flags) const {
 			w[i].vertex[j] = rv[indices[im3 + j]];
 		}
 	}
-
-	w.release();
 
 	return faces;
 }
@@ -158,9 +155,9 @@ void TiledWall::refresh() {
 	}
 
 	if (_mesh_rid == RID()) {
-		_mesh_rid = VisualServer::get_singleton()->mesh_create();
+		_mesh_rid = RenderingServer::get_singleton()->mesh_create();
 
-		VS::get_singleton()->instance_set_base(get_instance(), _mesh_rid);
+		RS::get_singleton()->instance_set_base(get_instance(), _mesh_rid);
 	}
 
 	Ref<PropMaterialCache> old_cache;
@@ -223,12 +220,12 @@ void TiledWall::generate_mesh() {
 		return;
 	}
 
-	VisualServer::get_singleton()->mesh_add_surface_from_arrays(_mesh_rid, VisualServer::PRIMITIVE_TRIANGLES, _mesh_array);
+	RenderingServer::get_singleton()->mesh_add_surface_from_arrays(_mesh_rid, RenderingServer::PRIMITIVE_TRIANGLES, _mesh_array);
 
 	Ref<Material> material = _cache->material_lod_get(0);
 
 	if (material.is_valid()) {
-		VisualServer::get_singleton()->mesh_surface_set_material(_mesh_rid, 0, material->get_rid());
+		RenderingServer::get_singleton()->mesh_surface_set_material(_mesh_rid, 0, material->get_rid());
 	}
 
 	_aabb.size = Vector3(_width, _height, 0);
@@ -240,19 +237,19 @@ void TiledWall::clear_mesh() {
 	_mesh_array.clear();
 
 	if (_mesh_rid != RID()) {
-		if (VS::get_singleton()->mesh_get_surface_count(_mesh_rid) > 0)
+		if (RS::get_singleton()->mesh_get_surface_count(_mesh_rid) > 0)
 #if VERSION_MAJOR < 4
 			VS::get_singleton()->mesh_remove_surface(_mesh_rid, 0);
 #else
-			VS::get_singleton()->mesh_clear(_mesh_rid);
+			RS::get_singleton()->mesh_clear(_mesh_rid);
 #endif
 	}
 }
 
 void TiledWall::free_mesh() {
 	if (_mesh_rid != RID()) {
-		VS::get_singleton()->instance_set_base(get_instance(), RID());
-		VS::get_singleton()->free(_mesh_rid);
+		RS::get_singleton()->instance_set_base(get_instance(), RID());
+		RS::get_singleton()->free(_mesh_rid);
 		_mesh_rid = RID();
 	}
 }
@@ -264,17 +261,17 @@ void TiledWall::create_colliders() {
 
 	free_colliders();
 
-	ERR_FAIL_COND(!get_world().is_valid() && get_world()->get_space() == RID());
+	ERR_FAIL_COND(!get_world_3d().is_valid() && get_world_3d()->get_space() == RID());
 
-	_physics_shape_rid = PhysicsServer::get_singleton()->shape_create(PhysicsServer::SHAPE_BOX);
+	_physics_shape_rid = PhysicsServer3D::get_singleton()->shape_create(PhysicsServer3D::SHAPE_BOX);
 
-	PhysicsServer::get_singleton()->shape_set_data(_physics_shape_rid, Vector3(_width / 2.0, _height / 2.0, 0.01));
-	PhysicsServer::get_singleton()->body_add_shape(_physics_body_rid, _physics_shape_rid);
+	PhysicsServer3D::get_singleton()->shape_set_data(_physics_shape_rid, Vector3(_width / 2.0, _height / 2.0, 0.01));
+	PhysicsServer3D::get_singleton()->body_add_shape(_physics_body_rid, _physics_shape_rid);
 }
 
 void TiledWall::free_colliders() {
 	if (_physics_shape_rid != RID()) {
-		PhysicsServer::get_singleton()->free(_physics_shape_rid);
+		PhysicsServer3D::get_singleton()->free(_physics_shape_rid);
 
 		_physics_shape_rid = RID();
 	}
@@ -287,7 +284,8 @@ TiledWall::TiledWall() {
 	_collision_layer = 1;
 	_collision_mask = 1;
 
-	_physics_body_rid = PhysicsServer::get_singleton()->body_create(PhysicsServer::BODY_MODE_STATIC);
+	_physics_body_rid = PhysicsServer3D::get_singleton()->body_create();
+	PhysicsServer3D::get_singleton()->body_set_mode(_physics_body_rid, PhysicsServer3D::BODY_MODE_STATIC);
 
 #if VERSION_MINOR >= 4
 	//temporary
@@ -301,7 +299,7 @@ TiledWall::~TiledWall() {
 	_cache.unref();
 	_mesher.unref();
 
-	PhysicsServer::get_singleton()->free(_physics_body_rid);
+	PhysicsServer3D::get_singleton()->free(_physics_body_rid);
 
 	_physics_body_rid = RID();
 
@@ -313,27 +311,27 @@ void TiledWall::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_ENTER_WORLD: {
 			Transform t = get_global_transform();
-			t.translate(Vector3(_width / 2.0, _height / 2.0, 0));
+			t.translate_local(Vector3(_width / 2.0, _height / 2.0, 0));
 
-			PhysicsServer::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer::BODY_STATE_TRANSFORM, t);
+			PhysicsServer3D::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer3D::BODY_STATE_TRANSFORM, t);
 
-			RID space = get_world()->get_space();
-			PhysicsServer::get_singleton()->body_set_space(_physics_body_rid, space);
+			RID space = get_world_3d()->get_space();
+			PhysicsServer3D::get_singleton()->body_set_space(_physics_body_rid, space);
 
 			refresh();
 
 			break;
 		}
 		case NOTIFICATION_EXIT_WORLD: {
-			PhysicsServer::get_singleton()->body_set_space(_physics_body_rid, RID());
+			PhysicsServer3D::get_singleton()->body_set_space(_physics_body_rid, RID());
 			break;
 		}
 		case NOTIFICATION_TRANSFORM_CHANGED: {
 			if (_collision) {
 				Transform t = get_global_transform();
-				t.translate(Vector3(_width / 2.0, _height / 2.0, 0));
+				t.translate_local(Vector3(_width / 2.0, _height / 2.0, 0));
 
-				PhysicsServer::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer::BODY_STATE_TRANSFORM, t);
+				PhysicsServer3D::get_singleton()->body_set_state(_physics_body_rid, PhysicsServer3D::BODY_STATE_TRANSFORM, t);
 			}
 
 			break;

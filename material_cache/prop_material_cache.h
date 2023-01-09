@@ -68,15 +68,15 @@ public:
 	Vector<Variant> materials_get();
 	void materials_set(const Vector<Variant> &materials);
 
-	virtual void texture_add(const Ref<Texture> &texture);
-	virtual void texture_remove(const Ref<Texture> &texture);
+	virtual void texture_add(const Ref<Texture2D> &texture);
+	virtual void texture_remove(const Ref<Texture2D> &texture);
 	virtual void texture_remove_index(const int index);
 	virtual void textures_clear();
 	virtual int texture_count();
-	virtual Ref<Texture> texture_get(const int index);
+	virtual Ref<Texture2D> texture_get(const int index);
 	virtual Ref<AtlasTexture> texture_get_atlas(const int index);
-	virtual Ref<AtlasTexture> texture_get_atlas_tex(const Ref<Texture> &texture);
-	virtual Rect2 texture_get_uv_rect(const Ref<Texture> &texture);
+	virtual Ref<AtlasTexture> texture_get_atlas_tex(const Ref<Texture2D> &texture);
+	virtual Rect2 texture_get_uv_rect(const Ref<Texture2D> &texture);
 
 	void prop_add_textures(const Ref<PropData> &prop);
 	void prop_remove_textures(const Ref<PropData> &prop);
@@ -85,7 +85,7 @@ public:
 
 	virtual void initial_setup_default();
 
-	void setup_material_albedo(Ref<Texture> texture);
+	void setup_material_albedo(Ref<Texture2D> texture);
 
 	PropMaterialCache();
 	~PropMaterialCache();
@@ -97,7 +97,7 @@ protected:
 	bool _initialized;
 
 	Vector<Ref<Material>> _materials;
-	Vector<Ref<Texture>> _textures;
+	Vector<Ref<Texture2D>> _textures;
 
 	int _ref_count;
 

@@ -76,8 +76,8 @@ public:
 	void set_margin(const int margin);
 #endif
 
-	PoolStringArray material_paths_get() const;
-	void material_paths_set(const PoolStringArray &array);
+	PackedStringArray material_paths_get() const;
+	void material_paths_set(const PackedStringArray &array);
 
 	void material_add(const Ref<Material> &value);
 	Ref<Material> material_get(const int index);
@@ -114,9 +114,9 @@ protected:
 
 	StringName _default_prop_material_cache_class;
 
-	Map<uint64_t, Ref<PropMaterialCache>> _material_cache;
-	Map<uint64_t, Ref<PropMaterialCache>> _tiled_wall_material_cache;
-	Map<uint64_t, Ref<PropMaterialCache>> _custom_keyed_material_cache;
+	HashMap<uint64_t, Ref<PropMaterialCache>> _material_cache;
+	HashMap<uint64_t, Ref<PropMaterialCache>> _tiled_wall_material_cache;
+	HashMap<uint64_t, Ref<PropMaterialCache>> _custom_keyed_material_cache;
 
 	Mutex _material_cache_mutex;
 	Mutex _tiled_wall_material_cache_mutex;
@@ -130,7 +130,7 @@ protected:
 	int _margin;
 #endif
 
-	PoolStringArray _material_paths;
+	PackedStringArray _material_paths;
 	Vector<Ref<Material>> _materials;
 };
 

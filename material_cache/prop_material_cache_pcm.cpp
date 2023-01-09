@@ -61,14 +61,14 @@ void PropMaterialCachePCM::set_margin(const int margin) {
 	_packer->set_margin(margin);
 }
 
-Ref<AtlasTexture> PropMaterialCachePCM::texture_get_atlas_tex(const Ref<Texture> &texture) {
+Ref<AtlasTexture> PropMaterialCachePCM::texture_get_atlas_tex(const Ref<Texture2D> &texture) {
 	if (!_packer->contains_texture(texture)) {
 		return Ref<AtlasTexture>();
 	}
 
 	return _packer->get_texture(texture);
 }
-Rect2 PropMaterialCachePCM::texture_get_uv_rect(const Ref<Texture> &texture) {
+Rect2 PropMaterialCachePCM::texture_get_uv_rect(const Ref<Texture2D> &texture) {
 	if (!texture.is_valid()) {
 		return Rect2(0, 0, 1, 1);
 	}
@@ -81,13 +81,13 @@ Rect2 PropMaterialCachePCM::texture_get_uv_rect(const Ref<Texture> &texture) {
 
 	Rect2 region = at->get_region();
 
-	Ref<Texture> tex = at->get_atlas();
+	Ref<Texture2D> tex = at->get_atlas();
 
 	if (!tex.is_valid()) {
 		return Rect2(0, 0, 1, 1);
 	}
 
-	Ref<Image> image = tex->get_data();
+	Ref<Image> image = tex->get_image();
 
 	if (!image.is_valid()) {
 		return Rect2(0, 0, 1, 1);
@@ -106,7 +106,7 @@ void PropMaterialCachePCM::refresh_rects() {
 	bool texture_added = false;
 
 	for (int i = 0; i < _textures.size(); i++) {
-		Ref<Texture> tex = _textures.get(i);
+		Ref<Texture2D> tex = _textures.get(i);
 
 		ERR_CONTINUE(!tex.is_valid());
 
@@ -121,7 +121,7 @@ void PropMaterialCachePCM::refresh_rects() {
 
 		ERR_FAIL_COND(_packer->get_texture_count() == 0);
 
-		Ref<Texture> tex = _packer->get_generated_texture(0);
+		Ref<Texture2D> tex = _packer->get_generated_texture(0);
 
 		setup_material_albedo(tex);
 	}
@@ -141,7 +141,7 @@ void PropMaterialCachePCM::initial_setup_default() {
 	set_margin(pc->get_margin());
 }
 
-void PropMaterialCachePCM::_setup_material_albedo(Ref<Texture> texture) {
+void PropMaterialCachePCM::_setup_material_albedo(Ref<Texture2D> texture) {
 	int count = material_get_num();
 
 	for (int i = 0; i < count; ++i) {
@@ -157,7 +157,7 @@ void PropMaterialCachePCM::_setup_material_albedo(Ref<Texture> texture) {
 		Ref<ShaderMaterial> shmat = m;
 
 		if (shmat.is_valid()) {
-			shmat->set_shader_param("texture_albedo", texture);
+			shmat->set_shader_parameter("texture_albedo", texture);
 		}
 	}
 }

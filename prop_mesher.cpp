@@ -23,7 +23,7 @@ SOFTWARE.
 #include "prop_mesher.h"
 
 #include "lights/prop_light.h"
-#include "modules/opensimplex/open_simplex_noise.h"
+#include "modules/noise/fastnoise_lite.h"
 
 #include "material_cache/prop_material_cache.h"
 #include "tiled_wall/tiled_wall_data.h"
@@ -155,15 +155,15 @@ _FORCE_INLINE_ void PropMesher::set_build_flags(const int flags) {
 	_build_flags = flags;
 
 	if ((_build_flags & PropMesher::BUILD_FLAG_USE_LIGHTING) != 0) {
-		_format |= VisualServer::ARRAY_FORMAT_COLOR;
+		_format |= RenderingServer::ARRAY_FORMAT_COLOR;
 	} else {
-		_format ^= VisualServer::ARRAY_FORMAT_COLOR;
+		_format ^= RenderingServer::ARRAY_FORMAT_COLOR;
 	}
 }
 
 Array PropMesher::build_mesh() {
 	Array a;
-	a.resize(VisualServer::ARRAY_MAX);
+	a.resize(RenderingServer::ARRAY_MAX);
 
 	if (_vertices.size() == 0) {
 		//Nothing to do
@@ -173,133 +173,70 @@ Array PropMesher::build_mesh() {
 	{
 		PoolVector<Vector3> array;
 		array.resize(_vertices.size());
-#if !GODOT4
-		PoolVector<Vector3>::Write w = array.write();
-#endif
 
 		for (int i = 0; i < _vertices.size(); ++i) {
-#if !GODOT4
-			w[i] = _vertices[i].vertex;
-#else
 			array.set(i, _vertices[i].vertex);
-#endif
 		}
 
-#if !GODOT4
-		w.release();
-#endif
-
-		a[VisualServer::ARRAY_VERTEX] = array;
+		a[RenderingServer::ARRAY_VERTEX] = array;
 	}
 
-	if ((_format & VisualServer::ARRAY_FORMAT_NORMAL) == 0) {
+	if ((_format & RenderingServer::ARRAY_FORMAT_NORMAL) == 0) {
 		generate_normals();
 	}
 
 	{
 		PoolVector<Vector3> array;
 		array.resize(_vertices.size());
-#if !GODOT4
-		PoolVector<Vector3>::Write w = array.write();
-#endif
-
 		for (int i = 0; i < _vertices.size(); ++i) {
-#if !GODOT4
-			w[i] = _vertices[i].normal;
-#else
 			array.set(i, _vertices[i].normal);
-#endif
 		}
 
-#if !GODOT4
-		w.release();
-#endif
-		a[VisualServer::ARRAY_NORMAL] = array;
+		a[RenderingServer::ARRAY_NORMAL] = array;
 	}
 
-	if ((_format & VisualServer::ARRAY_FORMAT_COLOR) != 0) {
+	if ((_format & RenderingServer::ARRAY_FORMAT_COLOR) != 0) {
 		PoolVector<Color> array;
 		array.resize(_vertices.size());
-#if !GODOT4
-		PoolVector<Color>::Write w = array.write();
-#endif
 
 		for (int i = 0; i < _vertices.size(); ++i) {
-#if !GODOT4
-			w[i] = _vertices[i].color;
-#else
 			array.set(i, _vertices[i].color);
-#endif
 		}
 
-#if !GODOT4
-		w.release();
-#endif
-		a[VisualServer::ARRAY_COLOR] = array;
+		a[RenderingServer::ARRAY_COLOR] = array;
 	}
 
-	if ((_format & VisualServer::ARRAY_FORMAT_TEX_UV) != 0) {
+	if ((_format & RenderingServer::ARRAY_FORMAT_TEX_UV) != 0) {
 		PoolVector<Vector2> array;
 		array.resize(_vertices.size());
-#if !GODOT4
-		PoolVector<Vector2>::Write w = array.write();
-#endif
 
 		for (int i = 0; i < _vertices.size(); ++i) {
-#if !GODOT4
-			w[i] = _vertices[i].uv;
-#else
 			array.set(i, _vertices[i].uv);
-#endif
 		}
 
-#if !GODOT4
-		w.release();
-#endif
-
-		a[VisualServer::ARRAY_TEX_UV] = array;
+		a[RenderingServer::ARRAY_TEX_UV] = array;
 	}
 
-	if ((_format & VisualServer::ARRAY_FORMAT_TEX_UV2) != 0) {
+	if ((_format & RenderingServer::ARRAY_FORMAT_TEX_UV2) != 0) {
 		PoolVector<Vector2> array;
 		array.resize(_vertices.size());
-#if !GODOT4
-		PoolVector<Vector2>::Write w = array.write();
-#endif
 
 		for (int i = 0; i < _vertices.size(); ++i) {
-#if !GODOT4
-			w[i] = _vertices[i].uv2;
-#else
 			array.set(i, _vertices[i].uv2);
-#endif
 		}
 
-#if !GODOT4
-		w.release();
-#endif
-		a[VisualServer::ARRAY_TEX_UV2] = array;
+		a[RenderingServer::ARRAY_TEX_UV2] = array;
 	}
 
 	if (_indices.size() > 0) {
 		PoolVector<int> array;
 		array.resize(_indices.size());
-#if !GODOT4
-		PoolVector<int>::Write w = array.write();
-#endif
 
 		for (int i = 0; i < _indices.size(); ++i) {
-#if !GODOT4
-			w[i] = _indices[i];
-#else
 			array.set(i, _indices[i]);
-#endif
 		}
 
-#if !GODOT4
-		w.release();
-#endif
-		a[VisualServer::ARRAY_INDEX] = array;
+		a[RenderingServer::ARRAY_INDEX] = array;
 	}
 
 	return a;
@@ -308,7 +245,7 @@ Array PropMesher::build_mesh() {
 void PropMesher::build_mesh_into(RID mesh) {
 	ERR_FAIL_COND(mesh == RID());
 
-	VS::get_singleton()->mesh_clear(mesh);
+	RS::get_singleton()->mesh_clear(mesh);
 
 	if (_vertices.size() == 0) {
 		//Nothing to do
@@ -317,14 +254,14 @@ void PropMesher::build_mesh_into(RID mesh) {
 
 	Array arr = build_mesh();
 
-	VS::get_singleton()->mesh_add_surface_from_arrays(mesh, VisualServer::PRIMITIVE_TRIANGLES, arr);
+	RS::get_singleton()->mesh_add_surface_from_arrays(mesh, RenderingServer::PRIMITIVE_TRIANGLES, arr);
 
 	if (_material.is_valid())
-		VS::get_singleton()->mesh_surface_set_material(mesh, 0, _material->get_rid());
+		RS::get_singleton()->mesh_surface_set_material(mesh, 0, _material->get_rid());
 }
 
 void PropMesher::generate_normals(bool p_flip) {
-	_format = _format | VisualServer::ARRAY_FORMAT_NORMAL;
+	_format = _format | RenderingServer::ARRAY_FORMAT_NORMAL;
 
 	for (int i = 0; i < _indices.size(); i += 3) {
 		int i0 = _indices[i];
@@ -426,7 +363,7 @@ void PropMesher::remove_doubles_hashed() {
 		for (int j = 0; j < indices.size(); ++j) {
 			int index = indices[j];
 
-			hashes.remove(index);
+			hashes.remove_at(index);
 			_vertices.remove_at(index);
 
 			//make all indices that were bigger than the one we replaced one lower
@@ -466,7 +403,7 @@ void PropMesher::reset() {
 	_last_tangent = Plane();
 }
 
-void PropMesher::add_tiled_wall_simple(const int width, const int height, const Transform &transform, const Ref<TiledWallData> &tiled_wall_data, Ref<PropMaterialCache> cache) {
+void PropMesher::add_tiled_wall_simple(const int width, const int height, const Transform3D &transform, const Ref<TiledWallData> &tiled_wall_data, Ref<PropMaterialCache> cache) {
 	ERR_FAIL_COND(!tiled_wall_data.is_valid());
 	ERR_FAIL_COND(!cache.is_valid());
 	ERR_FAIL_COND(width < 0);
@@ -610,7 +547,7 @@ void PropMesher::add_tiled_wall_simple(const int width, const int height, const 
 	}
 }
 
-void PropMesher::add_tiled_wall_mesh_rect_simple(const int x, const int y, const Transform &transform, const Rect2 &texture_rect) {
+void PropMesher::add_tiled_wall_mesh_rect_simple(const int x, const int y, const Transform3D &transform, const Rect2 &texture_rect) {
 	int vc = get_vertex_count();
 
 	//x + 1, y
@@ -703,7 +640,7 @@ void PropMesher::add_mesh_data_resource_transform(Ref<MeshDataResource> mesh, co
 	}
 }
 
-void PropMesher::add_mesh_data_resource_transform_colored(Ref<MeshDataResource> mesh, const Transform transform, const PoolColorArray &colors, const Rect2 uv_rect) {
+void PropMesher::add_mesh_data_resource_transform_colored(Ref<MeshDataResource> mesh, const Transform transform, const PackedColorArray &colors, const Rect2 uv_rect) {
 	if (mesh->get_array().size() == 0)
 		return;
 
@@ -1001,7 +938,7 @@ void PropMesher::bake_colors_lights() {
 }
 
 #ifdef TERRAMAN_PRESENT
-void PropMesher::bake_lights(MeshInstance *node, Vector<Ref<TerrainLight>> &lights) {
+void PropMesher::bake_lights(MeshInstance3D *node, Vector<Ref<TerrainLight>> &lights) {
 	ERR_FAIL_COND(node == NULL);
 
 	Color darkColor(0, 0, 0, 1);
@@ -1137,7 +1074,7 @@ Vector3 PropMesher::get_vertex(const int idx) const {
 }
 
 void PropMesher::remove_vertex(const int idx) {
-	_vertices.remove(idx);
+	_vertices.remove_at(idx);
 }
 
 PoolVector<Vector3> PropMesher::get_normals() const {
@@ -1285,7 +1222,7 @@ int PropMesher::get_index(const int idx) const {
 }
 
 void PropMesher::remove_index(const int idx) {
-	_indices.remove(idx);
+	_indices.remove_at(idx);
 }
 
 PropMesher::PropMesher() {
@@ -1301,13 +1238,13 @@ PropMesher::PropMesher() {
 
 	_build_flags = 0;
 
-	_format = VisualServer::ARRAY_FORMAT_NORMAL | VisualServer::ARRAY_FORMAT_TEX_UV;
+	_format = RenderingServer::ARRAY_FORMAT_NORMAL | RenderingServer::ARRAY_FORMAT_TEX_UV;
 
 	_noise.instantiate();
 	//todo add properties for these if needed
-	_noise->set_octaves(4);
-	_noise->set_period(30);
-	_noise->set_persistence(0.3);
+	_noise->set_fractal_octaves(4);
+	_noise->set_frequency(30);
+	_noise->set_fractal_lacunarity(0.3);
 
 	_rao_scale_factor = 0.6;
 	_rao_seed = 2134;
@@ -1343,15 +1280,15 @@ void PropMesher::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("get_voxel_scale"), &PropMesher::get_voxel_scale);
 	ClassDB::bind_method(D_METHOD("set_voxel_scale", "value"), &PropMesher::set_voxel_scale);
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "voxel_scale"), "set_voxel_scale", "get_voxel_scale");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "voxel_scale"), "set_voxel_scale", "get_voxel_scale");
 
 	ClassDB::bind_method(D_METHOD("get_ao_strength"), &PropMesher::get_ao_strength);
 	ClassDB::bind_method(D_METHOD("set_ao_strength", "value"), &PropMesher::set_ao_strength);
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "ao_strength"), "set_ao_strength", "get_ao_strength");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "ao_strength"), "set_ao_strength", "get_ao_strength");
 
 	ClassDB::bind_method(D_METHOD("get_base_light_value"), &PropMesher::get_base_light_value);
 	ClassDB::bind_method(D_METHOD("set_base_light_value", "value"), &PropMesher::set_base_light_value);
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "base_light_value"), "set_base_light_value", "get_base_light_value");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "base_light_value"), "set_base_light_value", "get_base_light_value");
 
 	ClassDB::bind_method(D_METHOD("get_uv_margin"), &PropMesher::get_uv_margin);
 	ClassDB::bind_method(D_METHOD("set_uv_margin", "value"), &PropMesher::set_uv_margin);
@@ -1374,7 +1311,7 @@ void PropMesher::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("generate_ao"), &PropMesher::generate_ao);
 	ClassDB::bind_method(D_METHOD("get_random_ao", "position"), &PropMesher::get_random_ao);
 
-	BIND_VMETHOD(MethodInfo("_add_mesher", PropertyInfo(Variant::OBJECT, "mesher", PROPERTY_HINT_RESOURCE_TYPE, "PropMesher")));
+	//BIND_VMETHOD(MethodInfo("_add_mesher", PropertyInfo(Variant::OBJECT, "mesher", PROPERTY_HINT_RESOURCE_TYPE, "PropMesher")));
 	ClassDB::bind_method(D_METHOD("add_mesher", "mesher"), &PropMesher::add_mesher);
 	ClassDB::bind_method(D_METHOD("_add_mesher", "mesher"), &PropMesher::_add_mesher);
 

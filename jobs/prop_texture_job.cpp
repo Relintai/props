@@ -96,7 +96,7 @@ void PropTextureJob::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("should_do", "just_check"), &PropTextureJob::should_do, DEFVAL(false));
 	ClassDB::bind_method(D_METHOD("should_return"), &PropTextureJob::should_return);
 
-	BIND_VMETHOD(MethodInfo("_execute"));
+	//BIND_VMETHOD(MethodInfo("_execute"));
 	ClassDB::bind_method(D_METHOD("execute"), &PropTextureJob::execute);
 
 	ADD_SIGNAL(MethodInfo("completed"));

@@ -25,6 +25,11 @@ SOFTWARE.
 #include "../props/prop_data.h"
 #include "../singleton/prop_utils.h"
 #include "core/os/keyboard.h"
+#include "scene/gui/box_container.h"
+#include "scene/gui/separator.h"
+#include "editor/editor_settings.h"
+
+#include "editor/editor_node.h"
 
 #include "core/version.h"
 
@@ -72,12 +77,12 @@ void PropEditorPlugin::convert_scene(Node *root, const String &path) {
 		res->copy_from(data);
 
 		ResourceSaver s;
-		s.save(path, res);
+		s.save(res, path);
 
 		res.unref();
 	} else {
 		ResourceSaver s;
-		s.save(path, data);
+		s.save(data, path);
 	}
 }
 
@@ -106,9 +111,7 @@ void PropEditorPlugin::_convert_selected_scene_to_prop_data(Variant param) {
 	convert_selected_scene_to_prop_data();
 }
 
-PropEditorPlugin::PropEditorPlugin(EditorNode *p_node) {
-	editor = p_node;
-
+PropEditorPlugin::PropEditorPlugin() {
 #if VERSION_MAJOR < 4
 	editor->add_tool_menu_item("Convert active scene to PropData", this, "convert_active_scene_to_prop_data");
 	editor->add_tool_menu_item("Convert selected scene(s) to PropData", this, "convert_selected_scene_to_prop_data");
@@ -128,7 +131,7 @@ PropEditorPlugin::PropEditorPlugin(EditorNode *p_node) {
 
 	b->CONNECT("pressed", this, PropEditorPlugin, _quick_convert_button_pressed);
 	b->set_text("To Prop");
-	b->set_shortcut(ED_SHORTCUT("spatial_editor/quick_prop_convert", "Quick convert scene to PropData.", KEY_MASK_ALT + KEY_U));
+	b->set_shortcut(ED_SHORTCUT("spatial_editor/quick_prop_convert", "Quick convert scene to PropData.", KeyModifierMask::ALT + Key::U));
 
 	add_control_to_container(EditorPlugin::CONTAINER_SPATIAL_EDITOR_MENU, container);
 }

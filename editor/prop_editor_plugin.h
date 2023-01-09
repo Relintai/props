@@ -23,7 +23,6 @@ SOFTWARE.
 #ifndef PROP_EDITOR_PLUGIN_H
 #define PROP_EDITOR_PLUGIN_H
 
-#include "editor/editor_node.h"
 #include "editor/editor_plugin.h"
 
 #include "core/version.h"
@@ -31,7 +30,6 @@ SOFTWARE.
 class PropEditorPlugin : public EditorPlugin {
 
 	GDCLASS(PropEditorPlugin, EditorPlugin);
-	EditorNode *editor;
 
 protected:
 	static void _bind_methods();
@@ -53,7 +51,7 @@ public:
 	void _convert_selected_scene_to_prop_data(Variant param);
 	void _quick_convert_button_pressed();
 
-	PropEditorPlugin(EditorNode *p_node);
+	PropEditorPlugin();
 	~PropEditorPlugin();
 };
 

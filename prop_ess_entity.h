@@ -37,7 +37,7 @@ SOFTWARE.
 
 class PropESSEntity : public Spatial {
 	GDCLASS(PropESSEntity, Spatial);
-	OBJ_CATEGORY("Props");
+	//OBJ_CATEGORY("Props");
 
 public:
 	PropESSEntity();

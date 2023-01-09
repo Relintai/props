@@ -90,9 +90,9 @@ public:
 	//Colliders
 	Transform collider_local_transform_get(const int index);
 	RID collider_body_get(const int index);
-	Ref<Shape> collider_shape_get(const int index);
+	Ref<Shape3D> collider_shape_get(const int index);
 	RID collider_shape_rid_get(const int index);
-	int collider_add(const Transform &local_transform, const Ref<Shape> &shape, const RID &shape_rid, const RID &body, const bool owns_shape = false);
+	int collider_add(const Transform &local_transform, const Ref<Shape3D> &shape, const RID &shape_rid, const RID &body, const bool owns_shape = false);
 	int collider_get_num() const;
 	void colliders_clear();
 
@@ -108,7 +108,7 @@ public:
 	bool debug_mesh_has();
 	void debug_mesh_clear();
 	void debug_mesh_array_clear();
-	void debug_mesh_add_vertices_to(const PoolVector3Array &arr);
+	void debug_mesh_add_vertices_to(const PackedVector3Array &arr);
 	void debug_mesh_send();
 	void draw_debug_mdr_colliders();
 
@@ -138,7 +138,7 @@ protected:
 	struct ColliderBody {
 		Transform transform;
 		RID body;
-		Ref<Shape> shape;
+		Ref<Shape3D> shape;
 		RID shape_rid;
 		bool owns_shape;
 
@@ -175,7 +175,7 @@ private:
 	//debug
 	RID _debug_mesh_rid;
 	RID _debug_mesh_instance;
-	PoolVector3Array _debug_mesh_array;
+	PackedVector3Array _debug_mesh_array;
 };
 
 #endif

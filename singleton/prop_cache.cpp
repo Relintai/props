@@ -44,7 +44,7 @@ SOFTWARE.
 #include "../material_cache/prop_material_cache.h"
 #include "../tiled_wall/tiled_wall_data.h"
 
-#include "core/hashfuncs.h"
+#include "core/templates/hashfuncs.h"
 
 #if VERSION_MAJOR > 3
 
@@ -116,10 +116,10 @@ void PropCache::set_margin(const int margin) {
 }
 #endif
 
-PoolStringArray PropCache::material_paths_get() const {
+PackedStringArray PropCache::material_paths_get() const {
 	return _material_paths;
 }
-void PropCache::material_paths_set(const PoolStringArray &value) {
+void PropCache::material_paths_set(const PackedStringArray &value) {
 	_material_paths = value;
 }
 
@@ -193,7 +193,7 @@ Ref<PropMaterialCache> PropCache::material_cache_get(const Ref<PropData> &prop) 
 	ERR_FAIL_COND_V(!prop.is_valid(), Ref<PropMaterialCache>());
 
 	//get pointer's value as uint64
-	uint64_t k = make_uint64_t<const PropData *>(*prop);
+	uint64_t k = hash_make_uint64_t<const PropData *>(*prop);
 
 	_material_cache_mutex.lock();
 
@@ -207,7 +207,7 @@ Ref<PropMaterialCache> PropCache::material_cache_get(const Ref<PropData> &prop) 
 		return m;
 	}
 
-	PropMaterialCache *p = Object::cast_to<PropMaterialCache>(ClassDB::instance(_default_prop_material_cache_class));
+	PropMaterialCache *p = Object::cast_to<PropMaterialCache>(ClassDB::instantiate(_default_prop_material_cache_class));
 
 	if (!p) {
 		ERR_PRINT("Can't instance the given PropMaterialCache! class_name: " + String(_default_prop_material_cache_class));
@@ -223,7 +223,7 @@ Ref<PropMaterialCache> PropCache::material_cache_get(const Ref<PropData> &prop) 
 }
 void PropCache::material_cache_unref(const Ref<PropData> &prop) {
 	//get pointer's value as uint64
-	uint64_t k = make_uint64_t<const PropData *>(*prop);
+	uint64_t k = hash_make_uint64_t<const PropData *>(*prop);
 
 	_material_cache_mutex.lock();
 
@@ -249,7 +249,7 @@ Ref<PropMaterialCache> PropCache::tiled_wall_material_cache_get(const Ref<TiledW
 	ERR_FAIL_COND_V(!twd.is_valid(), Ref<PropMaterialCache>());
 
 	//get pointer's value as uint64
-	uint64_t k = make_uint64_t<const TiledWallData *>(*twd);
+	uint64_t k = hash_make_uint64_t<const TiledWallData *>(*twd);
 
 	_tiled_wall_material_cache_mutex.lock();
 
@@ -263,7 +263,7 @@ Ref<PropMaterialCache> PropCache::tiled_wall_material_cache_get(const Ref<TiledW
 		return m;
 	}
 
-	PropMaterialCache *p = Object::cast_to<PropMaterialCache>(ClassDB::instance(_default_prop_material_cache_class));
+	PropMaterialCache *p = Object::cast_to<PropMaterialCache>(ClassDB::instantiate(_default_prop_material_cache_class));
 
 	if (!p) {
 		ERR_PRINT("Can't instance the given PropMaterialCache! class_name: " + String(_default_prop_material_cache_class));
@@ -279,7 +279,7 @@ Ref<PropMaterialCache> PropCache::tiled_wall_material_cache_get(const Ref<TiledW
 }
 void PropCache::tiled_wall_material_cache_unref(const Ref<TiledWallData> &twd) {
 	//get pointer's value as uint64
-	uint64_t k = make_uint64_t<const TiledWallData *>(*twd);
+	uint64_t k = hash_make_uint64_t<const TiledWallData *>(*twd);
 
 	_tiled_wall_material_cache_mutex.lock();
 
@@ -314,7 +314,7 @@ Ref<PropMaterialCache> PropCache::material_cache_custom_key_get(const uint64_t k
 		return m;
 	}
 
-	PropMaterialCache *p = Object::cast_to<PropMaterialCache>(ClassDB::instance(_default_prop_material_cache_class));
+	PropMaterialCache *p = Object::cast_to<PropMaterialCache>(ClassDB::instantiate(_default_prop_material_cache_class));
 
 	if (!p) {
 		ERR_PRINT("Can't instance the given PropMaterialCache! class_name: " + String(_default_prop_material_cache_class));
@@ -350,19 +350,7 @@ void PropCache::material_cache_custom_key_unref(const uint64_t key) {
 }
 
 Ref<Resource> PropCache::load_resource(const String &path, const String &type_hint) {
-	_ResourceLoader *rl = _ResourceLoader::get_singleton();
-
-#if VERSION_MAJOR < 4
-	Ref<ResourceInteractiveLoader> resl = rl->load_interactive(path, type_hint);
-
-	ERR_FAIL_COND_V(!resl.is_valid(), Ref<Resource>());
-
-	resl->wait();
-
-	return resl->get_resource();
-#else
-	return rl->load(path, type_hint);
-#endif
+	return ResourceLoader::load(path, type_hint);
 }
 
 PropCache::PropCache() {
@@ -387,7 +375,7 @@ PropCache::PropCache() {
 	_margin = GLOBAL_DEF("props/margin", 0);
 #endif
 
-	_material_paths = GLOBAL_DEF("props/material_paths", PoolStringArray());
+	_material_paths = GLOBAL_DEF("props/material_paths", PackedStringArray());
 }
 
 PropCache::~PropCache() {
@@ -423,7 +411,7 @@ void PropCache::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("material_paths_get"), &PropCache::material_paths_get);
 	ClassDB::bind_method(D_METHOD("material_paths_set", "value"), &PropCache::material_paths_set);
-	ADD_PROPERTY(PropertyInfo(Variant::POOL_STRING_ARRAY, "material_paths"), "material_paths_set", "material_paths_get");
+	ADD_PROPERTY(PropertyInfo(Variant::PACKED_STRING_ARRAY, "material_paths"), "material_paths_set", "material_paths_get");
 
 	ClassDB::bind_method(D_METHOD("material_add", "value"), &PropCache::material_add);
 	ClassDB::bind_method(D_METHOD("material_get", "index"), &PropCache::material_get);

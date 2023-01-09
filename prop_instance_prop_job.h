@@ -30,7 +30,7 @@ class PropInstance;
 class PropInstanceMerger;
 class PropMesherJobStep;
 class PropMaterialCache;
-class Shape;
+class Shape3D;
 class PropLight;
 class PropDataTiledWall;
 
@@ -51,7 +51,7 @@ public:
 	void add_jobs_step(const Ref<PropMesherJobStep> &step);
 	int get_jobs_step_count() const;
 
-	void add_collision_shape(const Ref<Shape> &shape, const Transform &transform, const bool owns_shape = false);
+	void add_collision_shape(const Ref<Shape3D> &shape, const Transform3D &transform, const bool owns_shape = false);
 	void clear_collision_shapes();
 
 	PropInstanceMerger *get_prop_instace();
@@ -62,11 +62,11 @@ public:
 	void set_prop_mesher(const Ref<PropMesher> &mesher);
 
 #if MESH_DATA_RESOURCE_PRESENT
-	void add_mesh(const Ref<PropDataMeshData> &mesh_data, const Transform &base_transform);
+	void add_mesh(const Ref<PropDataMeshData> &mesh_data, const Transform3D &base_transform);
 	void clear_meshes();
 #endif
 
-	void add_tiled_wall(const Ref<PropDataTiledWall> &data, const Transform &base_transform);
+	void add_tiled_wall(const Ref<PropDataTiledWall> &data, const Transform3D &base_transform);
 	void clear_tiled_walls();
 
 	void add_light(const Ref<PropLight> &light);
@@ -89,7 +89,7 @@ public:
 	void step_type_simplify_mesh();
 
 	Array merge_mesh_array(Array arr) const;
-	Array bake_mesh_array_uv(Array arr, Ref<Texture> tex, float mul_color = 0.7) const;
+	Array bake_mesh_array_uv(Array arr, Ref<Texture2D> tex, float mul_color = 0.7) const;
 
 	void reset_meshes();
 
@@ -103,18 +103,18 @@ protected:
 #if MESH_DATA_RESOURCE_PRESENT
 	struct PMDREntry {
 		Ref<PropDataMeshData> mesh_data;
-		Transform base_transform;
+		Transform3D base_transform;
 	};
 #endif
 
 	struct PTWEntry {
 		Ref<PropDataTiledWall> data;
-		Transform base_transform;
+		Transform3D base_transform;
 	};
 
 	struct CollisionShapeEntry {
-		Ref<Shape> shape;
-		Transform transform;
+		Ref<Shape3D> shape;
+		Transform3D transform;
 		bool owns_shape;
 
 		CollisionShapeEntry() {

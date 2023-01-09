@@ -61,7 +61,7 @@ void PropDataEntry::processor_process(Ref<PropData> prop_data, Node *node, const
 	call("_processor_process", prop_data, node, transform);
 }
 Node *PropDataEntry::processor_get_node_for(const Transform &transform) {
-	return call("_processor_get_node_for", transform);
+	return Object::cast_to<Node>(call("_processor_get_node_for", transform));
 }
 bool PropDataEntry::processor_evaluate_children() {
 	return call("_processor_evaluate_children");
@@ -87,24 +87,24 @@ PropDataEntry::~PropDataEntry() {
 void PropDataEntry::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_transform"), &PropDataEntry::get_transform);
 	ClassDB::bind_method(D_METHOD("set_transform", "value"), &PropDataEntry::set_transform);
-	ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM, "transform"), "set_transform", "get_transform");
+	ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform"), "set_transform", "get_transform");
 
 #if TEXTURE_PACKER_PRESENT
-	BIND_VMETHOD(MethodInfo("_add_textures_into", PropertyInfo(Variant::OBJECT, "texture_packer", PROPERTY_HINT_RESOURCE_TYPE, "TexturePacker")));
+	//BIND_VMETHOD(MethodInfo("_add_textures_into", PropertyInfo(Variant::OBJECT, "texture_packer", PROPERTY_HINT_RESOURCE_TYPE, "TexturePacker")));
 
 	ClassDB::bind_method(D_METHOD("add_textures_into", "texture_packer"), &PropDataEntry::add_textures_into);
 #endif
 
-	BIND_VMETHOD(MethodInfo(PropertyInfo(Variant::BOOL, "handles"), "_processor_handles"));
-	BIND_VMETHOD(MethodInfo("_processor_process",
-			PropertyInfo(Variant::OBJECT, "prop_data", PROPERTY_HINT_RESOURCE_TYPE, "PropData"),
-			PropertyInfo(Variant::OBJECT, "node", PROPERTY_HINT_RESOURCE_TYPE, "Node"),
-			PropertyInfo(Variant::TRANSFORM, "transform")));
+	//BIND_VMETHOD(MethodInfo(PropertyInfo(Variant::BOOL, "handles"), "_processor_handles"));
+	//BIND_VMETHOD(MethodInfo("_processor_process",
+	//		PropertyInfo(Variant::OBJECT, "prop_data", PROPERTY_HINT_RESOURCE_TYPE, "PropData"),
+	//		PropertyInfo(Variant::OBJECT, "node", PROPERTY_HINT_RESOURCE_TYPE, "Node"),
+	//		PropertyInfo(Variant::TRANSFORM3D, "transform")));
 
-	BIND_VMETHOD(MethodInfo(PropertyInfo(Variant::OBJECT, "node", PROPERTY_HINT_RESOURCE_TYPE, "Node"), "_processor_get_node_for",
-			PropertyInfo(Variant::TRANSFORM, "transform")));
+	//BIND_VMETHOD(MethodInfo(PropertyInfo(Variant::OBJECT, "node", PROPERTY_HINT_RESOURCE_TYPE, "Node"), "_processor_get_node_for",
+	//		PropertyInfo(Variant::TRANSFORM3D, "transform")));
 
-	BIND_VMETHOD(MethodInfo(PropertyInfo(Variant::BOOL, "evaluate"), "_processor_evaluate_children"));
+	//BIND_VMETHOD(MethodInfo(PropertyInfo(Variant::BOOL, "evaluate"), "_processor_evaluate_children"));
 
 	ClassDB::bind_method(D_METHOD("processor_handles", "node"), &PropDataEntry::processor_handles);
 	ClassDB::bind_method(D_METHOD("processor_process", "prop_data", "node", "transform"), &PropDataEntry::processor_process);

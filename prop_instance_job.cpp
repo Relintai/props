@@ -26,8 +26,6 @@ SOFTWARE.
 
 #include "./props/prop_data.h"
 
-#include "../opensimplex/open_simplex_noise.h"
-
 const String PropInstanceJob::BINDING_STRING_ACTIVE_BUILD_PHASE_TYPE = "Normal,Process,Physics Process";
 
 PropInstanceJob::ActiveBuildPhaseType PropInstanceJob::get_build_phase_type() {
@@ -149,8 +147,8 @@ PropInstanceJob::~PropInstanceJob() {
 }
 
 void PropInstanceJob::_bind_methods() {
-	BIND_VMETHOD(MethodInfo("_process", PropertyInfo(Variant::REAL, "delta")));
-	BIND_VMETHOD(MethodInfo("_physics_process", PropertyInfo(Variant::REAL, "delta")));
+	//BIND_VMETHOD(MethodInfo("_process", PropertyInfo(Variant::REAL, "delta")));
+	//BIND_VMETHOD(MethodInfo("_physics_process", PropertyInfo(Variant::REAL, "delta")));
 
 	ClassDB::bind_method(D_METHOD("get_build_phase_type"), &PropInstanceJob::get_build_phase_type);
 	ClassDB::bind_method(D_METHOD("set_build_phase_type", "value"), &PropInstanceJob::set_build_phase_type);
@@ -168,14 +166,14 @@ void PropInstanceJob::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("finished"), &PropInstanceJob::finished);
 
-	BIND_VMETHOD(MethodInfo("_reset"));
+	//BIND_VMETHOD(MethodInfo("_reset"));
 
 	ClassDB::bind_method(D_METHOD("reset"), &PropInstanceJob::reset);
 	ClassDB::bind_method(D_METHOD("_reset"), &PropInstanceJob::_reset);
 
 	ClassDB::bind_method(D_METHOD("_execute"), &PropInstanceJob::_execute);
 
-	BIND_VMETHOD(MethodInfo("_execute_phase"));
+	//BIND_VMETHOD(MethodInfo("_execute_phase"));
 
 	ClassDB::bind_method(D_METHOD("execute_phase"), &PropInstanceJob::execute_phase);
 	ClassDB::bind_method(D_METHOD("_execute_phase"), &PropInstanceJob::_execute_phase);
@@ -204,7 +202,7 @@ void PropInstanceJob::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("should_do", "just_check"), &PropInstanceJob::should_do, DEFVAL(false));
 	ClassDB::bind_method(D_METHOD("should_return"), &PropInstanceJob::should_return);
 
-	BIND_VMETHOD(MethodInfo("_execute"));
+	//BIND_VMETHOD(MethodInfo("_execute"));
 	ClassDB::bind_method(D_METHOD("execute"), &PropInstanceJob::execute);
 
 	ADD_SIGNAL(MethodInfo("completed"));

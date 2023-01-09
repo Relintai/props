@@ -51,7 +51,9 @@ typedef class RenderingServer VS;
 #include "jobs/prop_mesher_job_step.h"
 #include "lights/prop_light.h"
 #include "material_cache/prop_material_cache.h"
-#include "scene/3d/camera.h"
+#include "scene/3d/camera_3d.h"
+
+#include "scene/main/window.h"
 
 #if TEXTURE_PACKER_PRESENT
 #include "./singleton/prop_cache.h"
@@ -65,7 +67,7 @@ typedef class RenderingServer VS;
 
 #include "tiled_wall/tiled_wall_data.h"
 
-#include "scene/resources/box_shape.h"
+#include "scene/resources/box_shape_3d.h"
 
 const float PropInstanceMerger::LOD_CHECK_INTERVAL = 2;
 
@@ -263,8 +265,8 @@ RID PropInstanceMerger::collider_body_get(const int index) {
 	return _colliders[index].body;
 }
 
-Ref<Shape> PropInstanceMerger::collider_shape_get(const int index) {
-	ERR_FAIL_INDEX_V(index, _colliders.size(), Ref<Shape>());
+Ref<Shape3D> PropInstanceMerger::collider_shape_get(const int index) {
+	ERR_FAIL_INDEX_V(index, _colliders.size(), Ref<Shape3D>());
 
 	return _colliders[index].shape;
 }
@@ -275,7 +277,7 @@ RID PropInstanceMerger::collider_shape_rid_get(const int index) {
 	return _colliders[index].shape_rid;
 }
 
-int PropInstanceMerger::collider_add(const Transform &local_transform, const Ref<Shape> &shape, const RID &shape_rid, const RID &body, const bool owns_shape) {
+int PropInstanceMerger::collider_add(const Transform &local_transform, const Ref<Shape3D> &shape, const RID &shape_rid, const RID &body, const bool owns_shape) {
 	ERR_FAIL_COND_V(!shape.is_valid() && shape_rid == RID(), 0);
 
 	int index = _colliders.size();
@@ -346,7 +348,7 @@ void PropInstanceMerger::apply_lod_level() {
 		return;
 	}
 
-	VisualServer *vs = VisualServer::get_singleton();
+	RenderingServer *vs = RenderingServer::get_singleton();
 
 	for (int i = 0; i < _meshes.size(); ++i) {
 		RID mi = _meshes[i].mesh_instance;
@@ -383,11 +385,11 @@ void PropInstanceMerger::apply_lod_level() {
 
 void PropInstanceMerger::debug_mesh_allocate() {
 	if (_debug_mesh_rid == RID()) {
-		_debug_mesh_rid = VisualServer::get_singleton()->mesh_create();
+		_debug_mesh_rid = RenderingServer::get_singleton()->mesh_create();
 	}
 
 	if (_debug_mesh_instance == RID()) {
-		_debug_mesh_instance = VisualServer::get_singleton()->instance_create();
+		_debug_mesh_instance = RenderingServer::get_singleton()->instance_create();
 
 		if (GET_WORLD().is_valid())
 			VS::get_singleton()->instance_set_scenario(_debug_mesh_instance, GET_WORLD()->get_scenario());
@@ -399,11 +401,11 @@ void PropInstanceMerger::debug_mesh_allocate() {
 }
 void PropInstanceMerger::debug_mesh_free() {
 	if (_debug_mesh_instance != RID()) {
-		VisualServer::get_singleton()->free(_debug_mesh_instance);
+		RenderingServer::get_singleton()->free(_debug_mesh_instance);
 	}
 
 	if (_debug_mesh_rid != RID()) {
-		VisualServer::get_singleton()->free(_debug_mesh_rid);
+		RenderingServer::get_singleton()->free(_debug_mesh_rid);
 	}
 }
 bool PropInstanceMerger::debug_mesh_has() {
@@ -411,13 +413,13 @@ bool PropInstanceMerger::debug_mesh_has() {
 }
 void PropInstanceMerger::debug_mesh_clear() {
 	if (_debug_mesh_rid != RID()) {
-		VisualServer::get_singleton()->mesh_clear(_debug_mesh_rid);
+		RenderingServer::get_singleton()->mesh_clear(_debug_mesh_rid);
 	}
 }
 void PropInstanceMerger::debug_mesh_array_clear() {
 	_debug_mesh_array.resize(0);
 }
-void PropInstanceMerger::debug_mesh_add_vertices_to(const PoolVector3Array &arr) {
+void PropInstanceMerger::debug_mesh_add_vertices_to(const PackedVector3Array &arr) {
 	_debug_mesh_array.append_array(arr);
 
 	if (_debug_mesh_array.size() % 2 == 1) {
@@ -434,13 +436,13 @@ void PropInstanceMerger::debug_mesh_send() {
 	SceneTree *st = SceneTree::get_singleton();
 
 	Array arr;
-	arr.resize(VisualServer::ARRAY_MAX);
-	arr[VisualServer::ARRAY_VERTEX] = _debug_mesh_array;
+	arr.resize(RenderingServer::ARRAY_MAX);
+	arr[RenderingServer::ARRAY_VERTEX] = _debug_mesh_array;
 
-	VisualServer::get_singleton()->mesh_add_surface_from_arrays(_debug_mesh_rid, VisualServer::PRIMITIVE_LINES, arr);
+	RenderingServer::get_singleton()->mesh_add_surface_from_arrays(_debug_mesh_rid, RenderingServer::PRIMITIVE_LINES, arr);
 
 	if (st) {
-		VisualServer::get_singleton()->mesh_surface_set_material(_debug_mesh_rid, 0, SceneTree::get_singleton()->get_debug_collision_material()->get_rid());
+		RenderingServer::get_singleton()->mesh_surface_set_material(_debug_mesh_rid, 0, SceneTree::get_singleton()->get_debug_collision_material()->get_rid());
 	}
 
 	debug_mesh_array_clear();
@@ -489,7 +491,7 @@ void PropInstanceMerger::free_colliders() {
 	for (int i = 0; i < _colliders.size(); ++i) {
 		ColliderBody &e = _colliders.write[i];
 
-		PhysicsServer::get_singleton()->free(e.body);
+		PhysicsServer3D::get_singleton()->free(e.body);
 
 		e.body = RID();
 
@@ -508,7 +510,7 @@ void PropInstanceMerger::_build() {
 		return;
 	}
 
-	if (!is_inside_tree() || !get_world().is_valid()) {
+	if (!is_inside_tree() || !get_world_3d().is_valid()) {
 		queue_build();
 		return;
 	}
@@ -527,7 +529,7 @@ void PropInstanceMerger::_build() {
 
 		//this way we won't delete the user's nodes
 		if (n->get_owner() == NULL) {
-			n->queue_delete();
+			n->queue_free();
 		}
 	}
 
@@ -623,17 +625,17 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 			_job->add_tiled_wall(tiled_wall_data, t);
 
 			if (tiled_wall_data->get_collision()) {
-				Ref<BoxShape> tws;
+				Ref<BoxShape3D> tws;
 				tws.instantiate();
 
 				float hew = tiled_wall_data->get_width() / 2.0;
 				float heh = tiled_wall_data->get_heigth() / 2.0;
 
-				tws->set_extents(Vector3(hew, heh, 0.01));
+				tws->set_size(Vector3(hew, heh, 0.01));
 
 				Transform tt = t;
 				//tt.origin += Vector3(hew, heh, 0);
-				tt.translate(hew, heh, 0);
+				tt.translate_local(hew, heh, 0);
 
 				_job->add_collision_shape(tws, tt, true);
 			}
@@ -649,7 +651,7 @@ void PropInstanceMerger::_prop_preprocess(Transform transform, const Ref<PropDat
 			if (!sc.is_valid())
 				continue;
 
-			Node *n = sc->instance();
+			Node *n = sc->instantiate();
 			add_child(n);
 			n->set_owner(this);
 
@@ -705,7 +707,7 @@ void PropInstanceMerger::collision_layer_changed() {
 		const ColliderBody &c = _colliders[i];
 
 		if (c.body != RID()) {
-			PhysicsServer::get_singleton()->body_set_collision_layer(c.body, _collision_layer);
+			PhysicsServer3D::get_singleton()->body_set_collision_layer(c.body, _collision_layer);
 		}
 	}
 }
@@ -714,7 +716,7 @@ void PropInstanceMerger::collision_mask_changed() {
 		const ColliderBody &c = _colliders[i];
 
 		if (c.body != RID()) {
-			PhysicsServer::get_singleton()->body_set_collision_mask(c.body, _collision_mask);
+			PhysicsServer3D::get_singleton()->body_set_collision_mask(c.body, _collision_mask);
 		}
 	}
 }
@@ -861,7 +863,7 @@ void PropInstanceMerger::_notification(int p_what) {
 						Viewport *vp = st->get_root();
 
 						if (vp) {
-							Camera *cam = vp->get_camera();
+							Camera3D *cam = vp->get_camera_3d();
 
 							if (cam) {
 								Vector3 cam_world_pos = cam->get_global_transform().xform(Vector3());
@@ -900,7 +902,7 @@ void PropInstanceMerger::_notification(int p_what) {
 
 			_last_transform = new_transform;
 
-			VisualServer *vs = VisualServer::get_singleton();
+			RenderingServer *vs = RenderingServer::get_singleton();
 
 			for (int i = 0; i < _meshes.size(); ++i) {
 				RID mir = _meshes[i].mesh_instance;
@@ -918,7 +920,7 @@ void PropInstanceMerger::_notification(int p_what) {
 				const ColliderBody &c = _colliders[i];
 
 				if (c.body != RID()) {
-					PhysicsServer::get_singleton()->body_set_shape_transform(c.body, 0, new_transform * c.transform);
+					PhysicsServer3D::get_singleton()->body_set_shape_transform(c.body, 0, new_transform * c.transform);
 				}
 			}
 
@@ -932,7 +934,7 @@ void PropInstanceMerger::_notification(int p_what) {
 }
 
 void PropInstanceMerger::_bind_methods() {
-	BIND_VMETHOD(MethodInfo("_create_job"));
+	//BIND_VMETHOD(MethodInfo("_create_job"));
 	ClassDB::bind_method(D_METHOD("_create_job"), &PropInstanceMerger::_create_job);
 
 	ClassDB::bind_method(D_METHOD("get_job"), &PropInstanceMerger::get_job);
@@ -949,11 +951,11 @@ void PropInstanceMerger::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("get_first_lod_distance_squared"), &PropInstanceMerger::get_first_lod_distance_squared);
 	ClassDB::bind_method(D_METHOD("set_first_lod_distance_squared", "value"), &PropInstanceMerger::set_first_lod_distance_squared);
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "first_lod_distance_squared"), "set_first_lod_distance_squared", "get_first_lod_distance_squared");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "first_lod_distance_squared"), "set_first_lod_distance_squared", "get_first_lod_distance_squared");
 
 	ClassDB::bind_method(D_METHOD("get_lod_reduction_distance_squared"), &PropInstanceMerger::get_lod_reduction_distance_squared);
 	ClassDB::bind_method(D_METHOD("set_lod_reduction_distance_squared", "value"), &PropInstanceMerger::set_lod_reduction_distance_squared);
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "lod_reduction_distance_squared"), "set_lod_reduction_distance_squared", "get_lod_reduction_distance_squared");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "lod_reduction_distance_squared"), "set_lod_reduction_distance_squared", "get_lod_reduction_distance_squared");
 
 	///Materials
 	ClassDB::bind_method(D_METHOD("material_get", "index"), &PropInstanceMerger::material_get);

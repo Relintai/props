@@ -65,7 +65,7 @@ public:
 	void set_collision_mask(uint32_t p_mask);
 
 	AABB get_aabb() const;
-	PoolVector<Face3> get_faces(uint32_t p_usage_flags) const;
+	Vector<Face3> get_faces(uint32_t p_usage_flags) const;
 
 	void refresh();
 	void generate_mesh();

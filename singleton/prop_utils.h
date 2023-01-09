@@ -53,7 +53,7 @@ public:
 	static PropUtils *get_singleton();
 
 	Ref<PropData> convert_tree(Node *root);
-	void _convert_tree(Ref<PropData> prop_data, Node *node, const Transform &transform);
+	void _convert_tree(Ref<PropData> prop_data, Node *node, const Transform3D &transform);
 
 #if VERSION_MINOR >= 4
 	bool generate_room_points_node(Node *node);

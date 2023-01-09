@@ -60,7 +60,7 @@ using PoolVector = Vector<N>;
 #include "../terraman/data/terrain_light.h"
 #endif
 
-class OpenSimplexNoise;
+class FastNoiseLite;
 class PropLight;
 class PropMaterialCache;
 class TiledWallData;
@@ -145,14 +145,14 @@ public:
 
 	void reset();
 
-	void add_tiled_wall_simple(const int width, const int height, const Transform &transform, const Ref<TiledWallData> &tiled_wall_data, Ref<PropMaterialCache> cache);
-	void add_tiled_wall_mesh_rect_simple(const int x, const int y, const Transform &transform, const Rect2 &texture_rect);
+	void add_tiled_wall_simple(const int width, const int height, const Transform3D &transform, const Ref<TiledWallData> &tiled_wall_data, Ref<PropMaterialCache> cache);
+	void add_tiled_wall_mesh_rect_simple(const int x, const int y, const Transform3D &transform, const Rect2 &texture_rect);
 	Vector2 transform_uv(const Vector2 &uv, const Rect2 &rect) const;
 
 #ifdef MESH_DATA_RESOURCE_PRESENT
 	void add_mesh_data_resource(Ref<MeshDataResource> mesh, const Vector3 position = Vector3(0, 0, 0), const Vector3 rotation = Vector3(0, 0, 0), const Vector3 scale = Vector3(1.0, 1.0, 1.0), const Rect2 uv_rect = Rect2(0, 0, 1, 1));
-	void add_mesh_data_resource_transform(Ref<MeshDataResource> mesh, const Transform transform, const Rect2 uv_rect = Rect2(0, 0, 1, 1));
-	void add_mesh_data_resource_transform_colored(Ref<MeshDataResource> mesh, const Transform transform, const PoolColorArray &colors, const Rect2 uv_rect = Rect2(0, 0, 1, 1));
+	void add_mesh_data_resource_transform(Ref<MeshDataResource> mesh, const Transform3D transform, const Rect2 uv_rect = Rect2(0, 0, 1, 1));
+	void add_mesh_data_resource_transform_colored(Ref<MeshDataResource> mesh, const Transform3D transform, const PackedColorArray &colors, const Rect2 uv_rect = Rect2(0, 0, 1, 1));
 #endif
 
 	void generate_ao();
@@ -173,7 +173,7 @@ public:
 	void bake_colors_lights();
 
 #ifdef TERRAMAN_PRESENT
-	void bake_lights(MeshInstance *node, Vector<Ref<TerrainLight>> &lights);
+	void bake_lights(MeshInstance3D *node, Vector<Ref<TerrainLight>> &lights);
 #endif
 
 	Array build_mesh();
@@ -253,7 +253,7 @@ protected:
 	Rect2 _uv_margin;
 	int _build_flags;
 
-	Ref<OpenSimplexNoise> _noise;
+	Ref<FastNoiseLite> _noise;
 	float _rao_scale_factor;
 	int _rao_seed;
 };
